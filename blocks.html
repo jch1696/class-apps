@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>쌓기나무 관찰실</title><style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: 3D 무대(왼쪽, 크게) + 쌓는 판(오른쪽), 아래에 위·앞·옆 세 장의 관찰 카드. 방향마다 고유 색. */
+:root{
+  --bg:#EDF1F3; --panel:#FFFFFF; --ink:#1D2B36; --muted:#5C6B77; --line:#C9D3DA; --floor:#DCE4E9;
+  --top:#F6D27A; --front:#E3AE4A; --side:#C08A2B; --edge:#6B4A12; --on-block:#3A2706;
+  --c-top:#2F6FDB; --c-front:#D9482B; --c-side:#1E8E5A;
+  --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141B21; --panel:#1D262E; --ink:#E8EEF2; --muted:#9AA8B3; --line:#34424D; --floor:#232E37;
+  --top:#EFC666; --front:#CF9A3A; --side:#A47422; --edge:#3A2706; --on-block:#3A2706;
+  --c-top:#6FA3F5; --c-front:#F0775C; --c-side:#4FC08A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141B21; --panel:#1D262E; --ink:#E8EEF2; --muted:#9AA8B3; --line:#34424D; --floor:#232E37;
+  --top:#EFC666; --front:#CF9A3A; --side:#A47422; --edge:#3A2706; --on-block:#3A2706;
+  --c-top:#6FA3F5; --c-front:#F0775C; --c-side:#4FC08A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:20px 40px;display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(26px,4vw,36px);margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0}
+.count{font-family:var(--display);font-size:20px;background:var(--top);color:var(--on-block);padding:4px 14px;border-radius:999px}
+.main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px}
+@media (max-width:760px){.main{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+canvas{width:100%;aspect-ratio:4/3;max-width:100%;display:block;border-radius:10px;background:var(--bg);touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+.hint{color:var(--muted);font-size:14px;margin:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font-family:var(--display);font-size:16px;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer}
+button:hover{border-color:var(--ink)}
+button:focus-visible{outline:3px solid var(--c-top);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.t{background:var(--c-top)}.f{background:var(--c-front)}.s{background:var(--c-side)}
+.board{display:grid;grid-template-columns:repeat(5,1fr) auto;gap:6px;align-items:center;max-width:340px;width:100%;margin:0 auto}
+.cell{aspect-ratio:1;padding:0;font-size:22px;border-radius:8px;background:var(--bg);color:var(--muted)}
+.cell.on{background:var(--top);color:var(--on-block);border-color:var(--edge)}
+.lab{font-family:var(--display);font-size:15px;text-align:center}
+.lab.fr{grid-column:1/6;color:var(--c-front)}
+.lab.sd{grid-row:1/6;grid-column:6;color:var(--c-side);writing-mode:vertical-rl;padding-left:2px}
+.views{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.views{grid-template-columns:minmax(0,1fr)}}
+.card h2{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card button{font-size:14px;padding:4px 10px}
+.vt{color:var(--c-top)}.vf{color:var(--c-front)}.vs{color:var(--c-side)}
+.shape{min-height:170px;display:flex;align-items:center;justify-content:center}
+.shape svg,.layers svg{max-width:100%;height:auto}
+.q{font-family:var(--display);font-size:72px;color:var(--line)}
+.empty{color:var(--muted);font-size:14px}
+svg rect{fill:var(--top);stroke:var(--edge);stroke-width:2}
+svg text{fill:var(--on-block);font-family:var(--display);font-size:16px;text-anchor:middle;dominant-baseline:central}
+.layers{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end}
+.layers figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.layers figcaption{font-family:var(--display);font-size:15px;color:var(--muted)}
+label.chk{font-size:14px;display:flex;align-items:center;gap:6px;cursor:pointer}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>쌓기나무 관찰실</h1>
+    <span class="count" id="count">쌓기나무 0개</span>
+  </header>
+
+  <div class="main">
+    <section class="panel">
+      <canvas id="stage" aria-label="쌓기나무 입체 모양"></canvas>
+      <div class="row" id="presets">
+        <button data-v="35,28">비스듬히</button>
+        <button data-v="0,90"><span class="dot t"></span>위에서</button>
+        <button data-v="0,0"><span class="dot f"></span>앞에서</button>
+        <button data-v="90,0"><span class="dot s"></span>옆에서</button>
+      </div>
+      <p class="hint">입체 모양을 끌면 돌려 볼 수 있어요.</p>
+    </section>
+
+    <section class="panel">
+      <h2>쌓는 판 (위에서 본 자리)</h2>
+      <div class="row">
+        <button id="mAdd" aria-pressed="true">쌓기 +1</button>
+        <button id="mSub" aria-pressed="false">빼기 −1</button>
+      </div>
+      <div class="board" id="board"></div>
+      <p class="hint">칸을 누르면 그 자리에 한 개씩 쌓여요. 숫자는 쌓인 개수입니다. (한 칸에 5개까지)</p>
+      <div class="row">
+        <button id="bEx">예시 모양</button>
+        <button id="bRnd">새 문제 (무작위)</button>
+        <button id="bClr">모두 지우기</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="views">
+    <section class="panel card"><h2><span class="vt">위에서 본 모양</span><button data-h="top">보기</button></h2><div class="shape" id="vTop"></div>
+      <label class="chk" for="num"><input type="checkbox" id="num"> 각 자리에 쌓인 개수 쓰기</label></section>
+    <section class="panel card"><h2><span class="vf">앞에서 본 모양</span><button data-h="front">보기</button></h2><div class="shape" id="vFront"></div></section>
+    <section class="panel card"><h2><span class="vs">옆에서 본 모양</span><button data-h="side">보기</button></h2><div class="shape" id="vSide"></div></section>
+  </div>
+
+  <section class="panel card">
+    <h2><span>층별로 나타낸 모양</span><button data-h="layers">보기</button></h2>
+    <div class="layers" id="layers"></div>
+  </section>
+</div>
+
+<script>
+const N=5, MAX=5;
+const EX=[[0,0,0,0,0],[0,3,1,0,0],[0,2,1,1,0],[0,1,0,0,0],[0,0,0,0,0]];
+let H=EX.map(r=>r.slice());
+try{const s=JSON.parse(localStorage.getItem('ssakgi')||'null'); if(Array.isArray(s)&&s.length===N) H=s;}catch(e){}
+let mode='add', cam={t:35,p:28}, hide={top:true,front:true,side:true,layers:true}, showNum=false;
+const $=id=>document.getElementById(id);
+const cv=$('stage'), ctx=cv.getContext('2d');
+
+/* ---------- 쌓는 판 ---------- */
+const board=$('board'), cells=[];
+for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+  const b=document.createElement('button'); b.className='cell'; b.style.gridRow=r+1; b.style.gridColumn=c+1;
+  b.addEventListener('click',()=>change(r,c,mode==='add'?1:-1));
+  b.addEventListener('contextmenu',e=>{e.preventDefault();change(r,c,-1);});
+  board.appendChild(b); cells.push(b);
+}
+board.insertAdjacentHTML('beforeend','<div class="lab sd">옆 (오른쪽)</div><div class="lab fr">▼ 앞</div>');
+function change(r,c,d){H[r][c]=Math.max(0,Math.min(MAX,H[r][c]+d));update();}
+function setMode(m){mode=m;$('mAdd').setAttribute('aria-pressed',m==='add');$('mSub').setAttribute('aria-pressed',m==='sub');}
+$('mAdd').onclick=()=>setMode('add'); $('mSub').onclick=()=>setMode('sub');
+$('bEx').onclick=()=>{H=EX.map(r=>r.slice());update();};
+$('bClr').onclick=()=>{H=H.map(r=>r.map(()=>0));update();};
+$('bRnd').onclick=()=>{
+  const pool=[0,1,1,1,2,2,3];
+  H=H.map((row,r)=>row.map((_,c)=>(r>=1&&r<=3&&c>=1&&c<=3)?pool[Math.floor(Math.random()*pool.length)]:0));
+  if(!H[2][2])H[2][2]=1; update();
+};
+$('num').onchange=e=>{showNum=e.target.checked;renderViews();};
+document.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{const k=b.dataset.h;hide[k]=!hide[k];b.textContent=hide[k]?'보기':'가리기';renderViews();});
+
+/* ---------- 평면 모양 ---------- */
+function svg(cols,rows,map){
+  const s=30,p=2; let o=`<svg width="${cols*s+p*2}" height="${rows*s+p*2}" viewBox="0 0 ${cols*s+p*2} ${rows*s+p*2}">`;
+  for(const k in map){const [x,y]=k.split(',').map(Number);
+    o+=`<rect x="${p+x*s}" y="${p+y*s}" width="${s}" height="${s}"/>`;
+    if(map[k]!=='')o+=`<text x="${p+x*s+s/2}" y="${p+y*s+s/2+1}">${map[k]}</text>`;}
+  return o+'</svg>';
+}
+function renderViews(){
+  let total=0,maxH=0,c0=N,c1=-1,r0=N,r1=-1;
+  const colMax=Array(N).fill(0),rowMax=Array(N).fill(0);
+  H.forEach((row,r)=>row.forEach((h,c)=>{total+=h; if(h){maxH=Math.max(maxH,h);c0=Math.min(c0,c);c1=Math.max(c1,c);r0=Math.min(r0,r);r1=Math.max(r1,r);colMax[c]=Math.max(colMax[c],h);rowMax[r]=Math.max(rowMax[r],h);}}));
+  $('count').textContent=`쌓기나무 ${total}개`;
+  cells.forEach((b,i)=>{const h=H[Math.floor(i/N)][i%N];b.textContent=h||'';b.classList.toggle('on',h>0);b.setAttribute('aria-label',`${Math.floor(i/N)+1}행 ${i%N+1}열, ${h}개`);});
+  const empty='<span class="empty">쌓기나무를 놓아 보세요</span>', q='<span class="q">?</span>';
+  const put=(id,key,html)=>{$(id).innerHTML=hide[key]?q:(total?html:empty);};
+  const top={},front={},side={};
+  if(total){
+    for(let r=r0;r<=r1;r++)for(let c=c0;c<=c1;c++)if(H[r][c])top[`${c-c0},${r-r0}`]=showNum?H[r][c]:'';
+    for(let c=c0;c<=c1;c++)for(let y=0;y<colMax[c];y++)front[`${c-c0},${maxH-1-y}`]='';
+    for(let r=r1;r>=r0;r--)for(let y=0;y<rowMax[r];y++)side[`${r1-r},${maxH-1-y}`]='';
+  }
+  put('vTop','top',svg(c1-c0+1,r1-r0+1,top));
+  put('vFront','front',svg(c1-c0+1,maxH,front));
+  put('vSide','side',svg(r1-r0+1,maxH,side));
+  let L='';
+  for(let k=1;k<=maxH;k++){const m={};for(let r=r0;r<=r1;r++)for(let c=c0;c<=c1;c++)if(H[r][c]>=k)m[`${c-c0},${r-r0}`]='';
+    L+=`<figure>${svg(c1-c0+1,r1-r0+1,m)}<figcaption>${k}층</figcaption></figure>`;}
+  $('layers').innerHTML=hide.layers?q:(L||empty);
+}
+
+/* ---------- 입체 모양 ---------- */
+function draw(){
+  const cs=getComputedStyle(document.documentElement), col=n=>cs.getPropertyValue(n).trim();
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth, h=cv.clientHeight;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h);
+  const t=cam.t*Math.PI/180, p=cam.p*Math.PI/180, ct=Math.cos(t), st=Math.sin(t), cp=Math.cos(p), sp=Math.sin(p);
+  const S=Math.min(w,h)/(N*1.55), yc=1.2*cp;
+  const P=(x,y,z)=>{const d=x*st+z*ct; return [w/2+(x*ct-z*st)*S, h/2+yc*S-(y*cp-d*sp)*S];};
+  const v=[st*cp,sp,ct*cp], e=1e-3, g=N/2;
+  const quad=(a,fill,stroke,lw)=>{ctx.beginPath();a.forEach((q,i)=>{const s=P(q[0],q[1],q[2]);i?ctx.lineTo(s[0],s[1]):ctx.moveTo(s[0],s[1]);});ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill();}ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();};
+  ctx.lineJoin='round';
+  quad([[-g,0,-g],[g,0,-g],[g,0,g],[-g,0,g]],col('--floor'),col('--line'),1.5);
+  ctx.beginPath();
+  for(let i=1;i<N;i++){let a=P(-g+i,0,-g),b=P(-g+i,0,g);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);a=P(-g,0,-g+i);b=P(g,0,-g+i);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);}
+  ctx.strokeStyle=col('--line');ctx.lineWidth=1;ctx.stroke();
+  const cubes=[];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)for(let k=0;k<H[r][c];k++){
+    const x=c-g,z=r-g; cubes.push({x,z,k,d:(x+.5)*v[0]+(k+.5)*v[1]+(z+.5)*v[2]});}
+  cubes.sort((a,b)=>a.d-b.d);
+  const cT=col('--top'),cF=col('--front'),cS=col('--side'),cE=col('--edge');
+  for(const q of cubes){const x0=q.x,x1=x0+1,z0=q.z,z1=z0+1,y0=q.k,y1=y0+1;
+    if(v[2]>e)quad([[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]],cF,cE,1.5);
+    else if(v[2]<-e)quad([[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0]],cF,cE,1.5);
+    if(v[0]>e)quad([[x1,y0,z0],[x1,y0,z1],[x1,y1,z1],[x1,y1,z0]],cS,cE,1.5);
+    else if(v[0]<-e)quad([[x0,y0,z0],[x0,y0,z1],[x0,y1,z1],[x0,y1,z0]],cS,cE,1.5);
+    if(v[1]>e)quad([[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1]],cT,cE,1.5);
+  }
+  ctx.font='18px Jua, "Malgun Gothic", sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  let a=P(0,0,g+.7);ctx.fillStyle=col('--c-front');ctx.fillText('앞',a[0],a[1]);
+  a=P(g+.7,0,0);ctx.fillStyle=col('--c-side');ctx.fillText('옆',a[0],a[1]);
+}
+let drag=null;
+cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId);anim=null;});
+cv.addEventListener('pointermove',e=>{if(!drag)return;cam.t-=(e.clientX-drag.x)*.5;cam.p=Math.max(0,Math.min(90,cam.p+(e.clientY-drag.y)*.5));drag={x:e.clientX,y:e.clientY};draw();});
+cv.addEventListener('pointerup',()=>drag=null); cv.addEventListener('pointercancel',()=>drag=null);
+let anim=null;
+document.querySelectorAll('#presets button').forEach(b=>b.onclick=()=>{
+  const [tt,tp]=b.dataset.v.split(',').map(Number);
+  let from=((cam.t%360)+540)%360-180; if(from-tt>180)from-=360; if(tt-from>180)from+=360;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){cam={t:tt,p:tp};draw();return;}
+  const me=anim={}, f={t:from,p:cam.p}, t0=performance.now();
+  (function step(now){if(anim!==me)return;let u=Math.min(1,(now-t0)/600);u=u*u*(3-2*u);
+    cam.t=f.t+(tt-f.t)*u;cam.p=f.p+(tp-f.p)*u;draw();if(u<1)requestAnimationFrame(step);})(t0);
+});
+function update(){renderViews();draw();try{localStorage.setItem('ssakgi',JSON.stringify(H));}catch(e){}}
+new ResizeObserver(draw).observe(cv);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
+update();
+</script>
+
+</body></html>
