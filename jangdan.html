@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>장단 놀이터</title>
+<style>
+:root{--bg:#f3f1ea;--surface:#fff;--surface2:#f8f6f0;--ink:#1f2430;--muted:#687083;--line:#d9d5c8;--accent:#3d5a98;--accent-ink:#fff;--c1:#e2513a;--c2:#f2b84b;--c3:#3aa6b5;--c4:#5aa33c;--ok:#2e7d4f;--bad:#c2372d;--shadow:0 1px 2px rgba(30,30,40,.07),0 8px 22px -12px rgba(30,30,40,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161b;--surface:#1d2027;--surface2:#242832;--ink:#e9ebf1;--muted:#9aa2b4;--line:#3a4050;--accent:#8fb0ee;--accent-ink:#10182a;--c1:#ff8a73;--c2:#f2b84b;--c3:#5cc3d4;--c4:#8fd070;--ok:#6fcf97;--bad:#ff8a7a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -14px rgba(0,0,0,.7)}}
+:root[data-theme="dark"]{--bg:#14161b;--surface:#1d2027;--surface2:#242832;--ink:#e9ebf1;--muted:#9aa2b4;--line:#3a4050;--accent:#8fb0ee;--accent-ink:#10182a;--c1:#ff8a73;--c2:#f2b84b;--c3:#5cc3d4;--c4:#8fd070;--ok:#6fcf97;--bad:#ff8a7a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -14px rgba(0,0,0,.7)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:10px}
+h1{margin:0;font-size:clamp(20px,3vw,26px)}
+header p{margin:0;color:var(--muted);font-size:13.5px}
+h2{margin:0 0 6px;font-size:17px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lab{font-size:12.5px;font-weight:700;color:var(--muted)}
+button{font:inherit;cursor:pointer}
+.btn,.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:14px;font-weight:600}
+.chip{border-radius:999px;background:var(--surface2)}
+.btn.primary,.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:3px}
+.tabs button{border:0;background:none;color:var(--muted);font-weight:700;font-size:14.5px;padding:8px 14px;border-radius:9px}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+svg{display:block;width:100%;height:auto}
+svg text{fill:var(--ink);font-family:inherit}
+input[type=range]{flex:1;min-width:140px;accent-color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px}
+.stats div{background:var(--surface2);border-radius:10px;padding:8px 11px}
+.stats span{font-size:12px;color:var(--muted);display:block}
+.stats b{font-size:19px;font-variant-numeric:tabular-nums}
+.stats .hot{outline:2.5px solid var(--c1)}
+.say{background:var(--surface2);border-left:5px solid var(--accent);border-radius:8px;padding:9px 12px;margin:8px 0 0;font-size:15px}
+.say b{color:var(--c1)}
+.formula{font-size:clamp(16px,2.4vw,21px);font-weight:700;text-align:center;margin:10px 0 0;line-height:1.7}
+.formula i{font-style:normal;color:var(--c1)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.hidden{display:none!important}
+.note{color:var(--muted);font-size:13.5px;margin:6px 0 0}
+input[type=number]{font:inherit;width:110px;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink)}
+.msg{font-weight:700;min-height:24px;margin:8px 0 0}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+
+.q{font-weight:700;margin:10px 0 6px;font-size:16px}
+.opt{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 14px;font-size:15px;font-weight:600}
+.opt.right{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--bad);color:var(--bad);opacity:.7}
+.opt:disabled{cursor:default}
+.found{background:var(--surface2);border:2px solid var(--ok);border-radius:10px;padding:10px 13px;margin:10px 0 0;font-size:16px;font-weight:600}
+.found small{display:block;font-weight:700;color:var(--ok);font-size:12.5px;letter-spacing:.04em;margin-bottom:2px}
+.found i{font-style:normal;color:var(--c1)}
+.todo{color:var(--muted);font-size:14.5px;margin:8px 0 0}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:center;font-size:15px}
+th{background:var(--surface2);font-size:13px;color:var(--muted)}
+td input[type=number]{width:90px}
+.steps{counter-reset:s}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.qa{margin-top:4px}
+
+.jg{display:grid;gap:10px;margin-top:6px}
+.beat{border:2px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--surface)}
+.beat>span{display:block;text-align:center;font-size:12px;font-weight:700;color:var(--muted);background:var(--surface2);padding:2px 0;border-bottom:1px solid var(--line)}
+.cells{display:grid;grid-template-columns:repeat(3,1fr)}
+.cell{border:0;border-left:1px dashed var(--line);background:none;color:var(--ink);padding:6px 0 7px;min-height:86px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;font-size:clamp(11px,1.5vw,15px);font-weight:700;font-family:inherit}
+.cell:first-child{border-left:0}
+.cell svg{width:34px;height:40px}
+.cell svg *{stroke:var(--ink);fill:none;stroke-width:2.6}
+.cell svg .dot{fill:var(--ink);stroke:none}
+.cell.now{background:var(--c2);color:#2a2000}
+.cell.now svg *{stroke:#2a2000}.cell.now svg .dot{fill:#2a2000}
+.cell.hit{background:var(--ok);color:#fff}.cell.hit svg *{stroke:#fff}.cell.hit svg .dot{fill:#fff}
+.cell.miss{background:var(--bad);color:#fff}.cell.miss svg *{stroke:#fff}.cell.miss svg .dot{fill:#fff}
+.cell.edit{cursor:pointer}
+.cell.edit:hover{background:var(--surface2)}
+.hide .cell>*{visibility:hidden}
+.pads{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
+.pad{border:2px solid var(--ink);border-radius:14px;padding:16px 6px;font-size:20px;font-weight:800;background:var(--surface);color:var(--ink);touch-action:manipulation;user-select:none}
+.pad small{display:block;font-size:12px;font-weight:600;color:var(--muted)}
+.pad:active,.pad.on{background:var(--c2);color:#2a2000}
+.drum .hd{fill:var(--surface2);stroke:var(--ink);stroke-width:3}
+.drum .body{fill:var(--c2);stroke:var(--ink);stroke-width:3}
+.drum .on{fill:var(--c1)}
+.drum text{font-weight:700;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13.5px;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend svg{width:20px;height:24px}.legend svg *{stroke:var(--ink);fill:none;stroke-width:2.6}.legend svg .dot{fill:var(--ink);stroke:none}
+</style>
+</head><body>
+<div class="app">
+  <header><h1>장단 놀이터</h1><p>장구 장단을 듣고, 보고, 따라 치고, 직접 만들어 봐요</p></header>
+  <div class="card">
+    <div class="tabs" role="tablist">
+      <button data-tab="see" role="tab" aria-selected="true">① 듣고 보기</button>
+      <button data-tab="tap" role="tab" aria-selected="false">② 따라 치기</button>
+      <button data-tab="make" role="tab" aria-selected="false">③ 장단 바꾸기</button>
+      <button data-tab="quiz" role="tab" aria-selected="false">④ 듣고 맞히기</button>
+    </div>
+    <div class="row" id="jdRow" style="margin-top:10px"><span class="lab">장단</span><span class="row" id="jds"></span></div>
+  </div>
+
+  <div class="card" id="stage">
+    <div class="grid2" style="align-items:center">
+      <div>
+        <h2 id="jdTitle"></h2>
+        <p class="todo" id="jdInfo" style="margin-top:0"></p>
+        <div class="row" style="margin-top:8px"><button class="btn primary" id="play">▶ 장단 듣기</button><span class="lab">빠르기</span><input type="range" id="tempo" min="40" max="150" value="90" aria-label="빠르기"><b id="tempoL"></b></div>
+      </div>
+      <svg class="drum" id="drum" viewBox="0 0 420 170" role="img" aria-label="장구"></svg>
+    </div>
+    <div class="jg" id="grid"></div>
+    <div class="legend" id="legend"></div>
+    <div id="x-see"><p class="say" id="seeSay"></p></div>
+    <div id="x-tap" class="hidden">
+      <div class="pads"><button class="pad" data-p="K">쿵<small>북편 (왼손) · F</small></button><button class="pad" data-p="D">덩<small>양손 · 스페이스</small></button><button class="pad" data-p="T">덕<small>채편 (오른손) · J</small></button></div>
+      <div class="row" style="margin-top:8px"><button class="chip" id="guide" aria-pressed="true">장단 소리 켜기</button><span class="msg" id="tapMsg" style="margin:0"></span></div>
+      <p class="note">노란 칸이 지나갈 때 맞는 단추를 쳐요. 기덕과 더러러러는 「덕」 단추로 쳐요. 익숙해지면 장단 소리를 끄고 혼자 쳐 보세요.</p>
+    </div>
+    <div id="x-make" class="hidden">
+      <div class="row" style="margin-top:8px"><button class="btn" id="mkReset">기본 장단으로 되돌리기</button><button class="btn" id="mkClear">모두 비우기</button></div>
+      <p class="note">칸을 누를 때마다 덩 → 쿵 → 덕 → 기덕 → 더러러러 → 빈칸으로 바뀌어요. 기본 장단에서 한두 칸만 바꿔 변형 장단을 만들고 들어 보세요.</p>
+    </div>
+    <div id="x-quiz" class="hidden">
+      <div class="row" style="margin-top:8px"><button class="btn primary" id="qPlay">▶ 문제 듣기</button></div>
+      <div class="qa" id="qBox"></div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  function $(id){return document.getElementById(id);}
+  var NAME={D:"덩",K:"쿵",T:"덕",G:"기덕",R:"더러러러"};
+  var SYM={D:'<circle cx="17" cy="20" r="10"/><line x1="17" y1="3" x2="17" y2="37"/>',K:'<circle cx="17" cy="20" r="10"/>',T:'<line x1="17" y1="5" x2="17" y2="35"/>',G:'<line x1="19" y1="8" x2="19" y2="35"/><circle class="dot" cx="11" cy="6" r="3"/>',R:'<line x1="12" y1="5" x2="12" y2="35"/><circle class="dot" cx="21" cy="12" r="2.4"/><circle class="dot" cx="21" cy="20" r="2.4"/><circle class="dot" cx="21" cy="28" r="2.4"/>'};
+  var JD=[
+    {id:"semachi",name:"세마치장단",bpm:90,p:["D","","","D","","T","K","T",""],info:"3박 · 한 박을 셋으로 나눠요 · 조금 빠르게",song:"아리랑, 도라지타령"},
+    {id:"jajin",name:"자진모리장단",bpm:100,p:["D","","","K","","","K","","T","K","",""],info:"4박 · 한 박을 셋으로 나눠요 · 빠르게",song:"군밤타령, 자진강강술래"},
+    {id:"gut",name:"굿거리장단",bpm:60,p:["D","","G","K","R","","K","","G","K","R",""],info:"4박 · 한 박을 셋으로 나눠요 · 조금 느리고 흥겹게",song:"늴리리야, 풍년가"},
+    {id:"jungjung",name:"중중모리장단",bpm:80,p:["D","","T","K","T","T","K","K","T","K","K",""],info:"4박 · 한 박을 셋으로 나눠요 · 보통 빠르기",song:"강강술래"}];
+  var S={i:1,tab:"see",pat:JD[1].p.slice(),playing:false,slot:-1,timer:null,guide:true,exp:[],quiz:null};
+
+  /* ---------- 소리 ---------- */
+  var AC=null,out=null,noise=null;
+  function audio(){if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C();out=AC.createGain();out.gain.value=.9;var cp=AC.createDynamicsCompressor();out.connect(cp);cp.connect(AC.destination);
+      noise=AC.createBuffer(1,AC.sampleRate*.3,AC.sampleRate);var d=noise.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+    if(AC.state==="suspended")AC.resume();return AC;}
+  function kung(t,v){var a=audio();if(!a)return;var o=a.createOscillator(),g=a.createGain();o.type="sine";o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(58,t+.2);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v||.95,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+.42);o.connect(g);g.connect(out);o.start(t);o.stop(t+.45);}
+  function deok(t,v){var a=audio();if(!a)return;v=v||.7;var s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=noise;f.type="bandpass";f.frequency.value=2100;f.Q.value=.9;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+.085);s.connect(f);f.connect(g);g.connect(out);s.start(t);s.stop(t+.1);
+    var o=a.createOscillator(),g2=a.createGain();o.type="triangle";o.frequency.setValueAtTime(520,t);o.frequency.exponentialRampToValueAtTime(330,t+.06);g2.gain.setValueAtTime(v*.45,t);g2.gain.exponentialRampToValueAtTime(.0001,t+.07);o.connect(g2);g2.connect(out);o.start(t);o.stop(t+.08);}
+  function stroke(c,t,dur){if(c==="D"){kung(t);deok(t);}else if(c==="K")kung(t);else if(c==="T")deok(t);
+    else if(c==="G"){deok(t,.3);deok(t+Math.min(.09,dur*.3),.75);}
+    else if(c==="R"){var gap=Math.min(.075,dur/4.4);[.6,.42,.3,.22].forEach(function(v,k){deok(t+k*gap,v);});}}
+
+  /* ---------- 장구 그림 ---------- */
+  $("drum").innerHTML='<path class="body" d="M95 35 Q210 95 325 35 L325 135 Q210 75 95 135 Z"/><ellipse class="hd" id="hdL" cx="95" cy="85" rx="26" ry="62"/><ellipse class="hd" id="hdR" cx="325" cy="85" rx="26" ry="62"/><text x="95" y="165" text-anchor="middle">북편 (쿵)</text><text x="325" y="165" text-anchor="middle">채편 (덕)</text>';
+  function flash(c){var L=c==="D"||c==="K",R=c!=="K";if(L){$("hdL").classList.add("on");setTimeout(function(){$("hdL").classList.remove("on");},130);}if(R){$("hdR").classList.add("on");setTimeout(function(){$("hdR").classList.remove("on");},130);}}
+
+  /* ---------- 정간 ---------- */
+  function drawGrid(){var g=$("grid"),n=S.pat.length/3;g.style.gridTemplateColumns="repeat("+n+",1fr)";g.innerHTML="";g.classList.toggle("hide",S.tab==="quiz"&&S.quiz&&!S.quiz.done);
+    for(var b=0;b<n;b++){var bt=document.createElement("div");bt.className="beat";bt.innerHTML="<span>"+(b+1)+"박</span><div class='cells'></div>";
+      for(var k=0;k<3;k++){(function(idx){var c=S.pat[idx],el=document.createElement("button");el.className="cell"+(S.tab==="make"?" edit":"");el.dataset.i=idx;el.setAttribute("aria-label",(idx+1)+"번째 칸 "+(NAME[c]||"빈칸"));
+          el.innerHTML=c?'<svg viewBox="0 0 34 40">'+SYM[c]+'</svg><span>'+NAME[c]+'</span>':'<span>&nbsp;</span>';
+          if(S.tab==="make")el.onclick=function(){var o=["","D","K","T","G","R"];S.pat[idx]=o[(o.indexOf(S.pat[idx])+1)%o.length];drawGrid();};
+          bt.lastChild.appendChild(el);})(b*3+k);}
+      g.appendChild(bt);}}
+  function cell(i){return $("grid").querySelector('[data-i="'+i+'"]');}
+
+  /* ---------- 재생 ---------- */
+  function slotDur(){return 60/(+$("tempo").value)/3;}
+  function stop(){S.playing=false;clearTimeout(S.timer);S.slot=-1;$("play").textContent="▶ 장단 듣기";Array.prototype.forEach.call($("grid").querySelectorAll(".now"),function(e){e.classList.remove("now");});}
+  function start(cycles,done){var a=audio();stop();S.playing=true;$("play").textContent="■ 멈추기";S.exp=[];var i=0,count=0,total=0,ok=0;
+    (function tick(){if(!S.playing)return;var d=slotDur(),c=S.pat[i],now=performance.now();
+      if(i===0&&count>0&&S.tab==="tap"){$("tapMsg").className="msg "+(ok>=total*.8?"ok":"");$("tapMsg").textContent="이번 장단: "+total+"번 중 "+ok+"번 맞았어요"+(ok===total&&total?" — 완벽해요!":"");total=0;ok=0;Array.prototype.forEach.call($("grid").querySelectorAll(".hit,.miss"),function(e){e.classList.remove("hit","miss");});}
+      if(cycles&&count>=cycles){stop();if(done)done();return;}
+      var prev=$("grid").querySelector(".now");if(prev)prev.classList.remove("now");var el=cell(i);if(el)el.classList.add("now");S.slot=i;
+      if(c){if(S.tab!=="tap"||S.guide){if(a)stroke(c,a.currentTime+.02,d);flash(c);}
+        if(S.tab==="tap"){total++;var e={i:i,c:c,t:now,done:false,mark:function(good){this.done=true;if(good)ok++;var x=cell(this.i);if(x)x.classList.add(good?"hit":"miss");}};S.exp.push(e);setTimeout(function(){if(!e.done)e.mark(false);},d*1000*.55);}}
+      i++;if(i>=S.pat.length){i=0;count++;}
+      S.timer=setTimeout(tick,d*1000);})();}
+  $("play").onclick=function(){if(S.playing)stop();else start(S.tab==="tap"?0:0);};
+
+  /* ---------- 따라 치기 ---------- */
+  function hit(p){var a=audio();if(a)stroke(p,a.currentTime,.2);flash(p);var now=performance.now(),tol=slotDur()*1000*.5,best=null;
+    S.exp.forEach(function(e){if(!e.done&&Math.abs(e.t-now)<=tol&&(!best||Math.abs(e.t-now)<Math.abs(best.t-now)))best=e;});
+    if(best){var need=best.c==="D"?"D":best.c==="K"?"K":"T";best.mark(need===p);}}
+  Array.prototype.forEach.call(document.querySelectorAll(".pad"),function(b){b.addEventListener("pointerdown",function(e){e.preventDefault();hit(b.dataset.p);});});
+  document.addEventListener("keydown",function(e){if(S.tab!=="tap"||e.repeat)return;var m={f:"K",j:"T"," ":"D"}[e.key.toLowerCase()];if(m){e.preventDefault();hit(m);var b=document.querySelector('.pad[data-p="'+m+'"]');b.classList.add("on");setTimeout(function(){b.classList.remove("on");},110);}});
+  $("guide").onclick=function(){S.guide=!S.guide;this.setAttribute("aria-pressed",S.guide);this.textContent=S.guide?"장단 소리 켜기":"장단 소리 끔 (혼자 치기)";};
+
+  /* ---------- 듣고 맞히기 ---------- */
+  function newQuiz(){S.quiz={ans:Math.floor(Math.random()*JD.length),done:false};S.pat=JD[S.quiz.ans].p.slice();$("tempo").value=JD[S.quiz.ans].bpm;label();drawGrid();
+    var el=$("qBox");el.innerHTML='<p class="q">어떤 장단일까요? 먼저 문제를 듣고 골라 보세요.</p><div class="row"></div><p class="msg"></p>';var row=el.children[1],msg=el.children[2];
+    JD.forEach(function(j,k){var b=document.createElement("button");b.className="opt";b.textContent=j.name;b.onclick=function(){if(k===S.quiz.ans){S.quiz.done=true;b.classList.add("right");Array.prototype.forEach.call(row.children,function(o){o.disabled=true;});msg.className="msg ok";msg.innerHTML="맞아요! "+j.name+"이에요. 정간보를 보며 다시 들어 보세요. ";var n=document.createElement("button");n.className="btn";n.textContent="새 문제";n.onclick=function(){stop();newQuiz();};msg.appendChild(n);drawGrid();}
+        else{b.classList.add("wrong");msg.className="msg bad";msg.textContent=JD[k].p.length!==JD[S.quiz.ans].p.length?"박의 수를 세어 보세요. 한 장단이 몇 박인가요?":"빠르기와, 「기덕」「더러러러」 같은 꾸밈 소리가 있는지 들어 보세요.";}};row.appendChild(b);});}
+  $("qPlay").onclick=function(){if(S.playing){stop();return;}start(2);};
+
+  /* ---------- 화면 ---------- */
+  function label(){$("tempoL").textContent="1분에 "+$("tempo").value+"박";}
+  function setJD(i){stop();S.i=i;S.pat=JD[i].p.slice();$("tempo").value=JD[i].bpm;refresh();}
+  function refresh(){var j=JD[S.i],q=S.tab==="quiz";label();
+    Array.prototype.forEach.call($("jds").children,function(c,k){c.setAttribute("aria-pressed",k===S.i);});
+    $("jdRow").classList.toggle("hidden",q);
+    $("jdTitle").textContent=q?"듣고 맞히기":S.tab==="make"?j.name+" 바꾸기":j.name;
+    $("jdInfo").textContent=q?"정간보를 가리고 소리만 들려줘요.":j.info;
+    $("play").classList.toggle("hidden",q);
+    $("seeSay").innerHTML="<b>"+j.name+"</b>으로 부르는 노래: "+j.song+". 장단을 들으며 입으로 「"+j.p.filter(function(c){return c;}).map(function(c){return NAME[c];}).join(" ")+"」 하고 따라 말해 보세요(입장단).";
+    ["see","tap","make","quiz"].forEach(function(t){$("x-"+t).classList.toggle("hidden",t!==S.tab);});
+    drawGrid();}
+  JD.forEach(function(j,i){var b=document.createElement("button");b.className="chip";b.textContent=j.name;b.onclick=function(){setJD(i);};$("jds").appendChild(b);});
+  $("legend").innerHTML=["D","K","T","G","R"].map(function(c){return '<span><svg viewBox="0 0 34 40">'+SYM[c]+'</svg>'+NAME[c]+(c==="D"?" (양손)":c==="K"?" (북편)":c==="T"?" (채편)":c==="G"?" (채편, 꾸밈)":" (채편, 굴림)")+'</span>';}).join("");
+  $("tempo").oninput=label;
+  $("mkReset").onclick=function(){S.pat=JD[S.i].p.slice();drawGrid();};
+  $("mkClear").onclick=function(){S.pat=S.pat.map(function(){return "";});drawGrid();};
+  Array.prototype.forEach.call(document.querySelectorAll("[data-tab]"),function(b){b.onclick=function(){stop();S.tab=b.dataset.tab;$("tapMsg").textContent="";Array.prototype.forEach.call(document.querySelectorAll("[data-tab]"),function(o){o.setAttribute("aria-selected",o===b);});
+      if(S.tab==="quiz")newQuiz();else{S.quiz=null;if(S.tab!=="make"||true)S.pat=JD[S.i].p.slice();$("tempo").value=JD[S.i].bpm;}refresh();};});
+  refresh();
+})();
+</script>
+</body></html>
