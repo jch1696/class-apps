@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>장조 음계 건반</title>
+<title>장조·단조 음계 건반</title>
 <style>
 :root{--bg:#f3f1ea;--surface:#fff;--surface2:#f8f6f0;--ink:#1f2430;--muted:#687083;--line:#d9d5c8;--accent:#3d5a98;--accent-ink:#fff;--half:#d2452f;--tonic:#f2b84b;--in:#bfe0c8;--inb:#3f8f5d;--ok:#2e7d4f;--bad:#c2372d;--shadow:0 1px 2px rgba(30,30,40,.07),0 8px 22px -12px rgba(30,30,40,.25)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161b;--surface:#1d2027;--surface2:#242832;--ink:#e9ebf1;--muted:#9aa2b4;--line:#333846;--accent:#8fb0ee;--accent-ink:#10182a;--half:#ff8a73;--tonic:#f2b84b;--in:#3c7a55;--inb:#7fd0a0;--ok:#6fcf97;--bad:#ff8a7a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -14px rgba(0,0,0,.7)}}
@@ -67,12 +67,12 @@ h2{font-size:15px;margin:0 0 8px}
 </head><body>
 <div class="app">
   <header>
-    <h1>장조 음계 건반</h1>
-    <p>어느 음에서 시작해도 <b>온-온-반-온-온-온-반</b>이면 장조예요</p>
+    <h1>장조·단조 음계 건반</h1>
+    <p id="sub"></p>
   </header>
 
   <div class="card">
-    <div class="row" style="margin-bottom:8px"><span class="lab">조 고르기</span><div class="row" id="keys"></div></div>
+    <div class="row" style="margin-bottom:8px"><div class="tabs" role="group" aria-label="장조 단조"><button id="mMaj" aria-selected="true">장조</button><button id="mMin" aria-selected="false">단조</button></div><span class="lab" style="margin-left:6px">조 고르기</span><div class="row" id="keys"></div></div>
     <div class="row">
       <div class="tabs" role="tablist">
         <button id="tScale" role="tab" aria-selected="true">① 음계 살펴보기</button>
@@ -114,7 +114,7 @@ h2{font-size:15px;margin:0 0 8px}
     <p class="msg" id="findMsg" style="margin:10px 0 6px"></p>
     <div class="row">
       <button class="btn" id="findReset">처음부터 다시</button>
-      <button class="btn" id="findHint">다장조 소리 다시 듣기</button>
+      <button class="btn" id="findHint"></button>
       <button class="btn" id="findShow">정답 보기</button>
     </div>
     <p class="note" style="margin-top:8px">온음은 건반 <b>두 칸</b>(사이에 건반이 하나 있음), 반음은 <b>바로 옆</b> 건반이에요. 검은건반도 한 칸으로 세요.</p>
@@ -131,7 +131,7 @@ h2{font-size:15px;margin:0 0 8px}
         <button class="btn" id="arp" aria-pressed="false">펼쳐서 듣기</button>
       </div>
       <p class="msg" id="chordMsg" style="margin:10px 0 0"></p>
-      <p class="note">Ⅰ 으뜸화음(도·미·솔) · Ⅳ 버금딸림화음(파·라·도) · Ⅴ 딸림화음(솔·시·레)</p>
+      <p class="note" id="chordNote"></p>
     </div>
     <div class="card">
       <h2>화음 듣고 맞히기</h2>
@@ -148,16 +148,23 @@ h2{font-size:15px;margin:0 0 8px}
 </div>
 <script>
 (function(){
-  var NAT=[0,2,4,5,7,9,11], KO=["다","라","마","바","사","가","나"], EN="CDEFGAB", MAJ=[0,2,4,5,7,9,11,12], SOL=["도","레","미","파","솔","라","시","도"];
-  var KEYS=[{li:0,pc:0},{li:4,pc:7},{li:1,pc:2},{li:5,pc:9},{li:2,pc:4},{li:3,pc:5},{li:6,pc:10},{li:2,pc:3},{li:5,pc:8}];
-  var S={key:1,tab:"scale",lbl:"name",found:0,reveal:false,arp:false,quiz:null};
+  var NAT=[0,2,4,5,7,9,11], KO=["다","라","마","바","사","가","나"], EN="CDEFGAB", MAJ, SOL, KEYS;
+  var MODE={maj:{steps:[0,2,4,5,7,9,11,12],sol:["도","레","미","파","솔","라","시","도"],suffix:"장조",pat:"온-온-반-온-온-온-반",
+      keys:[{li:0,pc:0},{li:4,pc:7},{li:1,pc:2},{li:5,pc:9},{li:2,pc:4},{li:3,pc:5},{li:6,pc:10},{li:2,pc:3},{li:5,pc:8}],
+      third:[4,4,4],csol:[["도","미","솔"],["파","라","도"],["솔","시","레"]]},
+    min:{steps:[0,2,3,5,7,8,10,12],sol:["라","시","도","레","미","파","솔","라"],suffix:"단조",pat:"온-반-온-온-반-온-온",
+      keys:[{li:5,pc:9},{li:2,pc:4},{li:6,pc:11},{li:3,pc:6},{li:0,pc:1},{li:1,pc:2},{li:4,pc:7},{li:0,pc:0},{li:3,pc:5}],
+      third:[3,3,4],csol:[["라","도","미"],["레","파","라"],["미","솔♯","시"]]}};
+  function applyMode(m){MAJ=MODE[m].steps;SOL=MODE[m].sol;KEYS=MODE[m].keys;}
+  applyMode("maj");
+  var S={mode:"maj",key:1,tab:"scale",lbl:"name",found:0,reveal:false,arp:false,quiz:null};
   function $(id){return document.getElementById(id);}
   function acc(pc,li){return ((pc-NAT[li])%12+18)%12-6;}
   function nm(li,a){return (a>0?"올림":a<0?"내림":"")+KO[li];}
   function en(li,a){return EN[li]+(a>0?"♯":a<0?"♭":"");}
   function scale(k){var K=KEYS[k],t=60+K.pc,out=[];for(var d=0;d<8;d++){var li=(K.li+d)%7,m=t+MAJ[d];out.push({midi:m,li:li,acc:acc(m%12,li),deg:d});}return out;}
   function naive(k){var K=KEYS[k],t=60+K.pc,out=[t];for(var d=1;d<7;d++){out.push(t+((NAT[(K.li+d)%7]-K.pc)%12+12)%12);}out.push(t+12);return out;}
-  function keyName(k){var K=KEYS[k];return nm(K.li,acc(K.pc,K.li))+"장조";}
+  function keyName(k){var K=KEYS[k];return nm(K.li,acc(K.pc,K.li))+MODE[S.mode].suffix;}
   function sig(k){var sc=scale(k).slice(0,7),sh=sc.filter(function(n){return n.acc>0;}),fl=sc.filter(function(n){return n.acc<0;});
     var so=[3,0,4,1,5,2,6],fo=[6,2,5,1,4,0,3],list=[],type=sh.length?"♯":fl.length?"♭":"";
     (sh.length?so:fo).forEach(function(li){(sh.length?sh:fl).forEach(function(n){if(n.li===li)list.push(n);});});
@@ -188,7 +195,7 @@ h2{font-size:15px;margin:0 0 8px}
   /* ---------- find ---------- */
   function check(m){var sc=scale(S.key),exp=sc[S.found].midi,msg=$("findMsg");
     if(m===exp){S.found++;
-      if(S.found===8){S.reveal=true;msg.className="msg ok";msg.textContent="완성! "+keyName(S.key)+" 음계를 찾았어요. 다장조와 똑같이 '도레미파솔라시도'로 들리나요?";render();setTimeout(function(){playSeq(sc.map(function(n){return n.midi;}));},500);return;}
+      if(S.found===8){S.reveal=true;msg.className="msg ok";msg.textContent="완성! "+keyName(S.key)+" 음계를 찾았어요. "+(S.key?refName()+"와 똑같이 ":"")+"'"+SOL.join("")+"'로 들리나요?";render();setTimeout(function(){playSeq(sc.map(function(n){return n.midi;}));},500);return;}
       msg.className="msg ok";msg.textContent="맞아요! 다음은 '"+SOL[S.found]+"' 자리예요.";render();
     }else{flash(m,450,"bad");msg.className="msg bad";
       if(S.found===0){msg.textContent="으뜸음 '"+nm(sc[0].li,sc[0].acc)+"'부터 시작해요. 노란 건반을 눌러 보세요.";}
@@ -217,10 +224,11 @@ h2{font-size:15px;margin:0 0 8px}
     Array.prototype.forEach.call($("keys").children,function(c,i){c.setAttribute("aria-pressed",i===S.key?"true":"false");});
     // info
     var sg=sig(S.key);
-    $("info").innerHTML='<div><span>조 이름</span><b>'+keyName(S.key)+'</b></div><div><span>으뜸음 (계이름 도)</span><b>'+nm(sc[0].li,sc[0].acc)+' ('+en(sc[0].li,sc[0].acc)+')</b></div><div><span>조표</span><b>'+(sg.type?sg.type+" "+sg.list.length+"개":"없음")+'</b></div><div><span>'+(sg.type==="♭"?"내리는 음":"올리는 음")+'</span><b style="font-size:14.5px">'+(sg.list.length?sg.list.map(function(n){return nm(n.li,n.acc);}).join(", "):"없음 (흰건반만)")+'</b></div>';
+    $("info").innerHTML='<div><span>조 이름</span><b>'+keyName(S.key)+'</b></div><div><span>으뜸음 (계이름 '+SOL[0]+')</span><b>'+nm(sc[0].li,sc[0].acc)+' ('+en(sc[0].li,sc[0].acc)+')</b></div><div><span>조표</span><b>'+(sg.type?sg.type+" "+sg.list.length+"개":"없음")+'</b></div><div><span>'+(sg.type==="♭"?"내리는 음":"올리는 음")+'</span><b style="font-size:14.5px">'+(sg.list.length?sg.list.map(function(n){return nm(n.li,n.acc);}).join(", "):"없음 (흰건반만)")+'</b></div><div style="grid-column:1/-1"><span>나란한조 (같은 건반, 으뜸음만 달라요)</span><b style="font-size:15px">'+relName()+' <button class="btn" id="goRel" style="padding:3px 10px;font-size:13px;margin-left:6px">바꿔 보기</button></b></div>';
+    $("goRel").onclick=function(){setMode(S.mode==="maj"?"min":"maj");};
     var nv=naive(S.key),diff=[];for(var d=0;d<8;d++)if(nv[d]!==sc[d].midi)diff.push(SOL[d]);
     $("playNaive").disabled=!diff.length;
-    $("naiveNote").innerHTML=diff.length?"조표 없이 치면 <b>'"+diff.join("', '")+"'</b> 자리가 어색하게 들려요. 그래서 "+sg.list.map(function(n){return nm(n.li,n.acc);}).join(", ")+"(으)로 바꿔요.":"다장조는 흰건반만으로 온-온-반-온-온-온-반이 돼요. 그래서 조표가 없어요.";
+    $("naiveNote").innerHTML=diff.length?"조표 없이 치면 <b>'"+diff.join("', '")+"'</b> 자리가 어색하게 들려요. 그래서 조표("+sg.list.map(function(n){return nm(n.li,n.acc);}).join(", ")+")를 붙여요.":keyName(S.key)+"는 흰건반만으로 "+MODE[S.mode].pat+"이 돼요. 그래서 조표가 없어요.";
     // staff
     var st='',y=function(s){return 105-s*5;};
     for(var l=0;l<5;l++)st+='<line x1="10" x2="710" y1="'+(55+l*10)+'" y2="'+(55+l*10)+'"/>';
@@ -233,14 +241,22 @@ h2{font-size:15px;margin:0 0 8px}
       st+='<ellipse class="'+(i%7===0?"t":"")+'" cx="'+x+'" cy="'+yy+'" rx="8.5" ry="5.8"/><text class="s" x="'+x+'" y="132">'+SOL[i]+'</text><text class="s" x="'+x+'" y="147">'+nm(n.li,n.acc)+'</text>';});
     $("staff").innerHTML=st;
     // find
-    $("findTitle").textContent="'"+nm(sc[0].li,sc[0].acc)+"'에서 시작해 '도레미파솔라시도'로 들리는 건반 8개를 찾아보세요";
+    $("findTitle").textContent="'"+nm(sc[0].li,sc[0].acc)+"'에서 시작해 '"+SOL.join("")+"'로 들리는 건반 8개를 찾아보세요";
+    $("findHint").textContent=refName()+" 소리 다시 듣기";
+    $("sub").innerHTML="어느 음에서 시작해도 <b>"+MODE[S.mode].pat+"</b>이면 "+MODE[S.mode].suffix+"예요";
+    $("chordNote").textContent=S.mode==="maj"?"Ⅰ 으뜸화음(도·미·솔) · Ⅳ 버금딸림화음(파·라·도) · Ⅴ 딸림화음(솔·시·레)":"Ⅰ 으뜸화음(라·도·미) · Ⅳ 버금딸림화음(레·파·라) · Ⅴ 딸림화음(미·솔♯·시) — 단조의 Ⅴ에서는 '솔'을 반음 올려요.";
     var sp='';for(var k=0;k<8;k++){sp+='<span class="'+(k<S.found?"done":"")+(k===S.found&&!S.reveal?" now":"")+'">'+SOL[k]+'</span>';if(k<7){var hh=MAJ[k+1]-MAJ[k]===1;sp+='<span class="'+(hh?"h":"")+'" style="border-style:dashed">'+(hh?"반":"온")+'</span>';}}
     $("steps").innerHTML=sp;
   }
 
   /* ---------- controls ---------- */
-  KEYS.forEach(function(K,i){var b=document.createElement("button");b.className="chip";var s=sig(i);b.innerHTML=keyName(i)+"<small>"+(s.type?s.type+s.list.length:"조표 없음")+"</small>";
-    b.addEventListener("click",function(){S.key=i;seqId++;resetFind();S.quiz=null;$("quizMsg").textContent="";$("chordMsg").textContent="";render();});$("keys").appendChild(b);});
+  function refName(){var k=S.key;S.key=0;var n=keyName(0);S.key=k;return n;}
+  function relName(){var o=S.mode==="maj"?"min":"maj",K=MODE[o].keys[S.key];return nm(K.li,acc(K.pc,K.li))+MODE[o].suffix;}
+  function buildKeys(){$("keys").innerHTML="";KEYS.forEach(function(K,i){var b=document.createElement("button");b.className="chip";var s=sig(i);b.innerHTML=keyName(i)+"<small>"+(s.type?s.type+s.list.length:"조표 없음")+"</small>";
+    b.addEventListener("click",function(){S.key=i;seqId++;resetFind();S.quiz=null;$("quizMsg").textContent="";$("chordMsg").textContent="";render();});$("keys").appendChild(b);});}
+  function setMode(m){S.mode=m;applyMode(m);seqId++;$("mMaj").setAttribute("aria-selected",m==="maj");$("mMin").setAttribute("aria-selected",m==="min");buildKeys();resetFind();S.quiz=null;$("quizMsg").textContent="";$("chordMsg").textContent="";render();}
+  $("mMaj").onclick=function(){setMode("maj");};$("mMin").onclick=function(){setMode("min");};
+  buildKeys();
   function setTab(t){S.tab=t;seqId++;$("tScale").setAttribute("aria-selected",t==="scale");$("tFind").setAttribute("aria-selected",t==="find");$("tChord").setAttribute("aria-selected",t==="chord");
     $("pScale").classList.toggle("hidden",t!=="scale");$("pFind").classList.toggle("hidden",t!=="find");$("pChord").classList.toggle("hidden",t!=="chord");
     if(t==="find")resetFind();render();}
@@ -251,10 +267,13 @@ h2{font-size:15px;margin:0 0 8px}
   $("findReset").onclick=function(){resetFind();render();};
   $("findHint").onclick=function(){playSeq(scale(0).map(function(n){return n.midi;}),380);};
   $("findShow").onclick=function(){S.reveal=true;S.found=8;$("findMsg").className="msg";$("findMsg").textContent="초록 건반이 "+keyName(S.key)+" 음계예요. 간격(온·반)을 확인해 보세요.";render();playSeq(scale(S.key).map(function(n){return n.midi;}));};
-  function chord(i){var t=60+KEYS[S.key].pc,r=[0,5,7][i];return [t+r,t+r+4,t+r+7];}
-  function chordText(i){var sc=scale(S.key),by={};sc.forEach(function(n){by[n.midi%12]=n;});return chord(i).map(function(m){var n=by[m%12];return nm(n.li,n.acc);}).join(" · ");}
+  function chordNotes(i){var sc=scale(S.key),t=sc[0].midi,r=[0,5,7][i],d=[0,3,4][i],th=MODE[S.mode].third[i],ms=[t+r,t+r+th,t+r+7];
+    if(ms[2]>84)ms=ms.map(function(m){return m-12;});
+    return ms.map(function(m,j){var n=sc[(d+j*2)%7],a=acc(m%12,n.li);return {midi:m,name:nm(n.li,a)};});}
+  function chord(i){return chordNotes(i).map(function(n){return n.midi;});}
+  function chordText(i){return chordNotes(i).map(function(n){return n.name;}).join(" · ");}
   function playChord(i){var c=chord(i);if(S.arp)playSeq([c[0],c[1],c[2],c[1],c[2],[c[0],c[1],c[2]]],300);else playSeq([c],1100);}
-  Array.prototype.forEach.call(document.querySelectorAll("[data-ch]"),function(b){b.onclick=function(){var i=+b.dataset.ch;playChord(i);$("chordMsg").className="msg";$("chordMsg").textContent=["Ⅰ","Ⅳ","Ⅴ"][i]+" 화음: "+chordText(i)+"  ("+[["도","미","솔"],["파","라","도"],["솔","시","레"]][i].join("·")+")";};});
+  Array.prototype.forEach.call(document.querySelectorAll("[data-ch]"),function(b){b.onclick=function(){var i=+b.dataset.ch;playChord(i);$("chordMsg").className="msg";$("chordMsg").textContent=["Ⅰ","Ⅳ","Ⅴ"][i]+" 화음: "+chordText(i)+"  ("+MODE[S.mode].csol[i].join("·")+")";};});
   $("arp").onclick=function(){S.arp=!S.arp;this.setAttribute("aria-pressed",S.arp);};
   $("quizPlay").onclick=function(){if(S.quiz===null)S.quiz=Math.floor(Math.random()*3);$("quizMsg").className="msg";$("quizMsg").textContent="어떤 화음일까요? Ⅰ, Ⅳ, Ⅴ 중에서 골라 보세요.";var id=++seqId;[chord(0),chord(S.quiz)].forEach(function(c,i){setTimeout(function(){if(id!==seqId)return;c.forEach(function(m){tone(m,0,2);});},i*1300);});};
   Array.prototype.forEach.call(document.querySelectorAll("[data-ans]"),function(b){b.onclick=function(){var q=$("quizMsg");if(S.quiz===null){q.className="msg";q.textContent="먼저 '문제 듣기'를 눌러 주세요.";return;}
