@@ -55,7 +55,7 @@ input[type=number]{font:inherit;width:110px;padding:7px 9px;border:1.5px solid v
   <!-- 1 -->
   <section id="p-roll" class="card">
     <h2>원을 한 바퀴 굴리면 얼마나 갈까요?</h2>
-    <svg id="rollSvg" viewBox="0 0 1000 330" role="img" aria-label="원을 굴려 원주를 재는 그림"></svg>
+    <svg id="rollSvg" viewBox="0 0 1000 350" role="img" aria-label="원을 굴려 원주를 재는 그림"></svg>
     <div class="row" style="margin-top:6px"><span class="lab">지름</span><input type="range" id="dS" min="2" max="10" step="1" value="5" aria-label="지름"><span class="lab">굴리기</span><input type="range" id="pS" min="0" max="1000" value="0" aria-label="굴린 정도"><button class="btn primary" id="rollPlay">한 바퀴 굴리기</button></div>
     <div class="stats" id="rollStats"></div>
     <p class="say" id="rollSay"></p>
@@ -108,9 +108,9 @@ input[type=number]{font:inherit;width:110px;padding:7px 9px;border:1.5px solid v
 
   /* ---------- 1. 원주율 ---------- */
   function drawRoll(){
-    var d=+$("dS").value,p=+$("pS").value/1000,s=28,R=d*s/2,C=PI*d*s,x0=50,gy=240,cx=x0+p*C,cy=gy-R,th=p*360,o='';
+    var d=+$("dS").value,p=+$("pS").value/1000,s=23,R=d*s/2,C=PI*d*s,x0=128,gy=262,cx=x0+p*C,cy=gy-R,th=p*360,o='';
     o+='<line x1="15" x2="985" y1="'+gy+'" y2="'+gy+'" stroke="var(--muted)" stroke-width="2"/>';
-    for(var k=0;k<=33;k++){var x=x0+k*s,big=k%5===0;o+='<line x1="'+x+'" x2="'+x+'" y1="'+gy+'" y2="'+(gy+(big?10:5))+'" stroke="var(--muted)" stroke-width="'+(big?1.6:1)+'"/>';if(big)o+='<text x="'+x+'" y="'+(gy+25)+'" font-size="13" text-anchor="middle" style="fill:var(--muted)">'+k+'</text>';}
+    for(var k=0;k<=32;k++){var x=x0+k*s,big=k%5===0;o+='<line x1="'+x+'" x2="'+x+'" y1="'+gy+'" y2="'+(gy+(big?10:5))+'" stroke="var(--muted)" stroke-width="'+(big?1.6:1)+'"/>';if(big)o+='<text x="'+x+'" y="'+(gy+25)+'" font-size="13" text-anchor="middle" style="fill:var(--muted)">'+k+'</text>';}
     o+='<text x="975" y="'+(gy+25)+'" font-size="12" text-anchor="end" style="fill:var(--muted)">cm</text>';
     o+='<line x1="'+x0+'" x2="'+cx+'" y1="'+gy+'" y2="'+gy+'" stroke="var(--c1)" stroke-width="7" stroke-linecap="round"/>';
     o+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="var(--surface2)" stroke="var(--line)" stroke-width="2"/>';
@@ -123,8 +123,7 @@ input[type=number]{font:inherit;width:110px;padding:7px 9px;border:1.5px solid v
     for(var i=0;i<4;i++){var a0=i*d*s,a1=Math.min((i+1)*d*s,laid);if(a1<=a0)break;var full=(a1-a0)>=d*s-0.5;
       o+='<rect x="'+(x0+a0)+'" y="'+by+'" width="'+(a1-a0)+'" height="22" rx="4" fill="'+(i<3?"var(--c3)":"var(--c2)")+'" opacity="'+(i%2?0.7:1)+'" stroke="var(--surface)" stroke-width="2"/>';
       if(full&&i<3)o+='<text x="'+(x0+a0+d*s/2)+'" y="'+(by+16)+'" font-size="13" font-weight="700" text-anchor="middle" style="fill:#fff">지름 '+(i+1)+'</text>';}
-    if(p>0.999)o+='<text x="'+(x0+C+10)+'" y="'+(by+16)+'" font-size="14" font-weight="700" style="fill:var(--c1)">← 지름의 3배보다 조금 더!</text>';
-    o+='<text x="'+x0+'" y="'+(by+44)+'" font-size="13" style="fill:var(--muted)">굴러간 거리를 지름 막대로 재어 보면…</text>';
+    o+=p>0.999?'<text x="'+x0+'" y="'+(by+46)+'" font-size="15" font-weight="700" style="fill:var(--c1)">지름 막대 3개보다 조금 더 길어요! (지름의 약 3.14배)</text>':'<text x="'+x0+'" y="'+(by+44)+'" font-size="13" style="fill:var(--muted)">굴러간 거리를 지름 막대로 재어 보면…</text>';
     $("rollSvg").innerHTML=o;
     var dist=p*PI*d,done=p>0.999;
     $("rollStats").innerHTML='<div><span>지름</span><b>'+d+' cm</b></div><div><span>'+(done?"원주 (한 바퀴 굴러간 거리)":"굴러간 거리")+'</span><b>약 '+fmt(dist)+' cm</b></div><div class="'+(done?"hot":"")+'"><span>'+(done?"원주 ÷ 지름":"굴러간 거리 ÷ 지름")+'</span><b>약 '+fmt(dist/d)+'</b></div>';
