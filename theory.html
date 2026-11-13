@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>음악 이론 교실</title>
+<style>
+
+
+:root{--bg:#f3f1ea;--surface:#fff;--surface2:#f8f6f0;--ink:#1f2430;--muted:#687083;--line:#d9d5c8;--accent:#3d5a98;--accent-ink:#fff;--c1:#e2513a;--c2:#f2b84b;--c3:#3aa6b5;--c4:#5aa33c;--ok:#2e7d4f;--bad:#c2372d;--shadow:0 1px 2px rgba(30,30,40,.07),0 8px 22px -12px rgba(30,30,40,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161b;--surface:#1d2027;--surface2:#242832;--ink:#e9ebf1;--muted:#9aa2b4;--line:#3a4050;--accent:#8fb0ee;--accent-ink:#10182a;--c1:#ff8a73;--c2:#f2b84b;--c3:#5cc3d4;--c4:#8fd070;--ok:#6fcf97;--bad:#ff8a7a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -14px rgba(0,0,0,.7)}}
+:root[data-theme="dark"]{--bg:#14161b;--surface:#1d2027;--surface2:#242832;--ink:#e9ebf1;--muted:#9aa2b4;--line:#3a4050;--accent:#8fb0ee;--accent-ink:#10182a;--c1:#ff8a73;--c2:#f2b84b;--c3:#5cc3d4;--c4:#8fd070;--ok:#6fcf97;--bad:#ff8a7a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -14px rgba(0,0,0,.7)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:10px}
+h1{margin:0;font-size:clamp(20px,3vw,26px)}header p{margin:0;color:var(--muted);font-size:13.5px}
+h2{margin:0 0 6px;font-size:17px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lab{font-size:12.5px;font-weight:700;color:var(--muted)}
+button{font:inherit;cursor:pointer}
+.btn,.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:14px;font-weight:600}
+.chip{border-radius:999px;background:var(--surface2)}
+.btn.primary,.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:3px}
+.tabs button{border:0;background:none;color:var(--muted);font-weight:700;font-size:14.5px;padding:8px 14px;border-radius:9px}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+svg{display:block;width:100%;height:auto}svg text{fill:var(--ink);font-family:inherit}
+.grid2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.hidden{display:none!important}.note{color:var(--muted);font-size:13.5px;margin:6px 0 0}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.items button{border:1.5px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:12px;padding:8px 4px;font-weight:700;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.items button small{font-weight:500;color:var(--muted);font-size:12px}
+.items button[aria-pressed="true"]{outline:3px solid var(--accent);background:var(--surface)}
+.items svg{width:64px;height:64px}.items .sym{font-size:30px;font-style:italic;font-family:Georgia,"Times New Roman",serif;line-height:64px;height:64px}
+.big{font-size:clamp(22px,4vw,32px);font-weight:800;margin:0;line-height:1.25}
+.say{background:var(--surface2);border-left:5px solid var(--accent);border-radius:8px;padding:9px 12px;margin:8px 0 0;font-size:15px}
+.ink{stroke:var(--ink);fill:var(--ink)}.hol{stroke:var(--ink);fill:var(--surface2);stroke-width:2.4}
+.beats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px;position:relative}
+.beats div{height:46px;border:1.5px dashed var(--line);border-radius:8px;display:flex;align-items:flex-end;justify-content:center;font-size:12px;color:var(--muted);padding-bottom:2px}
+.beats div.tick{border-color:var(--c1);border-style:solid}
+#len{position:absolute;left:0;top:0;height:28px;border-radius:8px;background:var(--c3);opacity:.85;transition:width .2s}
+#len.rest{background:repeating-linear-gradient(45deg,var(--muted) 0 6px,transparent 6px 12px);opacity:.6}
+.vol{display:flex;align-items:flex-end;gap:6px;height:130px;margin-top:10px}
+.vol div{flex:1;background:var(--c3);border-radius:6px 6px 0 0;opacity:.35;min-height:6px}.vol div.now{opacity:1;background:var(--c1)}
+.metro{height:70px;position:relative;margin-top:10px;border-bottom:3px solid var(--line)}
+#ball{position:absolute;bottom:0;left:50%;width:30px;height:30px;margin-left:-15px;border-radius:50%;background:var(--c1)}
+.form{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.phrase{border-radius:12px;padding:8px;border:2px solid var(--pc)}
+.phrase b{color:var(--pc)}.phrase .ms{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:5px}
+.phrase .ms span{background:var(--surface2);border-radius:7px;padding:6px 2px;text-align:center;font-size:13px;font-weight:600;border:2px solid transparent}
+.phrase .ms span.now{background:var(--pc);color:#fff}
+.sec{font-weight:800;font-size:14px;margin:4px 0 0}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}
+.opts button{border:1.5px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:10px;padding:12px;font-weight:700;font-size:16px}
+.opts button.ok{background:var(--ok);border-color:var(--ok);color:#fff}.opts button.no{background:var(--bad);border-color:var(--bad);color:#fff}
+#qShow{display:flex;justify-content:center;align-items:center;min-height:110px}#qShow svg{width:110px;height:110px}#qShow .sym{font-size:56px;font-style:italic;font-family:Georgia,serif}
+table{border-collapse:collapse;width:100%;font-size:14.5px;margin-top:8px}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}th{color:var(--muted);font-size:12.5px}
+</style>
+</head><body>
+<div class="app">
+<header><h1>음악 이론 교실</h1><p>기호를 누르면 뜻을 보고, 소리로 듣고, 눈으로 확인할 수 있어요.</p></header>
+<div class="tabs" role="tablist" id="tabs"><button data-t="note" aria-selected="true">음표와 쉼표</button><button data-t="dyn" aria-selected="false">셈여림</button><button data-t="tempo" aria-selected="false">빠르기</button><button data-t="form" aria-selected="false">노래 형식</button><button data-t="quiz" aria-selected="false">퀴즈</button></div>
+
+<section id="p-note" class="grid2">
+ <div class="card"><h2>음표</h2><div class="items" id="notes"></div><h2 style="margin-top:12px">쉼표</h2><div class="items" id="rests"></div></div>
+ <div class="card"><p class="big" id="nName"></p><p class="say" id="nSay"></p>
+  <div class="beats" id="beats"><div>1박</div><div>2박</div><div>3박</div><div>4박</div><i id="len"></i></div>
+  <div class="row" style="margin-top:10px"><button class="btn primary" id="nPlay">🔊 4박 동안 들어 보기</button></div>
+  <p class="note">박마다 ‘똑’ 소리가 나요. 음표는 그 길이만큼 소리가 이어지고, 쉼표는 그 길이만큼 쉬어요. (4분음표를 1박으로 셀 때)</p></div>
+</section>
+
+<section id="p-dyn" class="grid2 hidden">
+ <div class="card"><h2>셈여림표</h2><div class="items" id="dyns"></div><p class="note">셈여림은 소리의 크고 작음이에요. 같은 가락도 셈여림에 따라 느낌이 달라져요.</p></div>
+ <div class="card"><p class="big" id="dName"></p><p class="say" id="dSay"></p><div class="vol" id="vol"></div>
+  <div class="row" style="margin-top:10px"><button class="btn primary" id="dPlay">🔊 이 세기로 듣기</button></div></div>
+</section>
+
+<section id="p-tempo" class="grid2 hidden">
+ <div class="card"><h2>빠르기말</h2><div class="items" id="tempos"></div><p class="note">♩= 숫자는 1분 동안 4분음표를 몇 번 치는지 나타내요. 숫자는 대략의 값이에요.</p></div>
+ <div class="card"><p class="big" id="tName"></p><p class="say" id="tSay"></p><div class="metro"><i id="ball"></i></div>
+  <div class="row" style="margin-top:10px"><button class="btn primary" id="tPlay">🔊 이 빠르기로 듣기</button></div></div>
+</section>
+
+<section id="p-form" class="hidden" style="display:flex;flex-direction:column;gap:12px">
+ <div class="card"><h2>노래의 짜임</h2><div class="row" id="forms"></div>
+  <p class="say" id="fSay"></p>
+  <table><tr><th>이름</th><th>길이</th><th>뜻</th></tr><tr><td>동기</td><td>2마디</td><td>가락의 가장 작은 덩어리</td></tr><tr><td>작은악절</td><td>4마디</td><td>동기 2개가 모인 것</td></tr><tr><td>큰악절</td><td>8마디</td><td>작은악절 2개가 모인 것</td></tr></table></div>
+ <div class="card" id="fCard"><div class="row" style="justify-content:space-between"><p class="big" id="fName"></p><button class="btn primary" id="fPlay">▶ 들으며 짜임 보기</button></div><div class="form" id="form"></div>
+  <p class="note">같은 색은 비슷한 가락이에요. a와 a′는 거의 같고 끝만 조금 달라요. b는 다른 가락이에요.</p></div>
+</section>
+
+<section id="p-quiz" class="hidden"><div class="card"><div class="row" style="justify-content:space-between"><h2 id="qNo"></h2><b id="qScore"></b></div>
+ <div id="qShow"></div><p class="big" id="qText" style="text-align:center;font-size:20px"></p><div class="opts" id="opts"></div>
+ <p class="say hidden" id="qFb"></p><div class="row" style="margin-top:10px"><button class="btn primary hidden" id="qNext">다음 문제 ▶</button></div></div></section>
+</div>
+<script>
+(function(){
+  function $(i){return document.getElementById(i);}
+  function E(t,a,x){var s="<"+t;for(var k in a)s+=" "+k+'="'+a[k]+'"';return s+">"+(x==null?"":x)+"</"+t+">";}
+  /* ---------- 기호 그림 ---------- */
+  function noteSvg(o){var s='<svg viewBox="0 0 64 64" aria-hidden="true">',x=28,y=46;
+    s+=E("ellipse",{cx:x,cy:y,rx:9,ry:6.3,transform:"rotate(-22 "+x+" "+y+")","class":o.hollow?"hol":"ink"});
+    if(o.stem)s+=E("line",{x1:x+8.3,y1:y-2,x2:x+8.3,y2:8,"class":"ink","stroke-width":2.4});
+    for(var f=0;f<(o.flags||0);f++)s+=E("path",{d:"M"+(x+8.3)+" "+(8+f*9)+"c2 8 12 9 9 20",fill:"none",stroke:"var(--ink)","stroke-width":2.6,"stroke-linecap":"round"});
+    if(o.dot)s+=E("circle",{cx:x+17,cy:y,r:2.8,"class":"ink"});return s+"</svg>";}
+  function restSvg(o){var s='<svg viewBox="0 0 64 64" aria-hidden="true">';
+    if(o.k==="w"||o.k==="h"){s+=E("line",{x1:12,x2:52,y1:32,y2:32,stroke:"var(--ink)","stroke-width":1.6})+E("rect",{x:22,y:o.k==="w"?32:24,width:20,height:8,"class":"ink"});}
+    else if(o.k==="q")s+=E("path",{d:"M27 10l10 13q-8 7 0 15l-7-1q-6 4 1 13q-13-8-3-18l-7-9q8-5 6-13z","class":"ink"});
+    else{var n=o.k==="e"?1:2;s+=E("line",{x1:38,y1:20,x2:28,y2:54,"class":"ink","stroke-width":2.4});for(var i=0;i<n;i++)s+=E("circle",{cx:26-i*2.6,cy:23+i*10,r:4,"class":"ink"})+E("path",{d:"M"+(26-i*2.6)+" "+(26+i*10)+"q8 2 "+(11.5)+" -5",fill:"none",stroke:"var(--ink)","stroke-width":2.2});}
+    if(o.dot)s+=E("circle",{cx:46,cy:30,r:2.8,"class":"ink"});return s+"</svg>";}
+  var NOTES=[{n:"온음표",b:4,o:{hollow:1}},{n:"점2분음표",b:3,o:{hollow:1,stem:1,dot:1}},{n:"2분음표",b:2,o:{hollow:1,stem:1}},{n:"점4분음표",b:1.5,o:{stem:1,dot:1}},{n:"4분음표",b:1,o:{stem:1}},{n:"8분음표",b:.5,o:{stem:1,flags:1}},{n:"16분음표",b:.25,o:{stem:1,flags:2}}];
+  var RESTS=[{n:"온쉼표",b:4,o:{k:"w"},tip:"줄 아래에 매달려 있어요."},{n:"2분쉼표",b:2,o:{k:"h"},tip:"줄 위에 얹혀 있어요."},{n:"4분쉼표",b:1,o:{k:"q"}},{n:"8분쉼표",b:.5,o:{k:"e"}},{n:"16분쉼표",b:.25,o:{k:"s"}}];
+  function bt(b){return b===.5?"반 박":b===.25?"반의 반 박":b===1.5?"1박 반":b+"박";}
+  var DYN=[{s:"pp",n:"피아니시모",m:"매우 여리게",g:.03},{s:"p",n:"피아노",m:"여리게",g:.07},{s:"mp",n:"메조 피아노",m:"조금 여리게",g:.13},{s:"mf",n:"메조 포르테",m:"조금 세게",g:.22},{s:"f",n:"포르테",m:"세게",g:.38},{s:"ff",n:"포르티시모",m:"매우 세게",g:.6},
+    {s:"<",n:"크레셴도",m:"점점 세게",ramp:1},{s:">",n:"데크레셴도",m:"점점 여리게",ramp:-1}];
+  var TEMPO=[{s:"Adagio",n:"아다지오",m:"매우 느리게",q:56},{s:"Andante",n:"안단테",m:"느리게",q:72},{s:"Andantino",n:"안단티노",m:"조금 느리게",q:84},{s:"Moderato",n:"모데라토",m:"보통 빠르게",q:96},{s:"Allegretto",n:"알레그레토",m:"조금 빠르게",q:112},{s:"Allegro",n:"알레그로",m:"빠르게",q:132},{s:"Presto",n:"프레스토",m:"매우 빠르게",q:176}];
+  var A="mi re do re|mi mi mi:2|re re re:2|mi sol sol:2",A2="mi re do re|mi mi mi mi|re re mi re|do:4";
+  var O1="mi mi fa sol|sol fa mi re|do do re mi|mi:1.5 re:.5 re:2",O2="mi mi fa sol|sol fa mi re|do do re mi|re:1.5 do:.5 do:2",O3="re re mi do|re mi:.5 fa:.5 mi do|re mi:.5 fa:.5 mi re|do re so:2";
+  var T1="do do sol sol|la la sol:2|fa fa mi mi|re re do:2",T2="sol sol fa fa|mi mi re:2|sol sol fa fa|mi mi re:2";
+  var FORMS=[{n:"한도막 형식",song:"비행기",say:"큰악절 1개(8마디)로 된 가장 짧은 형식이에요. 작은악절 2개가 묻고 답하듯 이어져요.",secs:[["A (큰악절)",[["a",A],["a′",A2]]]]},
+    {n:"두도막 형식",song:"환희의 송가",say:"큰악절 2개(16마디)로 된 형식이에요. 앞 큰악절 A와 뒤 큰악절 B로 나뉘어요.",secs:[["A (큰악절)",[["a",O1],["a′",O2]]],["B (큰악절)",[["b",O3],["a′",O2]]]]},
+    {n:"작은 세도막 형식",song:"작은 별",say:"작은악절 3개(12마디)로 된 형식이에요. 처음 가락(a) → 다른 가락(b) → 처음 가락(a)으로 돌아와요.",secs:[["",[["a",T1],["b",T2],["a",T1]]]]},
+    {n:"세도막 형식",song:"",say:"큰악절 3개(24마디)로 된 형식이에요. A → B → A처럼 처음 부분이 다시 돌아오는 곡이 많아요. 작은 세도막 형식을 두 배로 늘린 모양이라고 생각하면 쉬워요.",secs:[]}];
+  var MIDI={so:55,"do":60,re:62,mi:64,fa:65,sol:67,la:69},KO={so:"낮은솔","do":"도",re:"레",mi:"미",fa:"파",sol:"솔",la:"라"};
+  /* ---------- 소리 ---------- */
+  var ac=null,timers=[],raf=null;
+  function A_(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();}catch(e){}return ac;}
+  function tone(m,t,d,g){var f=440*Math.pow(2,(m-69)/12),G=ac.createGain();G.gain.setValueAtTime(0,t);G.gain.linearRampToValueAtTime(g,t+.02);G.gain.setValueAtTime(g*.85,t+Math.max(.03,d-.06));G.gain.linearRampToValueAtTime(0,t+d);G.connect(ac.destination);
+    [[1,1],[2,.25],[3,.08]].forEach(function(p){var o=ac.createOscillator(),g2=ac.createGain();o.type="triangle";o.frequency.value=f*p[0];g2.gain.value=p[1];o.connect(g2);g2.connect(G);o.start(t);o.stop(t+d+.03);G.nodes=(G.nodes||[]).concat(o);});live.push(G);}
+  function click(t){var o=ac.createOscillator(),g=ac.createGain();o.frequency.value=1500;g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.05);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.06);live.push(g);}
+  var live=[];
+  function stopAll(){live.forEach(function(g){try{g.disconnect();}catch(e){}});live=[];cancelAnimationFrame(raf);raf=null;if(onStop){var f=onStop;onStop=null;f();}}
+  var onStop=null;
+  /* 화면은 오디오 시계를 보고 움직인다 */
+  function follow(t0,events,end,done){onStop=done;(function fr(){var now=ac.currentTime-(ac.outputLatency||ac.baseLatency||0);while(events.length&&events[0].t<=now)events.shift().f();if(now>=end){raf=null;var f=onStop;onStop=null;if(f)f();return;}raf=requestAnimationFrame(fr);})();}
+  /* ---------- 음표와 쉼표 ---------- */
+  var cur={rest:false,i:4};
+  function item(box,list,svgf,rest){list.forEach(function(x,i){var b=document.createElement("button");b.innerHTML=svgf(x.o)+x.n+"<small>"+bt(x.b)+"</small>";b.onclick=function(){cur={rest:rest,i:i};showNote();playNote();};box.appendChild(b);});}
+  function showNote(){var x=(cur.rest?RESTS:NOTES)[cur.i];$("nName").textContent=x.n+" · "+bt(x.b);
+    $("nSay").innerHTML=cur.rest?"<b>"+bt(x.b)+"</b> 동안 소리를 내지 않고 쉬어요. "+(x.tip||""):"<b>"+bt(x.b)+"</b> 동안 소리를 내요."+(x.o.dot?" 점이 붙으면 원래 길이의 절반만큼 더 길어져요.":x.b<1?" 4분음표 1박 안에 "+(1/x.b)+"개가 들어가요.":"");
+    $("len").style.width="calc("+(x.b/4*100)+"% - "+(x.b>=4?0:2)+"px)";$("len").className=cur.rest?"rest":"";
+    [["notes",false],["rests",true]].forEach(function(p){Array.prototype.forEach.call($(p[0]).children,function(b,i){b.setAttribute("aria-pressed",cur.rest===p[1]&&i===cur.i);});});}
+  function playNote(){if(!A_())return;stopAll();var x=(cur.rest?RESTS:NOTES)[cur.i],t0=ac.currentTime+.1,sp=.75,ev=[],cells=$("beats").querySelectorAll("div");
+    for(var k=0;k<4;k++){click(t0+k*sp);(function(k){ev.push({t:t0+k*sp,f:function(){Array.prototype.forEach.call(cells,function(c,j){c.classList.toggle("tick",j===k);});}});})(k);}
+    if(!cur.rest)tone(67,t0,x.b*sp,.25);
+    follow(t0,ev,t0+4*sp,function(){Array.prototype.forEach.call(cells,function(c){c.classList.remove("tick");});});}
+  /* ---------- 셈여림 ---------- */
+  var di=3,PH=[60,62,64,65,67,65,64,62];
+  function gains(d){return PH.map(function(_,k){return d.ramp?(d.ramp>0?.03+k*(.57/7):.6-k*(.57/7)):d.g;});}
+  function showDyn(){var d=DYN[di];$("dName").innerHTML=(d.ramp?(d.ramp>0?"＜":"＞"):"<i style='font-family:Georgia,serif'>"+d.s+"</i>")+" "+d.n;$("dSay").innerHTML="<b>"+d.m+"</b> 연주하라는 뜻이에요."+(d.ramp?" 한 번에 바뀌지 않고 조금씩 바뀌어요.":"");
+    $("vol").innerHTML=gains(d).map(function(g){return "<div style='height:"+Math.round(8+Math.sqrt(g/.6)*92)+"%'></div>";}).join("");
+    Array.prototype.forEach.call($("dyns").children,function(b,i){b.setAttribute("aria-pressed",i===di);});}
+  function playDyn(){if(!A_())return;stopAll();var g=gains(DYN[di]),t0=ac.currentTime+.1,sp=.42,ev=[],bars=$("vol").children;
+    PH.forEach(function(m,k){tone(m,t0+k*sp,sp*.95,g[k]);ev.push({t:t0+k*sp,f:function(){Array.prototype.forEach.call(bars,function(b,j){b.classList.toggle("now",j===k);});}});});
+    follow(t0,ev,t0+PH.length*sp,function(){Array.prototype.forEach.call(bars,function(b){b.classList.remove("now");});});}
+  /* ---------- 빠르기 ---------- */
+  var ti=3;
+  function showTempo(){var t=TEMPO[ti];$("tName").textContent=t.s+" ("+t.n+")";$("tSay").innerHTML="<b>"+t.m+"</b> 연주하라는 뜻이에요. ♩= 약 "+t.q;Array.prototype.forEach.call($("tempos").children,function(b,i){b.setAttribute("aria-pressed",i===ti);});}
+  function playTempo(){if(!A_())return;stopAll();var sp=60/TEMPO[ti].q,t0=ac.currentTime+.1,mel=[60,60,67,67,69,69,67,67];
+    mel.forEach(function(m,k){if(k!==7)tone(m,t0+k*sp,k===6?sp*1.9:sp*.92,.22);click(t0+k*sp);});
+    onStop=function(){$("ball").style.transform="";};(function fr(){var now=ac.currentTime-(ac.outputLatency||ac.baseLatency||0),p=(now-t0)/sp;if(p>=8){stopAll();return;}if(p>=0){var b=Math.floor(p),f=p-b,dir=b%2?-1:1;$("ball").style.transform="translate("+(dir*(110-220*f))+"px,"+(-48*4*f*(1-f))+"px)";}raf=requestAnimationFrame(fr);})();}
+  /* ---------- 노래 형식 ---------- */
+  var fi=0,COL={a:"var(--c3)",b:"var(--c1)"};
+  function parse(str){return str.split("|").map(function(m){return m.split(" ").map(function(x){var p=x.split(":");return {n:p[0],b:p[1]?+p[1]:1};});});}
+  function showForm(){stopAll();var F=FORMS[fi];$("fSay").innerHTML="<b>"+F.n+"</b> — "+F.say;$("fCard").classList.toggle("hidden",!F.secs.length);$("fName").textContent=F.song?"예: "+F.song:"";
+    var h="",no=0;F.secs.forEach(function(s){if(s[0])h+="<div class='sec'>"+s[0]+"</div>";s[1].forEach(function(p){h+="<div class='phrase' style='--pc:"+COL[p[0][0]]+"'><b>"+p[0]+"</b> 작은악절 (4마디)<div class='ms'>"+parse(p[1]).map(function(m){no++;return "<span data-m='"+no+"'>"+m.map(function(x){return KO[x.n];}).join(" ")+"</span>";}).join("")+"</div></div>";});});
+    $("form").innerHTML=h;Array.prototype.forEach.call($("forms").children,function(b,i){b.setAttribute("aria-pressed",i===fi);});$("fPlay").textContent="▶ 들으며 짜임 보기";}
+  function playForm(){if(raf){stopAll();return;}if(!A_())return;stopAll();var F=FORMS[fi],sp=.42,t=ac.currentTime+.15,t0=t,ev=[],no=0;
+    F.secs.forEach(function(s){s[1].forEach(function(p){parse(p[1]).forEach(function(m){no++;(function(no){ev.push({t:t,f:function(){mark(no);}});})(no);m.forEach(function(x){tone(MIDI[x.n],t,x.b*sp*.95,.22);t+=x.b*sp;});});});});
+    $("fPlay").textContent="■ 멈추기";follow(t0,ev,t,function(){mark(0);$("fPlay").textContent="▶ 들으며 짜임 보기";});}
+  function mark(no){Array.prototype.forEach.call($("form").querySelectorAll("span"),function(s){s.classList.toggle("now",+s.dataset.m===no);});var e=$("form").querySelector(".now");if(e&&e.scrollIntoView)e.scrollIntoView({block:"nearest"});}
+  /* ---------- 퀴즈 ---------- */
+  var Q=[],qi=0,score=0;
+  function pick(arr,ans,n){var o=arr.filter(function(x,i,a){return x!==ans&&a.indexOf(x)===i;}).sort(function(){return Math.random()-.5;}).slice(0,n-1);o.push(ans);return o.sort(function(){return Math.random()-.5;});}
+  function makeQuiz(){var pool=[];
+    NOTES.forEach(function(x){pool.push({show:noteSvg(x.o),q:"이 음표는 몇 박일까요?",a:bt(x.b),o:pick(NOTES.map(function(y){return bt(y.b);}),bt(x.b),4),fb:x.n+"는 "+bt(x.b)+"이에요."});});
+    RESTS.forEach(function(x){pool.push({show:restSvg(x.o),q:"이 쉼표의 이름은 무엇일까요?",a:x.n,o:pick(RESTS.map(function(y){return y.n;}),x.n,4),fb:x.n+"는 "+bt(x.b)+" 동안 쉬어요."});});
+    DYN.forEach(function(x){pool.push({show:"<span class='sym'>"+(x.ramp?(x.ramp>0?"＜":"＞"):x.s)+"</span>",q:"이 셈여림표의 뜻은 무엇일까요?",a:x.m,o:pick(DYN.map(function(y){return y.m;}),x.m,4),fb:x.n+"는 ‘"+x.m+"’예요."});});
+    TEMPO.forEach(function(x){pool.push({show:"<span class='sym' style='font-size:38px'>"+x.s+"</span>",q:"이 빠르기말의 뜻은 무엇일까요?",a:x.m,o:pick(TEMPO.map(function(y){return y.m;}),x.m,4),fb:x.s+"("+x.n+")는 ‘"+x.m+"’예요."});});
+    [["한도막 형식","8마디"],["두도막 형식","16마디"],["작은 세도막 형식","12마디"],["세도막 형식","24마디"]].forEach(function(f){pool.push({show:"<span class='sym' style='font-style:normal;font-family:inherit;font-size:30px;font-weight:800'>"+f[0]+"</span>",q:"이 형식은 보통 몇 마디일까요?",a:f[1],o:pick(["8마디","12마디","16마디","24마디"],f[1],4),fb:f[0]+"은 "+f[1]+"예요."});});
+    Q=pool.sort(function(){return Math.random()-.5;}).slice(0,10);qi=0;score=0;showQ();}
+  function showQ(){var q=Q[qi];$("qNo").textContent="문제 "+(qi+1)+" / "+Q.length;$("qScore").textContent="맞힌 문제 "+score;$("qShow").innerHTML=q.show;$("qText").textContent=q.q;$("qFb").classList.add("hidden");$("qNext").classList.add("hidden");
+    $("opts").innerHTML="";q.o.forEach(function(o){var b=document.createElement("button");b.textContent=o;b.onclick=function(){if(!$("qNext").classList.contains("hidden"))return;var ok=o===q.a;if(ok)score++;b.classList.add(ok?"ok":"no");Array.prototype.forEach.call($("opts").children,function(x){if(x.textContent===q.a)x.classList.add("ok");});
+      $("qFb").textContent=(ok?"맞았어요! ":"아쉬워요. ")+q.fb;$("qFb").classList.remove("hidden");$("qScore").textContent="맞힌 문제 "+score;$("qNext").textContent=qi===Q.length-1?"결과 보기":"다음 문제 ▶";$("qNext").classList.remove("hidden");};$("opts").appendChild(b);});}
+  $("qNext").onclick=function(){qi++;if(qi<Q.length){showQ();return;}$("qNo").textContent="끝!";$("qShow").innerHTML="<span class='sym' style='font-style:normal;font-family:inherit;font-weight:800'>"+score+" / "+Q.length+"</span>";$("qText").textContent=score>=9?"음악 이론 박사예요!":score>=6?"잘했어요. 틀린 것만 다시 살펴봐요.":"다른 탭에서 한 번 더 듣고 다시 도전해요.";$("opts").innerHTML="";$("qFb").classList.add("hidden");$("qNext").textContent="새 문제로 다시 하기";qi=-1;$("qNext").onclick2=1;Q=[];};
+  var oldNext=$("qNext").onclick;$("qNext").onclick=function(){if(!Q.length){makeQuiz();return;}oldNext();};
+  /* ---------- 조립 ---------- */
+  item($("notes"),NOTES,noteSvg,false);item($("rests"),RESTS,restSvg,true);
+  DYN.forEach(function(d,i){var b=document.createElement("button");b.innerHTML="<span class='sym'>"+(d.ramp?(d.ramp>0?"＜":"＞"):d.s)+"</span>"+d.m+"<small>"+d.n+"</small>";b.onclick=function(){di=i;showDyn();playDyn();};$("dyns").appendChild(b);});
+  TEMPO.forEach(function(t,i){var b=document.createElement("button");b.innerHTML="<span class='sym' style='font-size:17px'>"+t.s+"</span>"+t.m+"<small>♩= 약 "+t.q+"</small>";b.onclick=function(){ti=i;showTempo();playTempo();};$("tempos").appendChild(b);});
+  FORMS.forEach(function(f,i){var b=document.createElement("button");b.className="chip";b.textContent=f.n;b.onclick=function(){fi=i;showForm();};$("forms").appendChild(b);});
+  $("nPlay").onclick=playNote;$("dPlay").onclick=playDyn;$("tPlay").onclick=playTempo;$("fPlay").onclick=playForm;
+  Array.prototype.forEach.call($("tabs").children,function(b){b.onclick=function(){stopAll();Array.prototype.forEach.call($("tabs").children,function(x){x.setAttribute("aria-selected",x===b);$("p-"+x.dataset.t).classList.toggle("hidden",x!==b);});if(b.dataset.t==="quiz"&&!Q.length)makeQuiz();};});
+  showNote();showDyn();showTempo();showForm();
+})();
+</script>
+</body></html>
