@@ -173,16 +173,22 @@ td input[type=number]{width:90px}
 
   /* ---------- 재생 ---------- */
   function slotDur(){return 60/(+$("tempo").value)/3;}
-  function stop(){S.playing=false;clearTimeout(S.timer);S.slot=-1;$("play").textContent="▶ 장단 듣기";Array.prototype.forEach.call($("grid").querySelectorAll(".now"),function(e){e.classList.remove("now");});}
-  function start(cycles,done){var a=audio();stop();S.playing=true;$("play").textContent="■ 멈추기";S.exp=[];var i=0,count=0,total=0,ok=0;
-    (function tick(){if(!S.playing)return;var d=slotDur(),c=S.pat[i],now=performance.now();
-      if(i===0&&count>0&&S.tab==="tap"){$("tapMsg").className="msg "+(ok>=total*.8?"ok":"");$("tapMsg").textContent="이번 장단: "+total+"번 중 "+ok+"번 맞았어요"+(ok===total&&total?" — 완벽해요!":"");total=0;ok=0;Array.prototype.forEach.call($("grid").querySelectorAll(".hit,.miss"),function(e){e.classList.remove("hit","miss");});}
-      if(cycles&&count>=cycles){stop();if(done)done();return;}
-      var prev=$("grid").querySelector(".now");if(prev)prev.classList.remove("now");var el=cell(i);if(el)el.classList.add("now");S.slot=i;
-      if(c){if(S.tab!=="tap"||S.guide){if(a)stroke(c,a.currentTime+.02,d);flash(c);}
-        if(S.tab==="tap"){total++;var e={i:i,c:c,t:now,done:false,mark:function(good){this.done=true;if(good)ok++;var x=cell(this.i);if(x)x.classList.add(good?"hit":"miss");}};S.exp.push(e);setTimeout(function(){if(!e.done)e.mark(false);},d*1000*.55);}}
-      i++;if(i>=S.pat.length){i=0;count++;}
-      S.timer=setTimeout(tick,d*1000);})();}
+  var sched=null,rafId=null,vq=[];
+  function stop(){S.playing=false;clearInterval(sched);cancelAnimationFrame(rafId);vq=[];S.slot=-1;$("play").textContent="▶ 장단 듣기";Array.prototype.forEach.call($("grid").querySelectorAll(".now"),function(e){e.classList.remove("now");});}
+  /* 소리는 오디오 시계에 미리 예약하고, 화면은 그 소리가 실제로 들리는 순간에 맞춰 움직인다 */
+  function start(cycles,done){var a=audio();stop();if(!a)return;S.playing=true;$("play").textContent="■ 멈추기";S.exp=[];
+    var n=0,nextT=a.currentTime+.12,len=S.pat.length,limit=cycles?cycles*len:Infinity,total=0,ok=0,ended=false;
+    function plan(){while(!ended&&nextT<a.currentTime+.18){if(n>=limit){vq.push({end:true,t:nextT});ended=true;break;}
+        var i=n%len,c=S.pat[i],d=slotDur();if(c&&(S.tab!=="tap"||S.guide))stroke(c,nextT,d);vq.push({i:i,c:c,t:nextT,d:d,first:i===0&&n>0});n++;nextT+=d;}}
+    plan();sched=setInterval(plan,25);
+    (function frame(){if(!S.playing)return;var lat=(a.outputLatency||a.baseLatency||0),now=a.currentTime-lat;
+      while(vq.length&&vq[0].t<=now){var q=vq.shift();
+        if(q.end){stop();if(done)done();return;}
+        if(q.first&&S.tab==="tap"){$("tapMsg").className="msg "+(ok>=total*.8?"ok":"");$("tapMsg").textContent="이번 장단: "+total+"번 중 "+ok+"번 맞았어요"+(ok===total&&total?" — 완벽해요!":"");total=0;ok=0;Array.prototype.forEach.call($("grid").querySelectorAll(".hit,.miss"),function(e){e.classList.remove("hit","miss");});}
+        var prev=$("grid").querySelector(".now");if(prev)prev.classList.remove("now");var el=cell(q.i);if(el)el.classList.add("now");S.slot=q.i;
+        if(q.c){if(S.tab!=="tap"||S.guide)flash(q.c);
+          if(S.tab==="tap"){total++;(function(q){var e={i:q.i,c:q.c,t:performance.now()+(q.t-now)*1000,done:false,mark:function(good){this.done=true;if(good)ok++;var x=cell(this.i);if(x)x.classList.add(good?"hit":"miss");}};S.exp.push(e);setTimeout(function(){if(!e.done)e.mark(false);},q.d*1000*.55);})(q);}}}
+      rafId=requestAnimationFrame(frame);})();}
   $("play").onclick=function(){if(S.playing)stop();else start(S.tab==="tap"?0:0);};
 
   /* ---------- 따라 치기 ---------- */
@@ -219,6 +225,7 @@ td input[type=number]{width:90px}
   $("mkClear").onclick=function(){S.pat=S.pat.map(function(){return "";});drawGrid();};
   Array.prototype.forEach.call(document.querySelectorAll("[data-tab]"),function(b){b.onclick=function(){stop();S.tab=b.dataset.tab;$("tapMsg").textContent="";Array.prototype.forEach.call(document.querySelectorAll("[data-tab]"),function(o){o.setAttribute("aria-selected",o===b);});
       if(S.tab==="quiz")newQuiz();else{S.quiz=null;if(S.tab!=="make"||true)S.pat=JD[S.i].p.slice();$("tempo").value=JD[S.i].bpm;}refresh();};});
+  $("tempo").value=JD[S.i].bpm;
   refresh();
 })();
 </script>
