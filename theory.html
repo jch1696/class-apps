@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>음악 이론 교실</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <style>
 
 
@@ -56,6 +57,39 @@ svg{display:block;width:100%;height:auto}svg text{fill:var(--ink);font-family:in
 .opts button.ok{background:var(--ok);border-color:var(--ok);color:#fff}.opts button.no{background:var(--bad);border-color:var(--bad);color:#fff}
 #qShow{display:flex;justify-content:center;align-items:center;min-height:110px}#qShow svg{width:110px;height:110px}#qShow .sym{font-size:56px;font-style:italic;font-family:Georgia,serif}
 table{border-collapse:collapse;width:100%;font-size:14.5px;margin-top:8px}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}th{color:var(--muted);font-size:12.5px}
+
+/* THEME2: 쌓기나무 앱과 같은 색·글꼴 */
+:root{--bg:#EDF1F3;--surface:#FFFFFF;--surface2:#EDF1F3;--ink:#1D2B36;--muted:#5C6B77;--line:#C9D3DA;--accent:#2F6FDB;--accent-ink:#fff;--c1:#D9482B;--c3:#2F6FDB;--hi:#F6D27A;--on-hi:#3A2706;--ok:#1E8E5A;--bad:#D9482B;--shadow:none;
+ --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--c3:#6FA3F5;--hi:#EFC666;--on-hi:#3A2706;--ok:#4FC08A;--bad:#F0775C;--shadow:none;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--c3:#6FA3F5;--hi:#EFC666;--on-hi:#3A2706;--ok:#4FC08A;--bad:#F0775C;--shadow:none;color-scheme:dark}
+body{font-family:var(--body)}
+h1,h2,button,.big,.sec,.phrase b,th{font-family:var(--display);font-weight:400}
+header{border-bottom:0;padding-bottom:0}h1{font-size:clamp(26px,4vw,36px)}h2{font-size:20px}header p{font-size:15px}
+.card{border-radius:14px;padding:14px}
+.tabs{background:none;border:0;padding:0;gap:8px}
+.tabs button{font-size:17px;font-weight:400;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px}
+.tabs button:hover,.btn:hover,.chip:hover,.items button:hover,.opts button:hover{border-color:var(--ink)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.btn,.chip{font-size:16px;font-weight:400;border-width:1.5px;border-radius:10px;background:var(--surface)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.items button{background:var(--surface);font-weight:400;font-size:16px;border-color:var(--line)}
+.items button small{font-family:var(--body);font-size:13px}
+.items button[aria-pressed="true"]{background:var(--hi);border-color:var(--on-hi);color:var(--on-hi);outline:0}
+.items button[aria-pressed="true"] small{color:var(--on-hi)}
+.items button[aria-pressed="true"] .ink{stroke:var(--on-hi);fill:var(--on-hi)}.items button[aria-pressed="true"] .hol{stroke:var(--on-hi);fill:var(--hi)}
+.hol{fill:var(--surface)}
+.big{font-size:clamp(26px,4vw,34px)}
+.say{background:var(--bg);border-left:6px solid var(--accent);font-size:16px}.say b{color:var(--c1)}
+.note{font-size:14px}
+.beats div{border-color:var(--muted);font-size:13px}.beats div.tick{background:color-mix(in srgb,var(--c1) 14%,transparent);border-width:2px}
+#len{background:var(--hi);border:2px solid var(--on-hi);opacity:1}#len.rest{background:repeating-linear-gradient(45deg,var(--muted) 0 6px,transparent 6px 12px);border-color:var(--muted);opacity:1}
+.vol div{background:var(--accent);opacity:.3}
+.metro{border-bottom-color:var(--ink)}
+.phrase{background:color-mix(in srgb,var(--pc) 9%,var(--surface));border-width:2.5px}.phrase .ms span{background:var(--surface);border:1.5px solid var(--line);font-size:14px}
+.phrase .ms span.now{border-color:var(--pc)}
+.opts button{background:var(--surface);font-weight:400;font-size:18px}
 </style>
 </head><body>
 <div class="app">
