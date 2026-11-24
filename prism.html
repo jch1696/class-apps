@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>각기둥과 각뿔</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 다른 수업 앱(쌓기나무·원주와 원의 넓이)과 같은 색·글꼴 */
+:root{--bg:#EDF1F3;--surface:#FFFFFF;--surface2:#EDF1F3;--ink:#1D2B36;--muted:#5C6B77;--line:#C9D3DA;--accent:#2F6FDB;--accent-ink:#fff;--c1:#D9482B;--sel:#DCEAFF;--sel-ink:#1B4FB0;
+ --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4vw,36px)}
+header p{margin:0;color:var(--muted);font-size:15px}
+h1,button,label,output,select{font-family:var(--display);font-weight:400}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stage{max-width:760px;width:100%;margin:0 auto}
+button{font:inherit;font-family:var(--display);cursor:pointer}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs button{font-size:17px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.btn,.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:16px}
+.tabs button:hover,.btn:hover,.chip:hover{border-color:var(--ink)}
+.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+canvas{display:block;width:100%;border-radius:12px;background:var(--surface2);touch-action:none;cursor:grab}
+.hint{font-size:14px;color:var(--muted);margin:6px 0}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.row label{font-size:15px;min-width:64px}
+.row input[type=range]{flex:1;min-width:140px;height:28px;accent-color:var(--accent)}
+.row output{font-size:17px;min-width:56px;text-align:right}
+.say{background:var(--bg);border-left:6px solid var(--accent);border-radius:8px;padding:9px 12px;margin:10px 0 0;font-size:16px;font-weight:700;min-height:46px}
+.say small{display:block;font-weight:400;color:var(--muted);margin-top:2px;font-size:14.5px}
+.say b.r{color:var(--c1)}
+select{font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:15.5px}
+th{background:var(--surface2);font-family:var(--display);font-weight:400}
+td.st{text-align:left;font-weight:700}
+.ck{min-width:46px;min-height:36px;padding:4px 8px;font-size:19px;line-height:1}
+td.res{width:44px;font-size:18px}
+.vt td{height:92px;font-family:var(--display);font-size:17px;width:33.3%}
+.vt td.no{color:var(--muted);font-size:26px}
+.vt svg{display:block;margin:0 auto 2px;width:54px;height:46px;color:var(--accent)}
+input[type=number]{font:inherit;width:74px;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);margin-left:4px}
+input.ok{border-color:#1E8E5A;background:rgba(30,142,90,.12)}input.bad{border-color:var(--c1);background:rgba(217,72,43,.12)}
+.msg{font-weight:700;min-height:24px;margin:6px 0 0}.msg.ok{color:#1E8E5A}.msg.bad{color:var(--c1)}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+.found{background:var(--surface2);border:2px solid #1E8E5A;border-radius:10px;padding:10px 13px;margin:10px 0 0;font-size:16px;font-weight:700;line-height:1.8}
+.found small{display:block;color:#1E8E5A;font-size:13px}.found i{font-style:normal;color:var(--c1)}
+</style></head><body>
+<div class="app">
+  <header><h1>각기둥과 각뿔</h1><p>밑면의 모양을 바꿔 가며 이름, 구성 요소, 개수의 규칙, 전개도를 알아봐요</p></header>
+  <div class="card"><div class="tabs" id="tabs" role="tablist">
+    <button data-t="name" role="tab" aria-selected="true">① 모양과 이름</button>
+    <button data-t="part" role="tab" aria-selected="false">② 구성 요소</button>
+    <button data-t="cnt" role="tab" aria-selected="false">③ 개수와 규칙</button>
+    <button data-t="net" role="tab" aria-selected="false">④ 전개도</button>
+  </div></div>
+  <section class="card"><div class="stage">
+    <div id="top"></div>
+    <canvas id="cv"></canvas>
+    <p class="hint">그림을 손가락이나 마우스로 끌면 돌려 볼 수 있어요. 점선은 보이지 않는 모서리예요.</p>
+    <div id="ctl"></div>
+    <div class="say" id="say"></div>
+  </div></section>
+</div>
+<script>
+/* 각기둥과 각뿔 (6학년 1학기) — 캔버스 직교 투영 + 깊이 정렬. 외부 라이브러리 없음. solid.html 과 같은 그리기 방식 */
+var $=function(id){ return document.getElementById(id); };
+var cv=$('cv'), g=cv.getContext('2d'), W=640, H=440, S=100, yaw=-0.5, pit=0.36, tab='name';
+var KIND='prism', N=5, R=1.3, HH=2.2;
+var NUM={3:'삼',4:'사',5:'오',6:'육',7:'칠',8:'팔'}, SH={3:'삼각형',4:'사각형',5:'오각형',6:'육각형',7:'칠각형',8:'팔각형'};
+var BLUE=[125,180,245], GREEN=[120,210,165], ORANGE=[251,146,60];
+var INK='#1D2B36', HOT='#D9482B', ACC='#2F6FDB', HALO='#EDF1F3';
+function tone(){ var c=getComputedStyle(document.documentElement), v=function(n,d){ return (c.getPropertyValue(n)||'').trim()||d; }; INK=v('--ink',INK); HOT=v('--c1',HOT); ACC=v('--accent',ACC); HALO=v('--surface2',HALO); }
+function kn(){ return KIND==='prism'?'각기둥':'각뿔'; }
+function nm(){ return NUM[N]+kn(); }
+function fit(){ var w=cv.clientWidth||640, d=window.devicePixelRatio||1; W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
+function rot(p){ var cy=Math.cos(yaw), sy=Math.sin(yaw), cp=Math.cos(pit), sp=Math.sin(pit); var x=p[0]*cy+p[2]*sy, z=-p[0]*sy+p[2]*cy; return [x, p[1]*cp-z*sp, p[1]*sp+z*cp]; }
+function scr(q){ return [W/2+q[0]*S, H/2-q[1]*S]; }
+var L=(function(){ var v=[-0.35,0.6,0.72], n=Math.hypot(v[0],v[1],v[2]); return [v[0]/n,v[1]/n,v[2]/n]; })();
+function paint(faces,lines,dots,texts){
+  g.clearRect(0,0,W,H);
+  var fs=faces.map(function(f){ var q=f.p.map(rot), z=0; q.forEach(function(v){ z+=v[2]; }); z/=q.length;
+    var a=q[0], b=q[1], c=q[q.length-1], ux=b[0]-a[0], uy=b[1]-a[1], uz=b[2]-a[2], vx=c[0]-a[0], vy=c[1]-a[1], vz=c[2]-a[2];
+    var nx=uy*vz-uz*vy, ny=uz*vx-ux*vz, nz=ux*vy-uy*vx, nl=Math.hypot(nx,ny,nz)||1, k=0.6+0.4*Math.abs((nx*L[0]+ny*L[1]+nz*L[2])/nl);
+    return {q:q,z:z,k:k,f:f}; }).sort(function(a,b){ return a.z-b.z; });
+  fs.forEach(function(o){ var c=o.f.c, al=o.f.a==null?1:o.f.a, col='rgba('+Math.round(c[0]*o.k)+','+Math.round(c[1]*o.k)+','+Math.round(c[2]*o.k)+','+al+')';
+    g.beginPath(); o.q.forEach(function(v,i){ var s=scr(v); if(i) g.lineTo(s[0],s[1]); else g.moveTo(s[0],s[1]); }); g.closePath(); g.fillStyle=col; g.fill();
+    if(o.f.ol){ g.strokeStyle=o.f.ol; g.lineWidth=1.8; g.lineJoin='round'; g.stroke(); } });
+  (lines||[]).forEach(function(l){ g.beginPath(); l.p.forEach(function(v,i){ var s=scr(rot(v)); if(i) g.lineTo(s[0],s[1]); else g.moveTo(s[0],s[1]); }); g.strokeStyle=l.c||INK; g.lineWidth=l.w||2; g.setLineDash(l.dash||[]); g.lineCap='round'; g.lineJoin='round'; g.stroke(); g.setLineDash([]); });
+  (dots||[]).forEach(function(d){ var s=scr(rot(d.p)); g.beginPath(); g.arc(s[0],s[1],d.r||6,0,7); g.fillStyle=d.c||'#DC2626'; g.fill(); g.strokeStyle=HALO; g.lineWidth=2; g.stroke(); });
+  (texts||[]).forEach(function(t){ var s=scr(rot(t.p)); g.font=(t.s||17)+'px Jua,"Malgun Gothic",sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.lineWidth=5; g.lineJoin='round'; g.strokeStyle=HALO; g.strokeText(t.t,s[0]+(t.dx||0),s[1]+(t.dy||0)); g.fillStyle=t.c||HOT; g.fillText(t.t,s[0]+(t.dx||0),s[1]+(t.dy||0)); });
+}
+function P(r,y,th){ return [r*Math.sin(th),y,r*Math.cos(th)]; }
+function cen(ps){ var c=[0,0,0]; ps.forEach(function(p){ c[0]+=p[0]; c[1]+=p[1]; c[2]+=p[2]; }); return [c[0]/ps.length,c[1]/ps.length,c[2]/ps.length]; }
+
+/* 입체 모형: V=꼭짓점, F=면({v:[번호], g:'base'|'side'}), E=모서리({a,b,f:[면 번호]}) */
+function model(){ var V=[], F=[], E={}, i, idx=[]; for(i=0;i<N;i++){ V.push(P(R,-HH/2,2*Math.PI*i/N+Math.PI/N)); idx.push(i); }
+  if(KIND==='prism'){ for(i=0;i<N;i++) V.push([V[i][0],HH/2,V[i][2]]); F.push({v:idx.map(function(k){ return N+k; }),g:'base'},{v:idx,g:'base'}); for(i=0;i<N;i++) F.push({v:[i,(i+1)%N,N+(i+1)%N,N+i],g:'side'}); }
+  else { V.push([0,HH/2,0]); F.push({v:idx,g:'base'}); for(i=0;i<N;i++) F.push({v:[i,(i+1)%N,N],g:'side'}); }
+  F.forEach(function(f,fi){ f.v.forEach(function(a,k){ var b=f.v[(k+1)%f.v.length], key=Math.min(a,b)+'-'+Math.max(a,b); (E[key]=E[key]||{a:a,b:b,f:[]}).f.push(fi); }); });
+  return {V:V,F:F,E:Object.keys(E).map(function(k){ return E[k]; })}; }
+/* o: {hi:'base'|'side'|null, alpha, edges:모서리 강조, verts:꼭짓점 강조} */
+function drawSolid(o,lines,dots,texts){ var M=model(), ctr=[0,KIND==='prism'?0:-HH/4,0], faces=[]; lines=lines||[]; dots=dots||[]; texts=texts||[];
+  var front=M.F.map(function(f){ var p=f.v.map(function(i){ return M.V[i]; }), a=p[0], b=p[1], c=p[2], u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]], v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+    var n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]], m=cen(p); if(n[0]*(m[0]-ctr[0])+n[1]*(m[1]-ctr[1])+n[2]*(m[2]-ctr[2])<0) n=[-n[0],-n[1],-n[2]];
+    var on=o.hi===f.g; faces.push({p:p,c:on?ORANGE:(f.g==='base'?GREEN:BLUE),a:o.alpha==null?1:(on?Math.max(o.alpha,0.9):o.alpha)}); return rot(n)[2]>1e-6; });
+  var el=[]; M.E.forEach(function(e){ var vis=e.f.some(function(fi){ return front[fi]; }); el.push({p:[M.V[e.a],M.V[e.b]],c:o.edges?'#DC2626':INK,w:o.edges?(vis?4:2.5):(vis?2.2:1.4),dash:vis?[]:[5,5]}); });
+  if(o.verts) M.V.forEach(function(v){ dots.push({p:v,r:7}); });
+  paint(faces,el.concat(lines),dots,texts); return M; }
+
+/* ───────── 공통: 도형 고르기 ───────── */
+function topUI(){ $('top').innerHTML='<div class="chips">'+[['prism','각기둥'],['pyramid','각뿔']].map(function(k){ return '<button class="chip" aria-pressed="'+(k[0]===KIND)+'" data-k="'+k[0]+'">'+k[1]+'</button>'; }).join('')+
+  '<span style="width:10px"></span>'+[3,4,5,6,7,8].map(function(n){ return '<button class="chip" aria-pressed="'+(n===N)+'" data-n="'+n+'">'+SH[n]+'</button>'; }).join('')+'</div>';
+  $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ ntStop(); if(b.dataset.k) KIND=b.dataset.k; else N=+b.dataset.n; nt=0; if(KIND==='prism'&&ptPart==='apex') ptPart='base'; ui(); draw(); }; }); }
+
+/* ───────── 1. 모양과 이름 ───────── */
+function nmDraw(){ S=Math.min(W/4.4,H/3.5); drawSolid({hi:'base'});
+  $('say').innerHTML='밑면의 모양이 <b>'+SH[N]+'</b>인 '+kn()+'이므로 <b class="r">'+nm()+'</b>이에요.<small>'+(KIND==='prism'?'각기둥은 밑면의 모양에 따라 이름이 정해져요. 밑면(주황색)은 서로 평행하고 합동인 두 면이고, 옆면은 모두 직사각형이에요.':'각뿔도 밑면의 모양에 따라 이름이 정해져요. 밑면(주황색)은 1개이고, 옆면은 모두 삼각형이에요.')+'</small>'; }
+
+/* ───────── 2. 구성 요소 ───────── */
+var PT={prism:[['base','밑면','서로 평행하고 합동인 두 면이에요. 각기둥의 밑면은 2개예요.'],['side','옆면','두 밑면과 만나는 면이에요. 각기둥의 옆면은 모두 직사각형이에요.'],['edge','모서리','면과 면이 만나는 선분이에요.'],['vert','꼭짓점','모서리와 모서리가 만나는 점이에요.'],['height','높이','두 밑면 사이의 거리예요.']],
+  pyramid:[['base','밑면','밑에 놓인 면이에요. 각뿔의 밑면은 1개예요.'],['side','옆면','밑면과 만나는 면이에요. 각뿔의 옆면은 모두 삼각형이에요.'],['edge','모서리','면과 면이 만나는 선분이에요.'],['vert','꼭짓점','모서리와 모서리가 만나는 점이에요.'],['apex','각뿔의 꼭짓점','꼭짓점 중에서도 옆면이 모두 만나는 점이에요.'],['height','높이','각뿔의 꼭짓점에서 밑면에 수직인 선분의 길이예요.']]}, ptPart='base';
+function ptDraw(){ S=Math.min(W/4.4,H/3.5); var lines=[], dots=[], texts=[], hi=(ptPart==='base'||ptPart==='side')?ptPart:null;
+  if(ptPart==='height'){ if(KIND==='prism'){ var a=P(R,-HH/2,Math.PI/N), b=[a[0],HH/2,a[2]]; lines.push({p:[a,b],c:'#DC2626',w:5}); texts.push({p:[a[0],0,a[2]],t:'높이',dx:30}); }
+    else { lines.push({p:[[0,HH/2,0],[0,-HH/2,0]],c:'#DC2626',w:4}); dots.push({p:[0,-HH/2,0],r:4}); texts.push({p:[0,-0.2,0],t:'높이',dx:30}); } }
+  if(ptPart==='apex'){ dots.push({p:[0,HH/2,0],r:8}); texts.push({p:[0,HH/2,0],t:'각뿔의 꼭짓점',dy:-22}); }
+  drawSolid({hi:hi,alpha:0.45,edges:ptPart==='edge',verts:ptPart==='vert'},lines,dots,texts);
+  var p=PT[KIND].filter(function(x){ return x[0]===ptPart; })[0]; $('say').innerHTML='<b class="r">'+p[1]+'</b><small style="font-size:15.5px;color:var(--ink)">'+p[2]+'</small>'; }
+function ptUI(){ $('ctl').innerHTML='<div class="chips" style="margin-top:6px">'+PT[KIND].map(function(p){ return '<button class="chip" aria-pressed="'+(p[0]===ptPart)+'" data-p="'+p[0]+'">'+p[1]+'</button>'; }).join('')+'</div>';
+  $('ctl').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ ptPart=b.dataset.p; ptUI(); draw(); }; }); }
+
+/* ───────── 3. 개수와 규칙 ───────── */
+var recs={prism:{},pyramid:{}}, cnHi='';
+function counts(k,n){ return k==='prism'?[n+2,3*n,2*n]:[n+1,2*n,n+1]; }
+function cnDraw(){ S=Math.min(W/4.4,H/3.5); drawSolid({alpha:cnHi==='f'?0.6:1,edges:cnHi==='e',verts:cnHi==='v'});
+  $('say').innerHTML=nm()+'의 면, 모서리, 꼭짓점은 각각 몇 개일까요?<small>그림을 돌려 가며 세어 보세요. 칸을 누르면 그 부분이 그림에 표시돼요.</small>'; }
+function cnUI(msg,cls){ var rec=recs[KIND], keys=Object.keys(rec).map(Number).sort(function(a,b){ return a-b; }), base=KIND==='prism'?'한 밑면의 변의 수':'밑면의 변의 수';
+  $('ctl').innerHTML='<div class="row">'+[['f','면'],['e','모서리'],['v','꼭짓점']].map(function(x){ return '<label>'+x[1]+'의 수 <input type="number" id="cn_'+x[0]+'" min="0" max="99" inputmode="numeric"></label>'; }).join('')+'<button class="btn primary" id="cnGo">확인하기</button></div><p class="msg '+(cls||'')+'" id="cnMsg">'+(msg||'')+'</p>'+
+    (keys.length?('<table><thead><tr><th>도형</th><th>'+base+'</th><th>면의 수</th><th>모서리의 수</th><th>꼭짓점의 수</th></tr></thead><tbody>'+keys.map(function(n){ var c=counts(KIND,n); return '<tr><td>'+NUM[n]+kn()+'</td><td>'+n+'</td><td>'+c[0]+'</td><td>'+c[1]+'</td><td>'+c[2]+'</td></tr>'; }).join('')+'</tbody></table>'):'')+
+    (keys.length>=3?('<div class="found"><small>찾은 규칙</small>'+(KIND==='prism'?'면의 수 = <i>한 밑면의 변의 수 + 2</i><br>모서리의 수 = <i>한 밑면의 변의 수 × 3</i><br>꼭짓점의 수 = <i>한 밑면의 변의 수 × 2</i>':'면의 수 = <i>밑면의 변의 수 + 1</i><br>모서리의 수 = <i>밑면의 변의 수 × 2</i><br>꼭짓점의 수 = <i>밑면의 변의 수 + 1</i>')+'</div>'):(keys.length?'<p class="note">밑면의 모양을 바꿔 가며 3개 이상 세어 보면 규칙이 나타나요. (지금 '+keys.length+'개)</p>':''));
+  ['f','e','v'].forEach(function(k){ var el=$('cn_'+k); el.onfocus=function(){ cnHi=k; draw(); }; });
+  $('cnGo').onclick=function(){ var c=counts(KIND,N), all=true, any=false; ['f','e','v'].forEach(function(k,i){ var el=$('cn_'+k), ok=el.value!==''&&+el.value===c[i]; if(el.value!=='') any=true; el.className=el.value===''?'':(ok?'ok':'bad'); if(!ok) all=false; });
+    if(all){ recs[KIND][N]=1; cnHi=''; cnUI('맞았어요! 표에 기록했어요. 밑면의 모양을 바꿔서 또 세어 보세요.','ok'); draw(); } else { var m=$('cnMsg'); m.className='msg bad'; m.textContent=any?'빨간 칸을 다시 세어 보세요.':'칸에 수를 써 주세요.'; } }; }
+
+/* ───────── 4. 전개도 ───────── */
+var nt=0, ntTimer=null;
+function ntStop(){ if(ntTimer){ cancelAnimationFrame(ntTimer); ntTimer=null; } }
+function netFaces(e){ var out=[], w=2*R*Math.sin(Math.PI/N), a=R*Math.cos(Math.PI/N), i;
+  if(KIND==='prism'){ var phi=(1-e)*2*Math.PI/N, q=[[0,0]], al=[];
+    for(i=0;i<N;i++){ var A=(i-(N-1)/2)*phi; al.push(A); q.push([q[i][0]+w*Math.cos(A),q[i][1]-w*Math.sin(A)]); }
+    var c0=q[Math.floor(N/2)], c1=q[Math.ceil(N/2)], cx=(c0[0]+c1[0])/2, cz=(c0[1]+c1[1])/2; q=q.map(function(p){ return [p[0]-cx,p[1]-cz]; });
+    for(i=0;i<N;i++) out.push({p:[[q[i][0],HH/2,q[i][1]],[q[i+1][0],HH/2,q[i+1][1]],[q[i+1][0],-HH/2,q[i+1][1]],[q[i][0],-HH/2,q[i][1]]],c:BLUE,ol:INK,g:'side'});
+    var j=Math.floor((N-1)/2), Aj=al[j], u=[Math.cos(Aj),-Math.sin(Aj)], nr=[Math.sin(Aj),Math.cos(Aj)], psi=e*Math.PI/2, loc=[[0,0]], d=0;
+    for(i=1;i<N;i++){ loc.push([loc[i-1][0]+w*Math.cos(d),loc[i-1][1]+w*Math.sin(d)]); d+=2*Math.PI/N; }
+    [1,-1].forEach(function(sg){ out.push({p:loc.map(function(l){ return [q[j][0]+l[0]*u[0]-l[1]*nr[0]*Math.cos(psi), sg*HH/2+sg*l[1]*Math.sin(psi), q[j][1]+l[0]*u[1]-l[1]*nr[1]*Math.cos(psi)]; }),c:GREEN,ol:INK,g:'base'}); });
+  } else { var B=[], l=Math.hypot(a,HH), del=Math.atan2(HH,a); for(i=0;i<N;i++) B.push(P(R,-HH/2,2*Math.PI*i/N+Math.PI/N));
+    out.push({p:B,c:GREEN,ol:INK,g:'base'});
+    for(i=0;i<N;i++){ var p1=B[i], p2=B[(i+1)%N], M=[(p1[0]+p2[0])/2,-HH/2,(p1[2]+p2[2])/2], ml=Math.hypot(M[0],M[2]), o=[M[0]/ml,M[2]/ml], th=(Math.PI-del)*(1-e);
+      out.push({p:[p1,p2,[M[0]+l*Math.cos(th)*o[0],-HH/2+l*Math.sin(th),M[2]+l*Math.cos(th)*o[1]]],c:BLUE,ol:INK,g:'side'}); } }
+  return out; }
+function ntDraw(){ var e=nt*nt*(3-2*nt), w=2*R*Math.sin(Math.PI/N), a=R*Math.cos(Math.PI/N), sy=yaw, sp=pit, texts=[];
+  yaw=yaw*(1-e); pit=pit+((KIND==='prism'?0:Math.PI/2)-pit)*e;
+  if(KIND==='prism') S=Math.min(W*0.9/(2.8+(N*w-2.8)*e),H*0.88/(3+(HH+4*R-3)*e)); else { var D=2*(a+Math.hypot(a,HH)); S=Math.min(W,H)*0.88/(3.2+(D-3.2)*e); }
+  var fs=netFaces(e); if(e>0.97){ var sd=fs.filter(function(f){ return f.g==='side'; }); fs.forEach(function(f){ if(f.g==='base') texts.push({p:cen(f.p),t:'밑면',c:INK,s:15}); }); texts.push({p:cen(sd[Math.floor((N-1)/2)].p),t:'옆면',c:INK,s:15}); }
+  if(KIND==='pyramid'&&e>0){ var off=-HH/2*(1-0)*0; }
+  paint(fs,[],[],texts); yaw=sy; pit=sp;
+  var sl=$('ntT'); if(sl) sl.value=Math.round(nt*100); var b=$('ntGo'); if(b&&!ntTimer) b.textContent=nt>0.5?'◀ 다시 접기':'▶ 펼치기';
+  $('say').innerHTML=nt<0.03?(nm()+'의 모서리를 잘라 펼치면 어떤 모양이 될까요?<small>먼저 예상해 보고 ▶ 펼치기를 눌러 보세요.</small>'):(nt<0.97?'펼치는 중…':
+    (KIND==='prism'?(nm()+'의 전개도예요. 밑면은 합동인 <b class="r">'+SH[N]+' 2개</b>, 옆면은 <b class="r">직사각형 '+N+'개</b>예요.<small>접었을 때 서로 맞닿는 모서리는 길이가 같아요. 전개도는 자르는 모서리에 따라 여러 가지 모양이 나올 수 있어요.</small>'):
+      (nm()+'의 전개도예요. 밑면은 <b class="r">'+SH[N]+' 1개</b>, 옆면은 <b class="r">삼각형 '+N+'개</b>예요.<small>옆면을 접어 올리면 삼각형의 꼭짓점이 한 점에서 만나 각뿔의 꼭짓점이 돼요.</small>'))); }
+function ntUI(){ $('ctl').innerHTML='<div class="row"><label>펼치기</label><input type="range" id="ntT" min="0" max="100" value="'+Math.round(nt*100)+'"><button class="btn primary" id="ntGo">▶ 펼치기</button></div>';
+  $('ntT').oninput=function(){ ntStop(); nt=this.value/100; draw(); };
+  $('ntGo').onclick=function(){ ntStop(); var from=nt, to=from>0.5?0:1, t0=performance.now(); (function step(now){ var k=Math.min(1,(now-t0)/2600); nt=from+(to-from)*k; if(k<1){ ntTimer=requestAnimationFrame(step); draw(); } else { ntTimer=null; draw(); } })(t0); }; }
+
+function ui(){ topUI(); if(tab==='part') ptUI(); else if(tab==='cnt'){ cnHi=''; cnUI(); } else if(tab==='net') ntUI(); else $('ctl').innerHTML=''; }
+function draw(){ tone(); if(tab==='name') nmDraw(); else if(tab==='part') ptDraw(); else if(tab==='cnt') cnDraw(); else ntDraw(); }
+function setTab(t){ ntStop(); tab=t; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+var drag=null;
+cv.addEventListener('pointerdown',function(e){ drag=[e.clientX,e.clientY]; try{ cv.setPointerCapture(e.pointerId); }catch(_){} cv.style.cursor='grabbing'; });
+cv.addEventListener('pointermove',function(e){ if(!drag) return; yaw+=(e.clientX-drag[0])*0.011; pit=Math.max(-0.5,Math.min(1.5,pit+(e.clientY-drag[1])*0.009)); drag=[e.clientX,e.clientY]; draw(); });
+['pointerup','pointercancel'].forEach(function(n){ cv.addEventListener(n,function(){ drag=null; cv.style.cursor='grab'; }); });
+window.addEventListener('resize',fit); try{ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw); }catch(_){}
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+setTab('name'); fit();
+</script></body></html>
