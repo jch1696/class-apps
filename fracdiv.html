@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>분수의 나눗셈</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 다른 수업 앱(쌓기나무·원주와 원의 넓이)과 같은 색·글꼴 */
+:root{--bg:#EDF1F3;--surface:#FFFFFF;--surface2:#EDF1F3;--ink:#1D2B36;--muted:#5C6B77;--line:#C9D3DA;--accent:#2F6FDB;--accent-ink:#fff;--c1:#D9482B;--sel:#DCEAFF;--sel-ink:#1B4FB0;
+ --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4vw,36px)}
+header p{margin:0;color:var(--muted);font-size:15px}
+h1,button,label,output,select{font-family:var(--display);font-weight:400}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stage{max-width:760px;width:100%;margin:0 auto}
+button{font:inherit;font-family:var(--display);cursor:pointer}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs button{font-size:17px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.btn,.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:16px}
+.tabs button:hover,.btn:hover,.chip:hover{border-color:var(--ink)}
+.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+canvas{display:block;width:100%;border-radius:12px;background:var(--surface2);touch-action:none;cursor:grab}
+.hint{font-size:14px;color:var(--muted);margin:6px 0}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.row label{font-size:15px;min-width:64px}
+.row input[type=range]{flex:1;min-width:140px;height:28px;accent-color:var(--accent)}
+.row output{font-size:17px;min-width:56px;text-align:right}
+.say{background:var(--bg);border-left:6px solid var(--accent);border-radius:8px;padding:9px 12px;margin:10px 0 0;font-size:16px;font-weight:700;min-height:46px}
+.say small{display:block;font-weight:400;color:var(--muted);margin-top:2px;font-size:14.5px}
+.say b.r{color:var(--c1)}
+select{font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:15.5px}
+th{background:var(--surface2);font-family:var(--display);font-weight:400}
+td.st{text-align:left;font-weight:700}
+.ck{min-width:46px;min-height:36px;padding:4px 8px;font-size:19px;line-height:1}
+td.res{width:44px;font-size:18px}
+.vt td{height:92px;font-family:var(--display);font-size:17px;width:33.3%}
+.vt td.no{color:var(--muted);font-size:26px}
+.vt svg{display:block;margin:0 auto 2px;width:54px;height:46px;color:var(--accent)}
+input[type=number]{font:inherit;width:74px;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);margin-left:4px}
+input.ok{border-color:#1E8E5A;background:rgba(30,142,90,.12)}input.bad{border-color:var(--c1);background:rgba(217,72,43,.12)}
+.msg{font-weight:700;min-height:24px;margin:6px 0 0}.msg.ok{color:#1E8E5A}.msg.bad{color:var(--c1)}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+.found{background:var(--surface2);border:2px solid #1E8E5A;border-radius:10px;padding:10px 13px;margin:10px 0 0;font-size:16px;font-weight:700;line-height:1.8}
+.found small{display:block;color:#1E8E5A;font-size:13px}.found i{font-style:normal;color:var(--c1)}
+.dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 16px}
+.dims .row label{min-width:40px}
+.score{margin-left:auto;font-family:var(--display)}
+input.wide{width:130px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 3px;font-family:var(--display);font-weight:400}
+.fr i{font-style:normal;border-bottom:2px solid currentColor;padding:0 4px}.fr span{padding:0 4px}
+.fin{display:inline-flex;flex-direction:column;vertical-align:middle;gap:3px;align-items:center}.fin input{margin:0;width:64px;text-align:center}.fin hr{width:100%;border:0;border-top:2.5px solid var(--ink);margin:0}
+.dims .row label{min-width:40px;white-space:nowrap}
+.say small .fr,.say .fr{font-size:.95em}
+canvas{cursor:default}
+</style></head><body>
+<div class="app">
+  <header><h1>분수의 나눗셈</h1><p>그림으로 나누어 보며 분수의 나눗셈을 곱셈으로 바꾸는 까닭을 알아봐요</p></header>
+  <div class="card"><div class="tabs" id="tabs" role="tablist">
+    <button data-t="nn" role="tab" aria-selected="true">① 자연수 ÷ 자연수</button>
+    <button data-t="fn" role="tab" aria-selected="false">② 분수 ÷ 자연수</button>
+    <button data-t="ff" role="tab" aria-selected="false">③ 분수 ÷ 분수</button>
+    <button data-t="fx" role="tab" aria-selected="false">④ 분모가 다를 때</button>
+    <button data-t="quiz" role="tab" aria-selected="false">⑤ 문제 풀기</button>
+  </div></div>
+  <section class="card"><div class="stage">
+    <div id="top"></div>
+    <canvas id="cv"></canvas>
+    <p class="hint" id="hint"></p>
+    <div id="ctl"></div>
+    <div class="say" id="say"></div>
+  </div></section>
+</div>
+<script>
+var $=function(id){ return document.getElementById(id); };
+var cv=$('cv'), g=cv.getContext('2d'), W=640, H=440, S=100, yaw=-0.5, pit=0.36, tab='';
+var BLUE=[125,180,245], GREEN=[120,210,165], ORANGE=[251,146,60], GRAY=[185,196,206], PINK=[236,150,190], YEL=[240,200,95];
+var INK='#1D2B36', HOT='#D9482B', ACC='#2F6FDB', HALO='#EDF1F3', MUTED='#5C6B77', LINE='#C9D3DA';
+function tone(){ var c=getComputedStyle(document.documentElement), v=function(n,d){ return (c.getPropertyValue(n)||'').trim()||d; }; INK=v('--ink',INK); HOT=v('--c1',HOT); ACC=v('--accent',ACC); HALO=v('--surface2',HALO); MUTED=v('--muted',MUTED); LINE=v('--line',LINE); }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function rgba(c,a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+(a==null?1:a)+')'; }
+function fit(){ var w=cv.clientWidth||640, d=window.devicePixelRatio||1; W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
+var D3=false, TAB0="nn";
+/* 수와 연산 앱 공통: 분수 표시, 막대 그리기, 입력 */
+function gcd(a,b){ return b?gcd(b,a%b):Math.abs(a); }
+function lcm(a,b){ return a/gcd(a,b)*b; }
+function F(n,d){ return '<span class="fr"><i>'+n+'</i><span>'+d+'</span></span>'; }
+function MXH(w,n,d){ return (w?w:'')+(n?F(n,d):(w?'':'0')); }
+/* n/d 를 기약분수(대분수) html 로 */
+function MX(n,d){ var k=gcd(n,d)||1; n/=k; d/=k; if(d===1) return ''+n; var w=Math.floor(n/d); return (w?w:'')+F(n-w*d,d); }
+function rect(x,y,w,h,fill,stroke,lw,dash){ if(fill){ g.fillStyle=fill; g.fillRect(x,y,w,h); } if(stroke){ g.strokeStyle=stroke; g.lineWidth=lw||2; g.setLineDash(dash||[]); g.strokeRect(x,y,w,h); g.setLineDash([]); } }
+function line(x1,y1,x2,y2,col,lw,dash){ g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.strokeStyle=col||INK; g.lineWidth=lw||1.5; g.setLineDash(dash||[]); g.stroke(); g.setLineDash([]); }
+function txt(t,x,y,col,sz,al){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; g.textAlign=al||'center'; g.textBaseline='middle'; g.lineWidth=5; g.lineJoin='round'; g.strokeStyle=HALO; g.strokeText(t,x,y); g.fillStyle=col||INK; g.fillText(t,x,y); }
+function tw(t,sz){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; return g.measureText(t).width; }
+/* 캔버스 분수: 가운데 (x,y), 너비를 돌려줌 */
+function cfr(n,d,x,y,col,sz){ sz=sz||18; var w=Math.max(tw(''+n,sz),tw(''+d,sz))+6; txt(''+n,x,y-sz*0.62,col,sz); txt(''+d,x,y+sz*0.66,col,sz); line(x-w/2,y,x+w/2,y,col||INK,2); return w; }
+/* 식 그리기: 토큰 = '÷' 같은 글자 또는 {w,n,d} */
+function cexpr(tk,cx,y,sz,col){ sz=sz||30; var ws=tk.map(function(t){ if(typeof t==='string') return tw(t,sz)+sz*0.5; var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; return (t.w?tw(''+t.w,sz)+4:0)+(t.n!=null?w:0)+sz*0.25; }), tot=ws.reduce(function(a,b){ return a+b; },0), x=cx-tot/2;
+  tk.forEach(function(t,i){ if(typeof t==='string') txt(t,x+ws[i]/2,y,col,sz); else { var xx=x+sz*0.12; if(t.w){ var a=tw(''+t.w,sz); txt(''+t.w,xx+a/2,y,col,sz); xx+=a+4; } if(t.n!=null){ var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; cfr(t.n,t.d,xx+w/2,y,col,sz*0.8); } } x+=ws[i]; }); }
+/* 단위 막대: parts 등분, fills=[[개수,색]...] 를 왼쪽부터 칠함 */
+function bar(x,y,w,h,parts,fills,thin){ var cw=w/parts, k=0; (fills||[]).forEach(function(f){ for(var i=0;i<f[0];i++){ rect(x+(k%parts)*cw,y,cw,h,f[1]); k++; } });
+  for(var i=1;i<parts;i++) line(x+i*cw,y,x+i*cw,y+h,INK,thin?0.8:1.5); rect(x,y,w,h,null,INK,2.4); }
+function sld(id,lab,min,max,val){ return '<div class="row"><label>'+lab+'</label><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" value="'+val+'"><output>'+val+'</output></div>'; }
+function sldBind(id,fn){ $(id).oninput=function(){ this.nextElementSibling.textContent=this.value; fn(+this.value); ui(); draw(); var e=$(id); if(e) e.focus(); }; }
+function frIn(p,whole){ return (whole?'<input type="number" id="'+p+'w" inputmode="numeric" style="width:58px;margin:0 4px 0 0" aria-label="자연수">':'')+'<span class="fin"><input type="number" id="'+p+'n" inputmode="numeric" aria-label="분자"><hr><input type="number" id="'+p+'d" inputmode="numeric" aria-label="분모"></span>'; }
+/* 입력한 분수 값 {n,d} (가분수로). 비어 있으면 null */
+function frVal(p){ var w=$(p+'w')?$(p+'w').value:'', n=$(p+'n').value, d=$(p+'d').value; if(n===''&&d===''&&w==='') return null; if(n===''&&d==='') return {n:+w,d:1}; if(d===''){ d='1'; } if(+d===0) return null; return {n:(+w||0)*(+d)+(+n||0),d:+d}; }
+function frShow(p,n,d){ var k=gcd(n,d)||1; n/=k; d/=k; var w=Math.floor(n/d), r=n-w*d; if($(p+'w')){ $(p+'w').value=w||''; if(r){ $(p+'n').value=r; $(p+'d').value=d; } } else { $(p+'n').value=n; $(p+'d').value=d; } [p+'w',p+'n',p+'d'].forEach(function(i){ if($(i)){ $(i).disabled=true; if($(i).value!=='') $(i).className='ok'; } }); }
+/* 숫자 뒤 조사: P(수,'이','가') → 받침 있으면 앞의 것 */
+function P(n,a,b){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '013678'.indexOf(d)>=0?a:b; }
+function J(n,a,b){ return n+P(n,a,b); }
+function Pr(n){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '036'.indexOf(d)>=0?'으로':'로'; }
+var anT=null;
+function anStop(){ if(anT){ cancelAnimationFrame(anT); anT=null; } }
+function anim(get,set,to,dur,done){ anStop(); var from=get(), t0=performance.now(); (function step(now){ var k=Math.min(1,(now-t0)/(dur||1500)), e=k*k*(3-2*k); set(from+(to-from)*e); if(k<1){ anT=requestAnimationFrame(step); draw(); } else { anT=null; if(done) done(); draw(); } })(t0); }
+function pick(a){ return a[rnd(a.length)]; }
+function shuf(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=rnd(i+1), t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function BWd(){ return Math.min(W-48,620); }
+var PC=[BLUE,ORANGE,GREEN,PINK,YEL,GRAY,[170,150,235],[120,205,215]];
+function scoreH(s){ return '<span class="score">맞힌 문제 '+s[0]+' / '+s[1]+'</span>'; }
+
+/* 분수의 나눗셈 (6학년 1·2학기) */
+/* ───────── 1. (자연수)÷(자연수) ───────── */
+var na=3, nb=4, nt=0;
+function nnDraw(){ var BW=BWd(), x0=(W-BW)/2, top=16, hh=Math.min(34,(H*0.52)/na-8), i, j;
+  for(i=0;i<na;i++){ var y=top+i*(hh+8), fl=[]; if(nt>0) for(j=0;j<nb;j++) fl.push([1,rgba(PC[j],0.85*nt)]); bar(x0,y,BW,hh,nb,fl); }
+  var y2=top+na*(hh+8)+34, units=Math.max(1,Math.ceil(na/nb)), uw=Math.min(BW,BW/units);
+  txt('한 명의 몫',x0,y2-16,MUTED,15,'left');
+  for(i=0;i<units;i++) bar(x0+i*uw,y2,uw,hh,nb,i===0?[[Math.round(Math.min(na,nb)*(nt>0.5?1:0)),rgba(PC[0],0.85)]]:[[nt>0.5?Math.max(0,Math.min(nb,na-i*nb)):0,rgba(PC[0],0.85)]]);
+  if(nt>0.5) for(i=1;i<units;i++){ }
+  var b=$('nGo'); if(b&&!anT) b.textContent=nt>0.5?'◀ 되돌리기':'▶ 똑같이 나누기';
+  $('say').innerHTML=nt<0.99?('떡 '+na+'개를 '+nb+'명이 똑같이 나누어 먹으려고 해요. 한 명이 먹는 양은 얼마일까요?<small>먼저 예상해 보고 ▶ 똑같이 나누기를 눌러 보세요.</small>'):
+    ('떡 1개를 '+nb+'명이 나누면 한 명의 몫은 '+F(1,nb)+'이에요. '+na+'개를 나누면 '+F(1,nb)+'이 '+na+'개이므로 <b class="r">'+na+' ÷ '+nb+' = '+F(na,nb)+(na>=nb?' = '+MX(na,nb):'')+'</b><small style="font-size:15.5px;color:var(--ink)">(자연수) ÷ (자연수)의 몫은 나누어지는 수를 분자, 나누는 수를 분모로 하는 분수로 나타낼 수 있어요.</small>'); }
+function nnUI(){ $('ctl').innerHTML='<div class="dims">'+sld('nA','떡의 수',1,5,na)+sld('nB','사람 수',2,6,nb)+'</div><div class="row"><button class="btn primary" id="nGo">▶ 똑같이 나누기</button></div>';
+  sldBind('nA',function(v){ anStop(); na=v; nt=0; }); sldBind('nB',function(v){ anStop(); nb=v; nt=0; });
+  $('nGo').onclick=function(){ anim(function(){ return nt; },function(v){ nt=v; },nt>0.5?0:1,1000); }; }
+
+/* ───────── 2. (분수)÷(자연수) ───────── */
+var gn=3, gd=4, gk=2, gt=0;
+function fnDraw(){ gn=Math.min(gn,gd); var BW=Math.min(BWd(),460), x0=(W-BW)/2, y0=20, BH=Math.min(H-60,230), cw=BW/gd, rh=BH/gk, i;
+  rect(x0,y0,gn*cw,BH,rgba(BLUE,0.45)); if(gt>0) rect(x0,y0,gn*cw,rh,rgba(ORANGE,0.9*gt));
+  for(i=1;i<gd;i++) line(x0+i*cw,y0,x0+i*cw,y0+BH,INK,1.5);
+  if(gt>0){ g.globalAlpha=gt; for(i=1;i<gk;i++) line(x0,y0+i*rh,x0+BW,y0+i*rh,HOT,2,[7,5]); g.globalAlpha=1; }
+  rect(x0,y0,BW,BH,null,INK,2.4); cfr(gn,gd,x0+gn*cw/2,y0+BH+24,ACC,16);
+  var b=$('gGo'); if(b&&!anT) b.textContent=gt>0.5?'◀ 되돌리기':'▶ '+gk+'등분 하기';
+  var D=gd*gk, simp=gcd(gn,D)>1?' = '+MX(gn,D):'';
+  $('say').innerHTML=gt<0.99?('파란 부분은 전체의 '+F(gn,gd)+P(gn,'이에요','예요')+'. 이것을 '+gk+'로 똑같이 나누면 전체의 얼마일까요?<small>▶ '+gk+'등분 하기를 눌러 보세요.</small>'):
+    ('전체가 '+gd+' × '+gk+' = '+D+'칸으로 나뉘고, 주황색은 그중 '+gn+'칸이에요. <b class="r">'+F(gn,gd)+' ÷ '+gk+' = '+F(gn,gd)+' × '+F(1,gk)+' = '+F(gn,D)+simp+'</b><small style="font-size:15.5px;color:var(--ink)">(분수) ÷ (자연수)는 자연수를 '+F(1,'자연수')+'로 바꾸어 곱해요.'+(gn%gk===0?' 분자가 '+gk+'로 나누어떨어지므로 '+F(gn+' ÷ '+gk,gd)+' = '+F(gn/gk,gd)+'로 계산해도 돼요.':'')+'</small>'); }
+function fnUI(){ $('ctl').innerHTML='<div class="dims">'+sld('gD','분모',2,8,gd)+sld('gN','분자',1,gd,gn)+sld('gK','나누는 수',2,5,gk)+'</div><div class="row"><button class="btn primary" id="gGo">▶ 등분 하기</button></div>';
+  sldBind('gD',function(v){ anStop(); gd=v; gn=Math.min(gn,gd); gt=0; }); sldBind('gN',function(v){ anStop(); gn=v; gt=0; }); sldBind('gK',function(v){ anStop(); gk=v; gt=0; });
+  $('gGo').onclick=function(){ anim(function(){ return gt; },function(v){ gt=v; },gt>0.5?0:1,1000); }; }
+
+/* 막대 위에 b칸씩 묶음 표시 (cnt: 보여 줄 묶음 수, 소수 가능) */
+function groups(x0,y,cw,hh,a,b,cnt){ var q=Math.ceil(a/b), i; for(i=0;i<q&&i<cnt;i++){ var s=i*b, e=Math.min(a,s+b), col=i%2?GREEN:ORANGE; rect(x0+s*cw,y,(e-s)*cw,hh,rgba(col,0.85)); rect(x0+s*cw+2,y+2,(e-s)*cw-4,hh-4,null,HOT,2.5);
+    if(e-s===b) txt((i+1)+'번',x0+(s+e)/2*cw,y-14,HOT,15); else cfr(e-s,b,x0+(s+e)/2*cw,y-22,HOT,13); } }
+/* ───────── 3. (분수)÷(분수) 분모가 같을 때 ───────── */
+var fa=6, fd=7, fb=2, fc=0;
+function ffDraw(){ fa=Math.min(fa,fd); fb=Math.min(fb,fd); var BW=BWd(), x0=(W-BW)/2, hh=50, y1=56, y2=y1+hh+70, cw=BW/fd, q=Math.ceil(fa/fb);
+  bar(x0,y1,BW,hh,fd,[[fa,rgba(BLUE,0.5)]]); groups(x0,y1,cw,hh,fa,fb,fc); for(var i=1;i<fd;i++) line(x0+i*cw,y1,x0+i*cw,y1+hh,INK,1.5); rect(x0,y1,BW,hh,null,INK,2.4);
+  cfr(fa,fd,x0-2,y1+hh+26,ACC,15); txt('나누어지는 수',x0+24,y1+hh+26,MUTED,14,'left');
+  bar(x0,y2,BW,hh*0.8,fd,[[fb,rgba(ORANGE,0.85)]]); cfr(fb,fd,x0-2,y2+hh*0.8+26,HOT,15); txt('나누는 수 (한 묶음)',x0+24,y2+hh*0.8+26,MUTED,14,'left');
+  var b=$('fGo'); if(b&&!anT) b.textContent=fc>=q?'◀ 되돌리기':'▶ 덜어 내기';
+  var full=Math.floor(fa/fb), r=fa%fb;
+  $('say').innerHTML=fc<q?(F(fa,fd)+' 안에 '+F(fb,fd)+P(fb,'이','가')+' 몇 번 들어갈까요?<small>'+F(fa,fd)+P(fa,'은','는')+' '+F(1,fd)+'이 '+fa+'개, '+F(fb,fd)+P(fb,'은','는')+' '+F(1,fd)+'이 '+fb+'개예요. ▶ 덜어 내기를 눌러 보세요.</small>'):
+    (F(1,fd)+'이 '+fa+'개인 것을 '+fb+'개씩 묶으면 '+(r?(full?full+'묶음과 ':'')+'한 묶음의 '+F(r,fb):full+'묶음')+'이에요. <b class="r">'+F(fa,fd)+' ÷ '+F(fb,fd)+' = '+fa+' ÷ '+fb+' = '+(fa%fb?F(fa,fb)+(MX(fa,fb)!==F(fa,fb)?' = '+MX(fa,fb):''):fa/fb)+'</b><small style="font-size:15.5px;color:var(--ink)">분모가 같은 (분수) ÷ (분수)는 분자끼리 나누어 계산해요.</small>'); }
+function ffUI(){ $('ctl').innerHTML='<div class="dims">'+sld('fD','분모',2,10,fd)+sld('fA','나누어지는 수의 분자',1,fd,fa)+sld('fB','나누는 수의 분자',1,fd,fb)+'</div><div class="row"><button class="btn primary" id="fGo">▶ 덜어 내기</button></div>';
+  sldBind('fD',function(v){ anStop(); fd=v; fa=Math.min(fa,fd); fb=Math.min(fb,fd); fc=0; }); sldBind('fA',function(v){ anStop(); fa=v; fc=0; }); sldBind('fB',function(v){ anStop(); fb=v; fc=0; });
+  $('fGo').onclick=function(){ var q=Math.ceil(fa/fb); if(fc>=q){ anStop(); fc=0; draw(); return; } anStop(); fc=0; var t0=performance.now(); (function step(now){ fc=Math.min(q,Math.floor((now-t0)/550)+1); if(fc<q){ anT=requestAnimationFrame(step); draw(); } else { anT=null; draw(); } })(t0); }; }
+
+/* ───────── 4. 분모가 다를 때 ───────── */
+var xa=3, xb=4, xc=2, xd=5, xs=0;
+function fxDraw(){ xa=Math.min(xa,xb); xc=Math.min(xc,xd); var BW=BWd()-40, x0=(W-BW)/2+30, hh=48, y1=50, y2=y1+hh+56, L=xb*xd, A=xa*xd, C=xc*xb, cw=BW/L, i;
+  bar(x0,y1,BW,hh,xs>=1?L:xb,[[xs>=1?A:xa,rgba(BLUE,0.5)]],xs>=1); if(xs>=2){ groups(x0,y1,cw,hh,A,C,99); for(i=1;i<L;i++) line(x0+i*cw,y1,x0+i*cw,y1+hh,INK,0.8); rect(x0,y1,BW,hh,null,INK,2.4); }
+  if(xs>=1) for(i=1;i<xb;i++) line(x0+i*BW/xb,y1-5,x0+i*BW/xb,y1+hh+5,INK,2.4);
+  bar(x0,y2,BW,hh,xs>=1?L:xd,[[xs>=1?C:xc,rgba(ORANGE,0.85)]],xs>=1); if(xs>=1) for(i=1;i<xd;i++) line(x0+i*BW/xd,y2-5,x0+i*BW/xd,y2+hh+5,INK,2.4);
+  cfr(xs>=1?A:xa,xs>=1?L:xb,x0-30,y1+hh/2,ACC,17); cfr(xs>=1?C:xc,xs>=1?L:xd,x0-30,y2+hh/2,HOT,17);
+  cexpr([{n:xa,d:xb},'÷',{n:xc,d:xd}].concat(xs>=2?['=',A+' ÷ '+C]:[]).concat(xs>=3?['=',{n:xa,d:xb},'×',{n:xd,d:xc}]:[]),W/2,y2+hh+50,24);
+  $('say').innerHTML=[F(xa,xb)+' ÷ '+F(xc,xd)+P(xc,'은','는')+' 어떻게 계산할까요?<small>분모가 달라서 '+F(xa,xb)+' 안에 '+F(xc,xd)+P(xc,'이','가')+' 몇 번 들어가는지 바로 알기 어려워요. [다음 ▶]을 눌러 보세요.</small>',
+    '먼저 <b class="r">통분</b>해요. 두 막대를 모두 '+xb+' × '+xd+' = '+L+'칸으로 나누면 '+F(xa,xb)+' = '+F(A,L)+', '+F(xc,xd)+' = '+F(C,L)+'이에요.',
+    '분모가 같아졌으니 <b class="r">분자끼리</b> 나누어요. '+A+'칸을 '+C+'칸씩 묶으면 '+A+' ÷ '+C+' = '+(A%C?F(A,C):A/C)+'<small style="font-size:15.5px;color:var(--ink)">'+F(A,L)+' ÷ '+F(C,L)+' = '+A+' ÷ '+C+' = '+MX(A,C)+'</small>',
+    A+' ÷ '+C+' = '+F(xa+' × '+xd,xb+' × '+xc)+'이므로 <b class="r">'+F(xa,xb)+' ÷ '+F(xc,xd)+' = '+F(xa,xb)+' × '+F(xd,xc)+' = '+MX(A,C)+'</b><small style="font-size:15.5px;color:var(--ink)">(분수) ÷ (분수)는 나누는 분수의 분모와 분자를 바꾸어 곱해요.</small>'][xs]; }
+function fxUI(){ $('ctl').innerHTML='<div class="dims">'+sld('xB','앞 분수의 분모',2,6,xb)+sld('xA','앞 분수의 분자',1,xb,xa)+sld('xD','뒤 분수의 분모',2,6,xd)+sld('xC','뒤 분수의 분자',1,xd,xc)+'</div><div class="row"><button class="btn" id="xPrev">◀ 이전</button><button class="btn primary" id="xNext">다음 ▶</button><span class="score">'+(xs+1)+' / 4단계</span></div>';
+  sldBind('xB',function(v){ xb=v; xa=Math.min(xa,xb); xs=0; }); sldBind('xA',function(v){ xa=v; xs=0; }); sldBind('xD',function(v){ xd=v; xc=Math.min(xc,xd); xs=0; }); sldBind('xC',function(v){ xc=v; xs=0; });
+  $('xPrev').onclick=function(){ xs=Math.max(0,xs-1); fxUI(); draw(); }; $('xNext').onclick=function(){ xs=Math.min(3,xs+1); fxUI(); draw(); }; }
+
+/* ───────── 5. 문제 풀기 ───────── */
+var qz=null, qzScore=[0,0];
+function prop(dmax){ var d, n; do{ d=2+rnd(dmax-1); n=1+rnd(d-1); }while(gcd(n,d)>1); return {n:n,d:d}; }
+function qzNew(){ var t=rnd(6), q={done:false,tries:0}, a, b, c, d, k, w;
+  if(t===0){ a=1+rnd(9); do{ b=2+rnd(8); }while(a%b===0); q.tk=[a+' ÷ '+b]; q.n=a; q.d=b; q.why=a+' ÷ '+b+' = '+F(a,b); }
+  else if(t===1){ a=prop(9); k=2+rnd(5); q.tk=[a,'÷',''+k]; q.n=a.n; q.d=a.d*k; q.why=F(a.n,a.d)+' × '+F(1,k)+' = '+F(a.n,a.d*k); }
+  else if(t===2){ d=3+rnd(9); a=1+rnd(d-1); do{ b=1+rnd(d-1); }while(b===a); q.tk=[{n:a,d:d},'÷',{n:b,d:d}]; q.n=a; q.d=b; q.why='분자끼리 나누면 '+a+' ÷ '+b+' = '+F(a,b); }
+  else if(t===3){ a=prop(8); do{ b=prop(8); }while(b.d===a.d); q.tk=[a,'÷',b]; q.n=a.n*b.d; q.d=a.d*b.n; q.why=F(a.n,a.d)+' × '+F(b.d,b.n)+' = '+F(q.n,q.d); }
+  else if(t===4){ k=2+rnd(7); b=prop(7); q.tk=[''+k,'÷',b]; q.n=k*b.d; q.d=b.n; q.why=k+' × '+F(b.d,b.n)+' = '+F(q.n,q.d); }
+  else { w=1+rnd(3); a=prop(6); b=prop(6); var im=w*a.d+a.n; q.tk=[{w:w,n:a.n,d:a.d},'÷',b]; q.n=im*b.d; q.d=a.d*b.n; q.why='대분수를 가분수로 바꾸면 '+F(im,a.d)+' × '+F(b.d,b.n)+' = '+F(q.n,q.d); }
+  qz=q; }
+function qzDraw(){ if(!qz) qzNew(); cexpr(qz.tk.concat(['=','?']),W/2,H/2,Math.min(52,W/11));
+  var simp=MX(qz.n,qz.d);
+  $('say').innerHTML=qz.done?('<b class="r">정답이에요!</b> 답: '+simp+'<small style="font-size:15.5px;color:var(--ink)">'+qz.why+(qz.why.slice(-(F(qz.n,qz.d).length))===simp?'':' = '+simp)+'</small>'):
+    ('계산해 보세요.'+(qz.tries>=2?'<small style="font-size:15.5px;color:var(--ink)">도움말: '+qz.why.split(' = ')[0]+'</small>':'<small>답은 분수로 써요. 자연수 칸은 대분수일 때만 쓰고, 답이 자연수이면 자연수 칸에만 쓰면 돼요.</small>')); }
+function qzUI(msg,cls){ if(!qz) qzNew(); $('ctl').innerHTML='<div class="row" style="margin-top:8px;font-size:17px"><span>답 = '+frIn('q',true)+'</span>'+(qz.done?'':'<button class="btn primary" id="qGo">확인하기</button>')+'<button class="btn'+(qz.done?' primary':'')+'" id="qNext">'+(qz.done?'다음 문제 ▶':'건너뛰기')+'</button>'+scoreH(qzScore)+'</div><p class="msg '+(cls||'')+'" id="qMsg">'+(msg||'')+'</p>';
+  if(qz.done) frShow('q',qz.n,qz.d);
+  if(!qz.done) $('qGo').onclick=function(){ var v=frVal('q'), m=$('qMsg'); if(!v){ m.className='msg bad'; m.textContent='칸에 수를 써 주세요.'; return; }
+    if(v.n*qz.d===qz.n*v.d){ if(qz.tries===0) qzScore[0]++; qzScore[1]++; qz.done=true; qzUI(gcd(v.n,v.d)>1&&v.d>1?'맞았어요. 기약분수로도 나타내 보세요.':'','ok'); draw(); } else { qz.tries++; m.className='msg bad'; m.textContent='다시 계산해 보세요.'; draw(); } };
+  $('qNext').onclick=function(){ if(!qz.done) qzScore[1]++; qzNew(); qzUI(); draw(); }; }
+
+var UIS={nn:nnUI,fn:fnUI,ff:ffUI,fx:fxUI,quiz:qzUI}, DRS={nn:nnDraw,fn:fnDraw,ff:ffDraw,fx:fxDraw,quiz:qzDraw};
+function ui(){ $('top').innerHTML=''; UIS[tab](); }
+function draw(){ tone(); g.clearRect(0,0,W,H); DRS[tab](); }
+function setTab(t){ anStop(); tab=t; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+
+document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+var drag=null, moved=0;
+cv.addEventListener('pointerdown',function(e){ drag=[e.clientX,e.clientY]; moved=0; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
+cv.addEventListener('pointermove',function(e){ if(!drag) return; var dx=e.clientX-drag[0], dy=e.clientY-drag[1]; moved+=Math.abs(dx)+Math.abs(dy); drag=[e.clientX,e.clientY];
+  if(D3&&!(window.noDrag&&noDrag())){ yaw+=dx*0.011; pit=Math.max(-0.5,Math.min(1.5,pit+dy*0.009)); draw(); } });
+cv.addEventListener('pointerup',function(e){ if(drag&&moved<10&&window.onTap){ var r=cv.getBoundingClientRect(); onTap(e.clientX-r.left,e.clientY-r.top); } drag=null; });
+cv.addEventListener('pointercancel',function(){ drag=null; });
+window.addEventListener('resize',fit); try{ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw); }catch(_){}
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+setTab(TAB0); fit();
+</script></body></html>
