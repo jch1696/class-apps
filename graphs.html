@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>여러 가지 그래프</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 다른 수업 앱(쌓기나무·원주와 원의 넓이)과 같은 색·글꼴 */
+:root{--bg:#EDF1F3;--surface:#FFFFFF;--surface2:#EDF1F3;--ink:#1D2B36;--muted:#5C6B77;--line:#C9D3DA;--accent:#2F6FDB;--accent-ink:#fff;--c1:#D9482B;--sel:#DCEAFF;--sel-ink:#1B4FB0;
+ --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4vw,36px)}
+header p{margin:0;color:var(--muted);font-size:15px}
+h1,button,label,output,select{font-family:var(--display);font-weight:400}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stage{max-width:760px;width:100%;margin:0 auto}
+button{font:inherit;font-family:var(--display);cursor:pointer}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs button{font-size:17px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.btn,.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:16px}
+.tabs button:hover,.btn:hover,.chip:hover{border-color:var(--ink)}
+.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+canvas{display:block;width:100%;border-radius:12px;background:var(--surface2);touch-action:none;cursor:grab}
+.hint{font-size:14px;color:var(--muted);margin:6px 0}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.row label{font-size:15px;min-width:64px}
+.row input[type=range]{flex:1;min-width:140px;height:28px;accent-color:var(--accent)}
+.row output{font-size:17px;min-width:56px;text-align:right}
+.say{background:var(--bg);border-left:6px solid var(--accent);border-radius:8px;padding:9px 12px;margin:10px 0 0;font-size:16px;font-weight:700;min-height:46px}
+.say small{display:block;font-weight:400;color:var(--muted);margin-top:2px;font-size:14.5px}
+.say b.r{color:var(--c1)}
+select{font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:15.5px}
+th{background:var(--surface2);font-family:var(--display);font-weight:400}
+td.st{text-align:left;font-weight:700}
+.ck{min-width:46px;min-height:36px;padding:4px 8px;font-size:19px;line-height:1}
+td.res{width:44px;font-size:18px}
+.vt td{height:92px;font-family:var(--display);font-size:17px;width:33.3%}
+.vt td.no{color:var(--muted);font-size:26px}
+.vt svg{display:block;margin:0 auto 2px;width:54px;height:46px;color:var(--accent)}
+input[type=number]{font:inherit;width:74px;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);margin-left:4px}
+input.ok{border-color:#1E8E5A;background:rgba(30,142,90,.12)}input.bad{border-color:var(--c1);background:rgba(217,72,43,.12)}
+.msg{font-weight:700;min-height:24px;margin:6px 0 0}.msg.ok{color:#1E8E5A}.msg.bad{color:var(--c1)}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+.found{background:var(--surface2);border:2px solid #1E8E5A;border-radius:10px;padding:10px 13px;margin:10px 0 0;font-size:16px;font-weight:700;line-height:1.8}
+.found small{display:block;color:#1E8E5A;font-size:13px}.found i{font-style:normal;color:var(--c1)}
+.dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 16px}
+.dims .row label{min-width:40px}
+.score{margin-left:auto;font-family:var(--display)}
+input.wide{width:130px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 3px;font-family:var(--display);font-weight:400}
+.fr i{font-style:normal;border-bottom:2px solid currentColor;padding:0 4px}.fr span{padding:0 4px}
+.fin{display:inline-flex;flex-direction:column;vertical-align:middle;gap:3px;align-items:center}.fin input{margin:0;width:64px;text-align:center}.fin hr{width:100%;border:0;border-top:2.5px solid var(--ink);margin:0}
+.dims .row label{min-width:40px;white-space:nowrap}
+.say small .fr,.say .fr{font-size:.95em}
+canvas{cursor:default}
+</style></head><body>
+<div class="app">
+  <header><h1>여러 가지 그래프</h1><p>그림그래프, 띠그래프, 원그래프를 만들고 읽어 봐요</p></header>
+  <div class="card"><div class="tabs" id="tabs" role="tablist">
+    <button data-t="pic" role="tab" aria-selected="true">① 그림그래프</button>
+    <button data-t="band" role="tab" aria-selected="false">② 띠그래프</button>
+    <button data-t="pie" role="tab" aria-selected="false">③ 원그래프</button>
+    <button data-t="read" role="tab" aria-selected="false">④ 그래프 해석하기</button>
+    <button data-t="pick" role="tab" aria-selected="false">⑤ 알맞은 그래프</button>
+    <button data-t="mine" role="tab" aria-selected="false">⑥ 우리 반 자료</button>
+  </div></div>
+  <section class="card"><div class="stage">
+    <div id="top"></div>
+    <canvas id="cv"></canvas>
+    <p class="hint" id="hint"></p>
+    <div id="ctl"></div>
+    <div class="say" id="say"></div>
+  </div></section>
+</div>
+<script>
+var $=function(id){ return document.getElementById(id); };
+var cv=$('cv'), g=cv.getContext('2d'), W=640, H=440, S=100, yaw=-0.5, pit=0.36, tab='';
+var BLUE=[125,180,245], GREEN=[120,210,165], ORANGE=[251,146,60], GRAY=[185,196,206], PINK=[236,150,190], YEL=[240,200,95];
+var INK='#1D2B36', HOT='#D9482B', ACC='#2F6FDB', HALO='#EDF1F3', MUTED='#5C6B77', LINE='#C9D3DA';
+function tone(){ var c=getComputedStyle(document.documentElement), v=function(n,d){ return (c.getPropertyValue(n)||'').trim()||d; }; INK=v('--ink',INK); HOT=v('--c1',HOT); ACC=v('--accent',ACC); HALO=v('--surface2',HALO); MUTED=v('--muted',MUTED); LINE=v('--line',LINE); }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function rgba(c,a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+(a==null?1:a)+')'; }
+function fit(){ var w=cv.clientWidth||640, d=window.devicePixelRatio||1; W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
+var D3=false, TAB0="pic";
+/* 수와 연산 앱 공통: 분수 표시, 막대 그리기, 입력 */
+function gcd(a,b){ return b?gcd(b,a%b):Math.abs(a); }
+function lcm(a,b){ return a/gcd(a,b)*b; }
+function F(n,d){ return '<span class="fr"><i>'+n+'</i><span>'+d+'</span></span>'; }
+function MXH(w,n,d){ return (w?w:'')+(n?F(n,d):(w?'':'0')); }
+/* n/d 를 기약분수(대분수) html 로 */
+function MX(n,d){ var k=gcd(n,d)||1; n/=k; d/=k; if(d===1) return ''+n; var w=Math.floor(n/d); return (w?w:'')+F(n-w*d,d); }
+function rect(x,y,w,h,fill,stroke,lw,dash){ if(fill){ g.fillStyle=fill; g.fillRect(x,y,w,h); } if(stroke){ g.strokeStyle=stroke; g.lineWidth=lw||2; g.setLineDash(dash||[]); g.strokeRect(x,y,w,h); g.setLineDash([]); } }
+function line(x1,y1,x2,y2,col,lw,dash){ g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.strokeStyle=col||INK; g.lineWidth=lw||1.5; g.setLineDash(dash||[]); g.stroke(); g.setLineDash([]); }
+function txt(t,x,y,col,sz,al){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; g.textAlign=al||'center'; g.textBaseline='middle'; g.lineWidth=5; g.lineJoin='round'; g.strokeStyle=HALO; g.strokeText(t,x,y); g.fillStyle=col||INK; g.fillText(t,x,y); }
+function tw(t,sz){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; return g.measureText(t).width; }
+/* 캔버스 분수: 가운데 (x,y), 너비를 돌려줌 */
+function cfr(n,d,x,y,col,sz){ sz=sz||18; var w=Math.max(tw(''+n,sz),tw(''+d,sz))+6; txt(''+n,x,y-sz*0.62,col,sz); txt(''+d,x,y+sz*0.66,col,sz); line(x-w/2,y,x+w/2,y,col||INK,2); return w; }
+/* 식 그리기: 토큰 = '÷' 같은 글자 또는 {w,n,d} */
+function cexpr(tk,cx,y,sz,col){ sz=sz||30; var ws=tk.map(function(t){ if(typeof t==='string') return tw(t,sz)+sz*0.5; var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; return (t.w?tw(''+t.w,sz)+4:0)+(t.n!=null?w:0)+sz*0.25; }), tot=ws.reduce(function(a,b){ return a+b; },0), x=cx-tot/2;
+  tk.forEach(function(t,i){ if(typeof t==='string') txt(t,x+ws[i]/2,y,col,sz); else { var xx=x+sz*0.12; if(t.w){ var a=tw(''+t.w,sz); txt(''+t.w,xx+a/2,y,col,sz); xx+=a+4; } if(t.n!=null){ var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; cfr(t.n,t.d,xx+w/2,y,col,sz*0.8); } } x+=ws[i]; }); }
+/* 단위 막대: parts 등분, fills=[[개수,색]...] 를 왼쪽부터 칠함 */
+function bar(x,y,w,h,parts,fills,thin){ var cw=w/parts, k=0; (fills||[]).forEach(function(f){ for(var i=0;i<f[0];i++){ rect(x+(k%parts)*cw,y,cw,h,f[1]); k++; } });
+  for(var i=1;i<parts;i++) line(x+i*cw,y,x+i*cw,y+h,INK,thin?0.8:1.5); rect(x,y,w,h,null,INK,2.4); }
+function sld(id,lab,min,max,val){ return '<div class="row"><label>'+lab+'</label><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" value="'+val+'"><output>'+val+'</output></div>'; }
+function sldBind(id,fn){ $(id).oninput=function(){ this.nextElementSibling.textContent=this.value; fn(+this.value); ui(); draw(); var e=$(id); if(e) e.focus(); }; }
+function frIn(p,whole){ return (whole?'<input type="number" id="'+p+'w" inputmode="numeric" style="width:58px;margin:0 4px 0 0" aria-label="자연수">':'')+'<span class="fin"><input type="number" id="'+p+'n" inputmode="numeric" aria-label="분자"><hr><input type="number" id="'+p+'d" inputmode="numeric" aria-label="분모"></span>'; }
+/* 입력한 분수 값 {n,d} (가분수로). 비어 있으면 null */
+function frVal(p){ var w=$(p+'w')?$(p+'w').value:'', n=$(p+'n').value, d=$(p+'d').value; if(n===''&&d===''&&w==='') return null; if(n===''&&d==='') return {n:+w,d:1}; if(d===''){ d='1'; } if(+d===0) return null; return {n:(+w||0)*(+d)+(+n||0),d:+d}; }
+function frShow(p,n,d){ var k=gcd(n,d)||1; n/=k; d/=k; var w=Math.floor(n/d), r=n-w*d; if($(p+'w')){ $(p+'w').value=w||''; if(r){ $(p+'n').value=r; $(p+'d').value=d; } } else { $(p+'n').value=n; $(p+'d').value=d; } [p+'w',p+'n',p+'d'].forEach(function(i){ if($(i)){ $(i).disabled=true; if($(i).value!=='') $(i).className='ok'; } }); }
+/* 숫자 뒤 조사: P(수,'이','가') → 받침 있으면 앞의 것 */
+function P(n,a,b){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '013678'.indexOf(d)>=0?a:b; }
+function J(n,a,b){ return n+P(n,a,b); }
+function Pr(n){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '036'.indexOf(d)>=0?'으로':'로'; }
+var anT=null;
+function anStop(){ if(anT){ cancelAnimationFrame(anT); anT=null; } }
+function anim(get,set,to,dur,done){ anStop(); var from=get(), t0=performance.now(); (function step(now){ var k=Math.min(1,(now-t0)/(dur||1500)), e=k*k*(3-2*k); set(from+(to-from)*e); if(k<1){ anT=requestAnimationFrame(step); draw(); } else { anT=null; if(done) done(); draw(); } })(t0); }
+function pick(a){ return a[rnd(a.length)]; }
+function shuf(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=rnd(i+1), t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function BWd(){ return Math.min(W-48,620); }
+var PC=[BLUE,ORANGE,GREEN,PINK,YEL,GRAY,[170,150,235],[120,205,215]];
+function scoreH(s){ return '<span class="score">맞힌 문제 '+s[0]+' / '+s[1]+'</span>'; }
+function chipsH(arr,cur,attr,st){ return '<div class="chips"'+(st?' style="'+st+'"':'')+'>'+arr.map(function(k){ return '<button class="chip" aria-pressed="'+(k[0]===cur)+'" data-'+attr+'="'+k[0]+'">'+k[1]+'</button>'; }).join('')+'</div>'; }
+function ri(a,b){ return a+rnd(b-a+1); }
+function beads(x,y,n,col,r,perRow){ perRow=perRow||10; for(var i=0;i<n;i++){ g.beginPath(); g.arc(x+(i%perRow)*(r*2+5)+r,y+Math.floor(i/perRow)*(r*2+5)+r,r,0,7); g.fillStyle=col; g.fill(); g.strokeStyle=INK; g.lineWidth=1.5; g.stroke(); } }
+/* 공통 문제 엔진. gen() → {lines:[글 또는 토큰배열], ask:html, kind:'mc'|'num'|'pair', opts, ans, unit, why} */
+function QZ(gen){ var o={q:null,score:[0,0]};
+  o.next=function(){ o.q=gen(); o.q.done=false; o.q.tries=0; o.q.right=false; };
+  o.draw=function(){ if(!o.q) o.next(); var q=o.q, n=q.lines.length, sz=Math.min(40,W/14,(H-40)/(n*1.9)), y=H/2-(n-1)*sz*0.95;
+    q.lines.forEach(function(l,i){ if(typeof l==='string'){ var s=sz; while(tw(l,s)>W-30&&s>12) s-=1; txt(l,W/2,y+i*sz*1.9,INK,s); } else cexpr(l,W/2,y+i*sz*1.9,sz); });
+    $('say').innerHTML=q.done?((q.right?'<b class="r">정답이에요!</b> ':'아쉬워요. ')+'답: '+q.show+'<small style="font-size:15.5px;color:var(--ink)">'+q.why+'</small>'):(q.ask+(q.tries>=2&&q.hint?'<small style="font-size:15.5px;color:var(--ink)">도움말: '+q.hint+'</small>':'')); };
+  o.ui=function(msg,cls){ if(!o.q) o.next(); var q=o.q, h='';
+    if(q.kind==='mc') h=q.opts.map(function(s,i){ return '<button class="btn'+(q.done?(s===q.ans?' primary':''):' primary')+'" data-o="'+i+'"'+(q.done?' disabled':'')+' style="font-size:17px">'+s+'</button>'; }).join('');
+    else h='<span style="font-size:17px">답 = '+(q.kind==='pair'?'<input type="number" id="qA" inputmode="decimal" step="any"> : <input type="number" id="qB" inputmode="decimal" step="any">':'<input type="number" class="wide" id="qA" inputmode="decimal" step="any">')+' '+(q.unit||'')+'</span>'+(q.done?'':'<button class="btn primary" id="qGo">확인하기</button>');
+    $('ctl').innerHTML='<div class="row" style="margin-top:8px">'+h+'<button class="btn'+(q.done?' primary':'')+'" id="qNext">'+(q.done?'다음 문제 ▶':'건너뛰기')+'</button>'+scoreH(o.score)+'</div><p class="msg '+(cls||'')+'" id="qMsg">'+(msg||'')+'</p>';
+    if(q.kind==='mc'){ if(!q.done) $('ctl').querySelectorAll('[data-o]').forEach(function(b){ b.onclick=function(){ q.done=true; q.right=q.opts[+b.dataset.o]===q.ans; o.score[1]++; if(q.right) o.score[0]++; o.ui(); draw(); }; }); }
+    else if(q.done){ $('qA').value=q.kind==='pair'?q.ans[0]:q.ans; $('qA').className=(q.kind==='pair'?'':'wide ')+'ok'; $('qA').disabled=true; if($('qB')){ $('qB').value=q.ans[1]; $('qB').className='ok'; $('qB').disabled=true; } }
+    else { $('qGo').onclick=function(){ var m=$('qMsg'), a=$('qA').value, b=$('qB')?$('qB').value:'0'; if(a===''||b===''){ m.className='msg bad'; m.textContent='칸에 수를 써 주세요.'; return; }
+        var ok=q.kind==='pair'?(Math.abs(+a-q.ans[0])<1e-9&&Math.abs(+b-q.ans[1])<1e-9):Math.abs(+a-q.ans)<1e-9;
+        if(ok){ if(q.tries===0) o.score[0]++; o.score[1]++; q.done=true; q.right=true; o.ui(); draw(); } else { q.tries++; m.className='msg bad'; m.textContent='다시 생각해 보세요.'; draw(); } };
+      $('qA').onkeydown=function(e){ if(e.key==='Enter'&&!$('qB')) $('qGo').click(); }; }
+    $('qNext').onclick=function(){ if(!o.q.done) o.score[1]++; o.next(); o.ui(); draw(); }; };
+  return o; }
+function DD(x){ return (Math.round(x*1000)/1000)+''; }
+/* 캔버스 표: rows=[[이름, 값들...]], hl=칸 색(선택). 아래쪽 y를 돌려줌 */
+function ctable(rows,y0,hl,rh){ var n=rows[0].length-1, lw=Math.min(150,W*0.3), cw=Math.min(74,(W-30-lw)/n), x0=(W-lw-cw*n)/2; rh=rh||40;
+  rows.forEach(function(r,i){ rect(x0,y0+i*rh,lw,rh,rgba(GRAY,0.3),LINE,1.2); txt(r[0],x0+lw/2,y0+i*rh+rh/2,INK,15); for(var j=0;j<n;j++){ rect(x0+lw+j*cw,y0+i*rh,cw,rh,hl&&hl[i]&&hl[i][j]?hl[i][j]:null,LINE,1.2); txt(''+r[j+1],x0+lw+j*cw+cw/2,y0+i*rh+rh/2,INK,Math.min(18,cw/3.2+6)); } });
+  return y0+rows.length*rh; }
+var GC=[BLUE,ORANGE,GREEN,PINK,YEL,[170,150,235],GRAY];
+/* 띠그래프: it=[{nm,p}] (p=백분율), lab=이름 표시 */
+function drawBand(it,x,y,w,h,lab,upto){ var acc=0, i; for(i=0;i<=20;i++){ line(x+w*i/20,y-(i%2?5:9),x+w*i/20,y,INK,1); if(i%2===0) txt(''+(i*5),x+w*i/20,y-18,MUTED,12); } txt('(%)',x+w+16,y-18,MUTED,12);
+  it.forEach(function(o,k){ if(upto!=null&&k>=upto) return; var sw=w*o.p/100; rect(x+w*acc/100,y,sw,h,rgba(GC[k%GC.length],0.9),INK,1.5); if(lab&&sw>26){ txt(o.nm,x+w*acc/100+sw/2,y+h/2-(sw>44?9:0),INK,Math.min(15,sw/3.2+5)); if(sw>44) txt('('+DD(o.p)+'%)',x+w*acc/100+sw/2,y+h/2+10,INK,12); } acc+=o.p; });
+  rect(x,y,w,h,null,INK,2.4); }
+/* 원그래프: 위쪽에서 시계 방향 */
+function drawPie(it,cx,cy,r,lab,upto){ var acc=0, i, A=function(p){ return -Math.PI/2+Math.PI*2*p/100; };
+  it.forEach(function(o,k){ if(upto!=null&&k>=upto) return; g.beginPath(); g.moveTo(cx,cy); g.arc(cx,cy,r,A(acc),A(acc+o.p)); g.closePath(); g.fillStyle=rgba(GC[k%GC.length],0.9); g.fill(); g.strokeStyle=INK; g.lineWidth=1.5; g.stroke();
+    if(lab&&o.p>=5){ var m=A(acc+o.p/2), rr=r*(o.p>=15?0.62:0.78); txt(o.nm,cx+rr*Math.cos(m),cy+rr*Math.sin(m)-(o.p>=10?8:0),INK,o.p>=15?15:12); if(o.p>=10) txt('('+DD(o.p)+'%)',cx+rr*Math.cos(m),cy+rr*Math.sin(m)+9,INK,12); } acc+=o.p; });
+  g.beginPath(); g.arc(cx,cy,r,0,7); g.strokeStyle=INK; g.lineWidth=2.4; g.stroke();
+  for(i=0;i<20;i++){ var a=A(i*5); line(cx+r*Math.cos(a),cy+r*Math.sin(a),cx+(r+(i%5?5:9))*Math.cos(a),cy+(r+(i%5?5:9))*Math.sin(a),INK,1.2); if(i%5===0) txt(''+(i*5),cx+(r+22)*Math.cos(a),cy+(r+22)*Math.sin(a),MUTED,12); } }
+/* 낱말 뒤 조사 (받침 있으면 앞의 것) */
+function KP(w,a,b){ var c=(''+w).charCodeAt((''+w).length-1); if(c>=0xAC00&&c<=0xD7A3) return (c-0xAC00)%28?a:b; return P(w,a,b); }
+
+/* 여러 가지 그래프 (6학년 1학기) */
+var DS=[{t:'좋아하는 운동',u:'명',T:40,it:[['축구',35],['피구',25],['농구',20],['줄넘기',15],['기타',5]]},{t:'가고 싶은 체험 학습 장소',u:'명',T:20,it:[['놀이공원',40],['과학관',25],['박물관',20],['동물원',10],['기타',5]]},
+  {t:'좋아하는 과목',u:'명',T:200,it:[['체육',30],['미술',25],['수학',20],['국어',15],['기타',10]]},{t:'마을별 쓰레기 배출량',u:'kg',T:400,it:[['가 마을',45],['나 마을',30],['다 마을',15],['라 마을',10]]}], ds=0;
+function items(o){ return o.it.map(function(x){ return {nm:x[0],p:x[1],n:o.T*x[1]/100}; }); }
+
+/* ───────── 1. 그림그래프 ───────── */
+var pg=null, pgNum=false, PGT=[['마을별 사과 생산량','상자','🍎'],['도서관별 책 수','권','📘'],['농장별 닭의 수','마리','🐔'],['지역별 초등학생 수','명','🧒']];
+function pgNew(){ var t=pick(PGT), v=[]; while(v.length<4){ var x=ri(11,49)*10; if(v.indexOf(x)<0) v.push(x); } pg={t:t,v:v,nm:['가','나','다','라']}; }
+function pgDraw(){ if(!pg) pgNew(); var rh=Math.min(64,(H-70)/4), x0=Math.max(70,W*0.14), y0=58, big=Math.min(40,rh*0.68), sm=big*0.52;
+  txt(pg.t[0],W/2,24,INK,19); g.textBaseline='middle';
+  pg.v.forEach(function(v,i){ var y=y0+i*rh+rh/2, x=x0+16, k; rect(14,y0+i*rh,W-28,rh,i%2?null:rgba(GRAY,0.15)); txt(pg.nm[i],x0-24,y,INK,19);
+    g.font=big+'px sans-serif'; g.textAlign='left'; g.fillStyle=INK; for(k=0;k<Math.floor(v/100);k++){ g.fillText(pg.t[2],x,y); x+=big*1.12; } g.font=sm+'px sans-serif'; for(k=0;k<(v%100)/10;k++){ g.fillText(pg.t[2],x,y+big*0.18); x+=sm*1.15; }
+    if(pgNum) txt(v+pg.t[1],W-24,y,HOT,17,'right'); });
+  g.font=big*0.8+'px sans-serif'; g.textAlign='left'; g.fillStyle=INK; g.fillText(pg.t[2],W/2-150,H-22); txt('100'+pg.t[1],W/2-150+big,H-22,INK,15,'left'); g.font=sm*0.9+'px sans-serif'; g.textAlign='left'; g.fillText(pg.t[2],W/2+20,H-20); txt('10'+pg.t[1],W/2+20+sm+4,H-22,INK,15,'left');
+  var mx=pg.v.indexOf(Math.max.apply(null,pg.v)), mn=pg.v.indexOf(Math.min.apply(null,pg.v));
+  $('say').innerHTML='조사한 수를 그림으로 나타낸 그래프를 <b class="r">그림그래프</b>라고 해요. 큰 그림은 100'+pg.t[1]+', 작은 그림은 10'+pg.t[1]+KP(pg.t[1],'을','를')+' 나타내요.'+(pgNum?' 가장 많은 곳은 <b>'+pg.nm[mx]+'</b>('+pg.v[mx]+pg.t[1]+'), 가장 적은 곳은 <b>'+pg.nm[mn]+'</b>('+pg.v[mn]+pg.t[1]+')예요.':'')+'<small style="font-size:15.5px;color:var(--ink)">그림의 크기와 수로 많고 적음을 한눈에 알 수 있어요. 먼저 그림을 세어 각각 얼마인지 읽어 보고 [수 보이기]로 확인하세요.</small>'; }
+function pgUI(){ $('top').innerHTML=''; $('ctl').innerHTML='<div class="row" style="margin-top:8px"><button class="btn primary" id="pgNum">'+(pgNum?'수 숨기기':'수 보이기')+'</button><button class="btn" id="pgNew">다른 자료</button></div>';
+  $('pgNum').onclick=function(){ pgNum=!pgNum; pgUI(); draw(); }; $('pgNew').onclick=function(){ pgNew(); pgNum=false; pgUI(); draw(); }; }
+
+/* ───────── 2. 띠그래프 ───────── */
+var bs=0;
+function dsChips(){ $('top').innerHTML=chipsH(DS.map(function(x,i){ return [i,x.t]; }),ds,'i'); $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ ds=+b.dataset.i; bs=0; ps=0; pm={}; pchk=false; ui(); draw(); }; }); }
+function tbl(o,it,pct,y){ var r=[['항목'].concat(it.map(function(x){ return x.nm; })).concat(['합계']),['수 ('+o.u+')'].concat(it.map(function(x){ return x.n; })).concat([o.T])]; if(pct) r.push(['백분율 (%)'].concat(it.map(function(x){ return x.p; })).concat([100])); return ctable(r,y,null,34); }
+function bdDraw(){ var o=DS[ds], it=items(o), BW=BWd(), x0=(W-BW)/2, y; txt(o.t,W/2,22,INK,18); y=tbl(o,it,bs>=1,40);
+  if(bs>=2) drawBand(it,x0,y+62,BW,58,bs>=3,null);
+  var f=it[0];
+  $('say').innerHTML=['조사한 자료를 표로 정리했어요. 전체에 대한 각 항목의 비율을 한눈에 보려면 어떻게 나타내면 좋을까요?<small>[다음 ▶]을 눌러 띠그래프를 만들어 보세요.</small>',
+    '먼저 각 항목의 <b class="r">백분율</b>을 구해요. '+f.nm+': '+F(f.n,o.T)+' × 100 = '+f.p+'(%)<small style="font-size:15.5px;color:var(--ink)">백분율의 합계가 100%인지 꼭 확인해요.</small>',
+    '전체를 100%로 하는 띠를 그리고, 각 항목이 차지하는 백분율만큼 띠를 나누어요.<small style="font-size:15.5px;color:var(--ink)">작은 눈금 한 칸은 5%예요. '+f.nm+KP(f.nm,'은','는')+' '+f.p+'%이므로 눈금 '+(f.p/5)+'칸이에요.</small>',
+    '나눈 부분에 항목의 이름과 백분율을 쓰면 <b class="r">띠그래프</b>가 완성돼요.<small style="font-size:15.5px;color:var(--ink)">전체에 대한 각 부분의 비율을 띠 모양에 나타낸 그래프예요. 길이가 길수록 비율이 높아요. 가장 비율이 높은 항목은 '+f.nm+'('+f.p+'%)예요.</small>'][bs]; }
+function bdUI(){ dsChips(); $('ctl').innerHTML='<div class="row" style="margin-top:8px"><button class="btn" id="bPrev">◀ 이전</button><button class="btn primary" id="bNext">다음 ▶</button><span class="score">'+(bs+1)+' / 4단계</span></div>';
+  $('bPrev').onclick=function(){ bs=Math.max(0,bs-1); bdUI(); draw(); }; $('bNext').onclick=function(){ bs=Math.min(3,bs+1); bdUI(); draw(); }; }
+
+/* ───────── 3. 원그래프 ───────── */
+var pmode='watch', ps=0, pm={}, pchk=false, PIE={cx:0,cy:0,r:0};
+function piDraw(){ var o=DS[ds], it=items(o), n=it.length, r=Math.min(H/2-44,W*0.24), cx=W*0.33, cy=H/2+10, acc=0, need=[], i; PIE={cx:cx,cy:cy,r:r}; txt(o.t,W/2,20,INK,18);
+  it.forEach(function(x,k){ acc+=x.p; if(k<n-1) need.push(acc); var y=64+k*30; rect(W*0.64,y-10,20,20,rgba(GC[k%GC.length],0.9),INK,1.2); txt(x.nm+'  '+x.p+'%',W*0.64+28,y,INK,16,'left'); });
+  if(pmode==='watch'){ drawPie(it,cx,cy,r,ps>n,ps>n?null:ps);
+    $('say').innerHTML=ps===0?('전체를 100%로 하는 원을 그렸어요. 작은 눈금 한 칸은 5%예요. 위쪽 0에서 시작해 시계 방향으로 나누어요.<small>[다음 ▶]을 누르면 한 항목씩 그려져요.</small>'):
+      (ps<=n?(it[ps-1].nm+KP(it[ps-1].nm,'은','는')+' '+it[ps-1].p+'%이므로 눈금 <b class="r">'+(it[ps-1].p/5)+'칸</b>만큼 나누어요.'):
+      ('나눈 부분에 항목의 이름과 백분율을 쓰면 <b class="r">원그래프</b>가 완성돼요.<small style="font-size:15.5px;color:var(--ink)">전체에 대한 각 부분의 비율을 원 모양에 나타낸 그래프예요. 넓이가 넓을수록 비율이 높아요. 띠그래프와 같은 자료를 다른 모양으로 나타낸 것이에요.</small>')); }
+  else { var keys=Object.keys(pm).map(Number), ok=keys.length===need.length&&need.every(function(v){ return pm[v]; });
+    if(pchk&&ok) drawPie(it,cx,cy,r,true,null); else { drawPie([],cx,cy,r,false,null); line(cx,cy,cx,cy-r,INK,2); keys.forEach(function(v){ var a=-Math.PI/2+Math.PI*2*v/100, bad=pchk&&need.indexOf(v)<0; line(cx,cy,cx+r*Math.cos(a),cy+r*Math.sin(a),bad?'#DC2626':ACC,3); }); }
+    $('say').innerHTML=(pchk&&ok)?'<b class="r">잘했어요!</b> 원그래프가 완성됐어요.<small>다른 자료로도 그려 보세요.</small>':
+      (pchk?('경계선이 맞지 않아요. 빨간 선을 다시 살펴보세요. 필요한 경계선은 '+need.length+'개예요.<small>백분율을 차례로 더해 가며 눈금을 세어요. 한 칸은 5%예요.</small>'):('원의 둘레에 있는 눈금 근처를 눌러 경계선을 그어 보세요. 0에서 시작해 시계 방향으로 '+it.map(function(x){ return x.nm+' '+x.p+'%'; }).join(', ')+' 순서예요.<small>누른 곳에 가장 가까운 눈금에 선이 생겨요. 다시 누르면 지워져요. 필요한 경계선은 '+need.length+'개예요.</small>')); } }
+function piUI(){ dsChips(); var n=DS[ds].it.length;
+  $('ctl').innerHTML=chipsH([['watch','그리는 과정 보기'],['draw','직접 그리기']],pmode,'m','margin-top:8px')+(pmode==='watch'?'<div class="row"><button class="btn" id="pPrev">◀ 이전</button><button class="btn primary" id="pNext">다음 ▶</button></div>':'<div class="row"><button class="btn primary" id="pChk">확인하기</button><button class="btn" id="pClr">지우기</button></div>');
+  $('ctl').querySelectorAll('[data-m]').forEach(function(b){ b.onclick=function(){ pmode=b.dataset.m; pm={}; pchk=false; ps=0; piUI(); draw(); }; });
+  if(pmode==='watch'){ $('pPrev').onclick=function(){ ps=Math.max(0,ps-1); draw(); }; $('pNext').onclick=function(){ ps=Math.min(n+1,ps+1); draw(); }; }
+  else { $('pChk').onclick=function(){ pchk=true; draw(); }; $('pClr').onclick=function(){ pm={}; pchk=false; draw(); }; } }
+function onTap(x,y){ if(tab!=='pie'||pmode!=='draw') return; var dx=x-PIE.cx, dy=y-PIE.cy, d=Math.hypot(dx,dy); if(d<PIE.r*0.35||d>PIE.r+40) return;
+  var p=Math.round(((Math.atan2(dy,dx)+Math.PI/2)/(Math.PI*2)*100+100)%100/5)*5%100; if(p===0) return; if(pm[p]) delete pm[p]; else pm[p]=1; pchk=false; draw(); }
+
+/* ───────── 4. 그래프 해석하기 ───────── */
+var RT=[['좋아하는 간식',['떡볶이','피자','치킨','과일','기타']],['취미 활동',['운동','게임','독서','음악 감상','기타']],['기르고 싶은 동물',['강아지','고양이','햄스터','물고기','기타']],['받고 싶은 선물',['책','옷','게임기','자전거','기타']]];
+var quiz=QZ(function(){ var t=pick(RT), ps=pick([[40,25,20,10,5],[35,30,15,10,10],[45,20,20,10,5],[30,30,20,15,5],[50,25,10,10,5]]), T=pick([20,40,60,200]), it=t[1].map(function(nm,i){ return {nm:nm,p:ps[i],n:T*ps[i]/100}; }), k=rnd(4), q, a, b;
+  if(k===0){ var tie=ps[0]===ps[1]; q={ask:'비율이 가장 '+(tie?'낮은':'높은')+' 항목은 어느 것일까요?',kind:'mc',opts:t[1].slice(0,5),ans:tie?it[4].nm:it[0].nm,why:'길이가 길거나 넓이가 넓을수록 비율이 높아요.'}; if(ps[3]===ps[4]&&tie){ q.ask='비율이 가장 높은 두 항목 가운데 왼쪽(먼저) 것은 어느 것일까요?'; q.ans=it[0].nm; } q.show=q.ans; }
+  else if(k===1){ var pr=[]; it.forEach(function(x,i){ it.forEach(function(y,j){ if(i!==j&&x.p>y.p&&x.p%y.p===0) pr.push([x,y]); }); }); var c=pick(pr); q={ask:c[0].nm+'의 비율은 '+c[1].nm+'의 비율의 몇 배일까요?',kind:'num',unit:'배',ans:c[0].p/c[1].p,show:(c[0].p/c[1].p)+'배',why:c[0].p+' ÷ '+c[1].p+' = '+(c[0].p/c[1].p),hint:'두 항목의 백분율을 나눗셈으로 비교해요.'}; }
+  else if(k===2){ a=it[rnd(4)]; q={ask:'조사한 전체가 '+T+'명일 때, '+a.nm+KP(a.nm,'을','를')+' 고른 사람은 몇 명일까요?',kind:'num',unit:'명',ans:a.n,show:a.n+'명',why:T+' × '+F(a.p,100)+' = '+a.n+'(명)',hint:'전체 수에 그 항목의 비율을 곱해요.'}; }
+  else { a=it[rnd(2)]; b=it[2+rnd(2)]; q={ask:a.nm+' 또는 '+b.nm+KP(b.nm,'을','를')+' 고른 사람은 전체의 몇 %일까요?',kind:'num',unit:'%',ans:a.p+b.p,show:(a.p+b.p)+'%',why:a.p+' + '+b.p+' = '+(a.p+b.p)+'(%)',hint:'두 항목의 백분율을 더해요.'}; }
+  q.lines=[]; q.g={t:t[0],it:it,pie:rnd(2)}; return q; });
+function rdDraw(){ if(!quiz.q) quiz.next(); var gq=quiz.q.g; txt(gq.t,W/2,22,INK,18); if(gq.pie) drawPie(gq.it,W/2,H/2+14,Math.min(H/2-50,W*0.3),true,null); else drawBand(gq.it,(W-BWd())/2,H/2-20,BWd(),70,true,null); quiz.draw(); }
+
+/* ───────── 5. 알맞은 그래프 고르기 ───────── */
+var GO=['그림그래프','막대그래프','꺾은선그래프','띠그래프 또는 원그래프'];
+var PK=[['우리 반 학생들이 좋아하는 계절별 학생 수를','서로 비교하려고 해요.',1,'항목별 수의 크기를 비교할 때는 막대그래프가 알맞아요.'],['하루 동안 교실의 온도가 시간에 따라','어떻게 변하는지 알아보려고 해요.',2,'시간에 따라 변하는 모습은 꺾은선그래프가 알맞아요.'],['전체 학생 수에 대한 혈액형별 학생 수의 비율을','한눈에 비교하려고 해요.',3,'전체에 대한 각 부분의 비율은 띠그래프나 원그래프가 알맞아요.'],
+  ['지역별 쌀 생산량을 지도 위에','그림의 크기로 나타내려고 해요.',0,'지역별 수량을 그림의 크기와 수로 나타낼 때는 그림그래프가 알맞아요.'],['내 키가 1학년부터 6학년까지','어떻게 자랐는지 나타내려고 해요.',2,'연도에 따른 변화는 꺾은선그래프가 알맞아요.'],['한 달 용돈을 어디에 얼마만큼의 비율로','썼는지 나타내려고 해요.',3,'전체 용돈에 대한 쓰임새별 비율은 띠그래프나 원그래프가 알맞아요.'],
+  ['반별 학급 문고 책의 수를','서로 비교하려고 해요.',1,'반별 수량의 크기를 비교할 때는 막대그래프가 알맞아요.'],['마을별 인구를 사람 그림으로','한눈에 알아보게 나타내려고 해요.',0,'수량을 그림으로 나타내는 그림그래프가 알맞아요.'],['우리 학교 학생들의 등교 방법별 비율을','나타내려고 해요.',3,'전체에 대한 각 방법의 비율은 띠그래프나 원그래프가 알맞아요.'],['월별 강수량이 일 년 동안','어떻게 달라지는지 나타내려고 해요.',2,'달에 따라 변하는 모습은 꺾은선그래프가 알맞아요. 양을 비교하려면 막대그래프도 쓸 수 있어요.']], pkI=-1;
+var pkq=QZ(function(){ var i; do{ i=rnd(PK.length); }while(i===pkI); pkI=i; var s=PK[i]; return {lines:[s[0],s[1]],ask:'어떤 그래프로 나타내면 좋을까요?',kind:'mc',opts:GO,ans:GO[s[2]],show:GO[s[2]],why:s[3]}; });
+
+/* ───────── 6. 우리 반 자료로 만들기 ───────── */
+var my={t:'우리 반이 좋아하는 급식',r:[['떡볶이',9],['돈가스',7],['비빔밥',4],['카레',3],['기타',2]],k:'band'};
+try{ var sv=JSON.parse(localStorage.getItem('graphsMine')||'null'); if(sv&&sv.r&&sv.r.length===5) my=sv; }catch(e){}
+function myItems(){ var r=my.r.filter(function(x){ return x[0]&&x[1]>0; }), T=r.reduce(function(a,x){ return a+x[1]; },0); if(!T) return {T:0,it:[]};
+  var raw=r.map(function(x){ return x[1]/T*100; }), fl=raw.map(Math.floor), left=100-fl.reduce(function(a,b){ return a+b; },0), ord=raw.map(function(v,i){ return [v-Math.floor(v),i]; }).sort(function(a,b){ return b[0]-a[0]; });
+  for(var i=0;i<left;i++) fl[ord[i%ord.length][1]]++; return {T:T,it:r.map(function(x,i){ return {nm:x[0],p:fl[i],n:x[1]}; })}; }
+function myDraw(){ var m=myItems(); txt(my.t||'제목',W/2,24,INK,20); if(!m.T){ txt('아래 표에 항목과 수를 써 보세요.',W/2,H/2,MUTED,17); $('say').innerHTML='항목 이름과 수를 쓰면 그래프가 그려져요.'; return; }
+  if(my.k==='band') drawBand(m.it,(W-BWd())/2,H/2-30,BWd(),80,true,null); else drawPie(m.it,W/2,H/2+16,Math.min(H/2-54,W*0.3),true,null);
+  $('say').innerHTML='전체 '+m.T+' 가운데 '+m.it.map(function(x){ return x.nm+' '+x.p+'%'; }).join(', ')+'<small>백분율은 합계가 100%가 되도록 자연수로 어림했어요. 쓴 내용은 이 기기에 저장돼요.</small>'; }
+function myUI(){ $('top').innerHTML=chipsH([['band','띠그래프'],['pie','원그래프']],my.k,'k');
+  $('ctl').innerHTML='<div class="row"><label>제목</label><input type="text" id="myT" value="'+my.t.replace(/"/g,'&quot;')+'" maxlength="30" style="flex:1;min-width:180px;font:inherit;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink)"></div><table><thead><tr><th style="white-space:nowrap">항목</th>'+my.r.map(function(x,i){ return '<td><input type="text" data-n="'+i+'" value="'+x[0].replace(/"/g,'&quot;')+'" maxlength="8" style="width:100%;min-width:60px;font:inherit;padding:6px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);text-align:center"></td>'; }).join('')+'</tr></thead><tbody><tr><th style="white-space:nowrap">수</th>'+my.r.map(function(x,i){ return '<td><input type="number" data-v="'+i+'" value="'+(x[1]||'')+'" min="0" max="9999" style="width:100%;min-width:60px;margin:0;text-align:center"></td>'; }).join('')+'</tr></tbody></table>';
+  var save=function(){ try{ localStorage.setItem('graphsMine',JSON.stringify(my)); }catch(e){} draw(); };
+  $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ my.k=b.dataset.k; myUI(); save(); }; });
+  $('myT').oninput=function(){ my.t=this.value; save(); };
+  $('ctl').querySelectorAll('[data-n]').forEach(function(el){ el.oninput=function(){ my.r[+el.dataset.n][0]=el.value.trim(); save(); }; });
+  $('ctl').querySelectorAll('[data-v]').forEach(function(el){ el.oninput=function(){ my.r[+el.dataset.v][1]=Math.max(0,Math.floor(+el.value||0)); save(); }; }); }
+
+var UIS={pic:pgUI,band:bdUI,pie:piUI,read:function(){ $('top').innerHTML=''; quiz.ui(); },pick:function(){ $('top').innerHTML=''; pkq.ui(); },mine:myUI}, DRS={pic:pgDraw,band:bdDraw,pie:piDraw,read:rdDraw,pick:pkq.draw,mine:myDraw};
+function ui(){ UIS[tab](); }
+function draw(){ tone(); g.clearRect(0,0,W,H); DRS[tab](); }
+function setTab(t){ anStop(); tab=t; $('hint').textContent=t==='pie'?'직접 그리기에서는 원 둘레의 눈금 근처를 눌러요.':''; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+
+document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+var drag=null, moved=0;
+cv.addEventListener('pointerdown',function(e){ drag=[e.clientX,e.clientY]; moved=0; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
+cv.addEventListener('pointermove',function(e){ if(!drag) return; var dx=e.clientX-drag[0], dy=e.clientY-drag[1]; moved+=Math.abs(dx)+Math.abs(dy); drag=[e.clientX,e.clientY];
+  if(D3&&!(window.noDrag&&noDrag())){ yaw+=dx*0.011; pit=Math.max(-0.5,Math.min(1.5,pit+dy*0.009)); draw(); } });
+cv.addEventListener('pointerup',function(e){ if(drag&&moved<10&&window.onTap){ var r=cv.getBoundingClientRect(); onTap(e.clientX-r.left,e.clientY-r.top); } drag=null; });
+cv.addEventListener('pointercancel',function(){ drag=null; });
+window.addEventListener('resize',fit); try{ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw); }catch(_){}
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+setTab(TAB0); fit();
+</script></body></html>

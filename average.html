@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>평균과 가능성</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 다른 수업 앱(쌓기나무·원주와 원의 넓이)과 같은 색·글꼴 */
+:root{--bg:#EDF1F3;--surface:#FFFFFF;--surface2:#EDF1F3;--ink:#1D2B36;--muted:#5C6B77;--line:#C9D3DA;--accent:#2F6FDB;--accent-ink:#fff;--c1:#D9482B;--sel:#DCEAFF;--sel-ink:#1B4FB0;
+ --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4vw,36px)}
+header p{margin:0;color:var(--muted);font-size:15px}
+h1,button,label,output,select{font-family:var(--display);font-weight:400}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stage{max-width:760px;width:100%;margin:0 auto}
+button{font:inherit;font-family:var(--display);cursor:pointer}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs button{font-size:17px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.btn,.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:16px}
+.tabs button:hover,.btn:hover,.chip:hover{border-color:var(--ink)}
+.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+canvas{display:block;width:100%;border-radius:12px;background:var(--surface2);touch-action:none;cursor:grab}
+.hint{font-size:14px;color:var(--muted);margin:6px 0}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.row label{font-size:15px;min-width:64px}
+.row input[type=range]{flex:1;min-width:140px;height:28px;accent-color:var(--accent)}
+.row output{font-size:17px;min-width:56px;text-align:right}
+.say{background:var(--bg);border-left:6px solid var(--accent);border-radius:8px;padding:9px 12px;margin:10px 0 0;font-size:16px;font-weight:700;min-height:46px}
+.say small{display:block;font-weight:400;color:var(--muted);margin-top:2px;font-size:14.5px}
+.say b.r{color:var(--c1)}
+select{font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:15.5px}
+th{background:var(--surface2);font-family:var(--display);font-weight:400}
+td.st{text-align:left;font-weight:700}
+.ck{min-width:46px;min-height:36px;padding:4px 8px;font-size:19px;line-height:1}
+td.res{width:44px;font-size:18px}
+.vt td{height:92px;font-family:var(--display);font-size:17px;width:33.3%}
+.vt td.no{color:var(--muted);font-size:26px}
+.vt svg{display:block;margin:0 auto 2px;width:54px;height:46px;color:var(--accent)}
+input[type=number]{font:inherit;width:74px;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);margin-left:4px}
+input.ok{border-color:#1E8E5A;background:rgba(30,142,90,.12)}input.bad{border-color:var(--c1);background:rgba(217,72,43,.12)}
+.msg{font-weight:700;min-height:24px;margin:6px 0 0}.msg.ok{color:#1E8E5A}.msg.bad{color:var(--c1)}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+.found{background:var(--surface2);border:2px solid #1E8E5A;border-radius:10px;padding:10px 13px;margin:10px 0 0;font-size:16px;font-weight:700;line-height:1.8}
+.found small{display:block;color:#1E8E5A;font-size:13px}.found i{font-style:normal;color:var(--c1)}
+.dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 16px}
+.dims .row label{min-width:40px}
+.score{margin-left:auto;font-family:var(--display)}
+input.wide{width:130px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 3px;font-family:var(--display);font-weight:400}
+.fr i{font-style:normal;border-bottom:2px solid currentColor;padding:0 4px}.fr span{padding:0 4px}
+.fin{display:inline-flex;flex-direction:column;vertical-align:middle;gap:3px;align-items:center}.fin input{margin:0;width:64px;text-align:center}.fin hr{width:100%;border:0;border-top:2.5px solid var(--ink);margin:0}
+.dims .row label{min-width:40px;white-space:nowrap}
+.say small .fr,.say .fr{font-size:.95em}
+canvas{cursor:default}
+</style></head><body>
+<div class="app">
+  <header><h1>평균과 가능성</h1><p>자료를 고르게 하여 평균을 구하고, 일이 일어날 가능성을 알아봐요</p></header>
+  <div class="card"><div class="tabs" id="tabs" role="tablist">
+    <button data-t="level" role="tab" aria-selected="true">① 평균의 뜻</button>
+    <button data-t="calc" role="tab" aria-selected="false">② 평균 구하기</button>
+    <button data-t="use" role="tab" aria-selected="false">③ 평균 이용하기</button>
+    <button data-t="word" role="tab" aria-selected="false">④ 가능성을 말로</button>
+    <button data-t="num" role="tab" aria-selected="false">⑤ 가능성을 수로</button>
+    <button data-t="exp" role="tab" aria-selected="false">⑥ 실험하기</button>
+  </div></div>
+  <section class="card"><div class="stage">
+    <div id="top"></div>
+    <canvas id="cv"></canvas>
+    <p class="hint" id="hint"></p>
+    <div id="ctl"></div>
+    <div class="say" id="say"></div>
+  </div></section>
+</div>
+<script>
+var $=function(id){ return document.getElementById(id); };
+var cv=$('cv'), g=cv.getContext('2d'), W=640, H=440, S=100, yaw=-0.5, pit=0.36, tab='';
+var BLUE=[125,180,245], GREEN=[120,210,165], ORANGE=[251,146,60], GRAY=[185,196,206], PINK=[236,150,190], YEL=[240,200,95];
+var INK='#1D2B36', HOT='#D9482B', ACC='#2F6FDB', HALO='#EDF1F3', MUTED='#5C6B77', LINE='#C9D3DA';
+function tone(){ var c=getComputedStyle(document.documentElement), v=function(n,d){ return (c.getPropertyValue(n)||'').trim()||d; }; INK=v('--ink',INK); HOT=v('--c1',HOT); ACC=v('--accent',ACC); HALO=v('--surface2',HALO); MUTED=v('--muted',MUTED); LINE=v('--line',LINE); }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function rgba(c,a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+(a==null?1:a)+')'; }
+function fit(){ var w=cv.clientWidth||640, d=window.devicePixelRatio||1; W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
+var D3=false, TAB0="level";
+/* 수와 연산 앱 공통: 분수 표시, 막대 그리기, 입력 */
+function gcd(a,b){ return b?gcd(b,a%b):Math.abs(a); }
+function lcm(a,b){ return a/gcd(a,b)*b; }
+function F(n,d){ return '<span class="fr"><i>'+n+'</i><span>'+d+'</span></span>'; }
+function MXH(w,n,d){ return (w?w:'')+(n?F(n,d):(w?'':'0')); }
+/* n/d 를 기약분수(대분수) html 로 */
+function MX(n,d){ var k=gcd(n,d)||1; n/=k; d/=k; if(d===1) return ''+n; var w=Math.floor(n/d); return (w?w:'')+F(n-w*d,d); }
+function rect(x,y,w,h,fill,stroke,lw,dash){ if(fill){ g.fillStyle=fill; g.fillRect(x,y,w,h); } if(stroke){ g.strokeStyle=stroke; g.lineWidth=lw||2; g.setLineDash(dash||[]); g.strokeRect(x,y,w,h); g.setLineDash([]); } }
+function line(x1,y1,x2,y2,col,lw,dash){ g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.strokeStyle=col||INK; g.lineWidth=lw||1.5; g.setLineDash(dash||[]); g.stroke(); g.setLineDash([]); }
+function txt(t,x,y,col,sz,al){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; g.textAlign=al||'center'; g.textBaseline='middle'; g.lineWidth=5; g.lineJoin='round'; g.strokeStyle=HALO; g.strokeText(t,x,y); g.fillStyle=col||INK; g.fillText(t,x,y); }
+function tw(t,sz){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; return g.measureText(t).width; }
+/* 캔버스 분수: 가운데 (x,y), 너비를 돌려줌 */
+function cfr(n,d,x,y,col,sz){ sz=sz||18; var w=Math.max(tw(''+n,sz),tw(''+d,sz))+6; txt(''+n,x,y-sz*0.62,col,sz); txt(''+d,x,y+sz*0.66,col,sz); line(x-w/2,y,x+w/2,y,col||INK,2); return w; }
+/* 식 그리기: 토큰 = '÷' 같은 글자 또는 {w,n,d} */
+function cexpr(tk,cx,y,sz,col){ sz=sz||30; var ws=tk.map(function(t){ if(typeof t==='string') return tw(t,sz)+sz*0.5; var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; return (t.w?tw(''+t.w,sz)+4:0)+(t.n!=null?w:0)+sz*0.25; }), tot=ws.reduce(function(a,b){ return a+b; },0), x=cx-tot/2;
+  tk.forEach(function(t,i){ if(typeof t==='string') txt(t,x+ws[i]/2,y,col,sz); else { var xx=x+sz*0.12; if(t.w){ var a=tw(''+t.w,sz); txt(''+t.w,xx+a/2,y,col,sz); xx+=a+4; } if(t.n!=null){ var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; cfr(t.n,t.d,xx+w/2,y,col,sz*0.8); } } x+=ws[i]; }); }
+/* 단위 막대: parts 등분, fills=[[개수,색]...] 를 왼쪽부터 칠함 */
+function bar(x,y,w,h,parts,fills,thin){ var cw=w/parts, k=0; (fills||[]).forEach(function(f){ for(var i=0;i<f[0];i++){ rect(x+(k%parts)*cw,y,cw,h,f[1]); k++; } });
+  for(var i=1;i<parts;i++) line(x+i*cw,y,x+i*cw,y+h,INK,thin?0.8:1.5); rect(x,y,w,h,null,INK,2.4); }
+function sld(id,lab,min,max,val){ return '<div class="row"><label>'+lab+'</label><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" value="'+val+'"><output>'+val+'</output></div>'; }
+function sldBind(id,fn){ $(id).oninput=function(){ this.nextElementSibling.textContent=this.value; fn(+this.value); ui(); draw(); var e=$(id); if(e) e.focus(); }; }
+function frIn(p,whole){ return (whole?'<input type="number" id="'+p+'w" inputmode="numeric" style="width:58px;margin:0 4px 0 0" aria-label="자연수">':'')+'<span class="fin"><input type="number" id="'+p+'n" inputmode="numeric" aria-label="분자"><hr><input type="number" id="'+p+'d" inputmode="numeric" aria-label="분모"></span>'; }
+/* 입력한 분수 값 {n,d} (가분수로). 비어 있으면 null */
+function frVal(p){ var w=$(p+'w')?$(p+'w').value:'', n=$(p+'n').value, d=$(p+'d').value; if(n===''&&d===''&&w==='') return null; if(n===''&&d==='') return {n:+w,d:1}; if(d===''){ d='1'; } if(+d===0) return null; return {n:(+w||0)*(+d)+(+n||0),d:+d}; }
+function frShow(p,n,d){ var k=gcd(n,d)||1; n/=k; d/=k; var w=Math.floor(n/d), r=n-w*d; if($(p+'w')){ $(p+'w').value=w||''; if(r){ $(p+'n').value=r; $(p+'d').value=d; } } else { $(p+'n').value=n; $(p+'d').value=d; } [p+'w',p+'n',p+'d'].forEach(function(i){ if($(i)){ $(i).disabled=true; if($(i).value!=='') $(i).className='ok'; } }); }
+/* 숫자 뒤 조사: P(수,'이','가') → 받침 있으면 앞의 것 */
+function P(n,a,b){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '013678'.indexOf(d)>=0?a:b; }
+function J(n,a,b){ return n+P(n,a,b); }
+function Pr(n){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '036'.indexOf(d)>=0?'으로':'로'; }
+var anT=null;
+function anStop(){ if(anT){ cancelAnimationFrame(anT); anT=null; } }
+function anim(get,set,to,dur,done){ anStop(); var from=get(), t0=performance.now(); (function step(now){ var k=Math.min(1,(now-t0)/(dur||1500)), e=k*k*(3-2*k); set(from+(to-from)*e); if(k<1){ anT=requestAnimationFrame(step); draw(); } else { anT=null; if(done) done(); draw(); } })(t0); }
+function pick(a){ return a[rnd(a.length)]; }
+function shuf(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=rnd(i+1), t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function BWd(){ return Math.min(W-48,620); }
+var PC=[BLUE,ORANGE,GREEN,PINK,YEL,GRAY,[170,150,235],[120,205,215]];
+function scoreH(s){ return '<span class="score">맞힌 문제 '+s[0]+' / '+s[1]+'</span>'; }
+function chipsH(arr,cur,attr,st){ return '<div class="chips"'+(st?' style="'+st+'"':'')+'>'+arr.map(function(k){ return '<button class="chip" aria-pressed="'+(k[0]===cur)+'" data-'+attr+'="'+k[0]+'">'+k[1]+'</button>'; }).join('')+'</div>'; }
+function ri(a,b){ return a+rnd(b-a+1); }
+function beads(x,y,n,col,r,perRow){ perRow=perRow||10; for(var i=0;i<n;i++){ g.beginPath(); g.arc(x+(i%perRow)*(r*2+5)+r,y+Math.floor(i/perRow)*(r*2+5)+r,r,0,7); g.fillStyle=col; g.fill(); g.strokeStyle=INK; g.lineWidth=1.5; g.stroke(); } }
+/* 공통 문제 엔진. gen() → {lines:[글 또는 토큰배열], ask:html, kind:'mc'|'num'|'pair', opts, ans, unit, why} */
+function QZ(gen){ var o={q:null,score:[0,0]};
+  o.next=function(){ o.q=gen(); o.q.done=false; o.q.tries=0; o.q.right=false; };
+  o.draw=function(){ if(!o.q) o.next(); var q=o.q, n=q.lines.length, sz=Math.min(40,W/14,(H-40)/(n*1.9)), y=H/2-(n-1)*sz*0.95;
+    q.lines.forEach(function(l,i){ if(typeof l==='string'){ var s=sz; while(tw(l,s)>W-30&&s>12) s-=1; txt(l,W/2,y+i*sz*1.9,INK,s); } else cexpr(l,W/2,y+i*sz*1.9,sz); });
+    $('say').innerHTML=q.done?((q.right?'<b class="r">정답이에요!</b> ':'아쉬워요. ')+'답: '+q.show+'<small style="font-size:15.5px;color:var(--ink)">'+q.why+'</small>'):(q.ask+(q.tries>=2&&q.hint?'<small style="font-size:15.5px;color:var(--ink)">도움말: '+q.hint+'</small>':'')); };
+  o.ui=function(msg,cls){ if(!o.q) o.next(); var q=o.q, h='';
+    if(q.kind==='mc') h=q.opts.map(function(s,i){ return '<button class="btn'+(q.done?(s===q.ans?' primary':''):' primary')+'" data-o="'+i+'"'+(q.done?' disabled':'')+' style="font-size:17px">'+s+'</button>'; }).join('');
+    else h='<span style="font-size:17px">답 = '+(q.kind==='pair'?'<input type="number" id="qA" inputmode="decimal" step="any"> : <input type="number" id="qB" inputmode="decimal" step="any">':'<input type="number" class="wide" id="qA" inputmode="decimal" step="any">')+' '+(q.unit||'')+'</span>'+(q.done?'':'<button class="btn primary" id="qGo">확인하기</button>');
+    $('ctl').innerHTML='<div class="row" style="margin-top:8px">'+h+'<button class="btn'+(q.done?' primary':'')+'" id="qNext">'+(q.done?'다음 문제 ▶':'건너뛰기')+'</button>'+scoreH(o.score)+'</div><p class="msg '+(cls||'')+'" id="qMsg">'+(msg||'')+'</p>';
+    if(q.kind==='mc'){ if(!q.done) $('ctl').querySelectorAll('[data-o]').forEach(function(b){ b.onclick=function(){ q.done=true; q.right=q.opts[+b.dataset.o]===q.ans; o.score[1]++; if(q.right) o.score[0]++; o.ui(); draw(); }; }); }
+    else if(q.done){ $('qA').value=q.kind==='pair'?q.ans[0]:q.ans; $('qA').className=(q.kind==='pair'?'':'wide ')+'ok'; $('qA').disabled=true; if($('qB')){ $('qB').value=q.ans[1]; $('qB').className='ok'; $('qB').disabled=true; } }
+    else { $('qGo').onclick=function(){ var m=$('qMsg'), a=$('qA').value, b=$('qB')?$('qB').value:'0'; if(a===''||b===''){ m.className='msg bad'; m.textContent='칸에 수를 써 주세요.'; return; }
+        var ok=q.kind==='pair'?(Math.abs(+a-q.ans[0])<1e-9&&Math.abs(+b-q.ans[1])<1e-9):Math.abs(+a-q.ans)<1e-9;
+        if(ok){ if(q.tries===0) o.score[0]++; o.score[1]++; q.done=true; q.right=true; o.ui(); draw(); } else { q.tries++; m.className='msg bad'; m.textContent='다시 생각해 보세요.'; draw(); } };
+      $('qA').onkeydown=function(e){ if(e.key==='Enter'&&!$('qB')) $('qGo').click(); }; }
+    $('qNext').onclick=function(){ if(!o.q.done) o.score[1]++; o.next(); o.ui(); draw(); }; };
+  return o; }
+function DD(x){ return (Math.round(x*1000)/1000)+''; }
+/* 캔버스 표: rows=[[이름, 값들...]], hl=칸 색(선택). 아래쪽 y를 돌려줌 */
+function ctable(rows,y0,hl,rh){ var n=rows[0].length-1, lw=Math.min(150,W*0.3), cw=Math.min(74,(W-30-lw)/n), x0=(W-lw-cw*n)/2; rh=rh||40;
+  rows.forEach(function(r,i){ rect(x0,y0+i*rh,lw,rh,rgba(GRAY,0.3),LINE,1.2); txt(r[0],x0+lw/2,y0+i*rh+rh/2,INK,15); for(var j=0;j<n;j++){ rect(x0+lw+j*cw,y0+i*rh,cw,rh,hl&&hl[i]&&hl[i][j]?hl[i][j]:null,LINE,1.2); txt(''+r[j+1],x0+lw+j*cw+cw/2,y0+i*rh+rh/2,INK,Math.min(18,cw/3.2+6)); } });
+  return y0+rows.length*rh; }
+var GC=[BLUE,ORANGE,GREEN,PINK,YEL,[170,150,235],GRAY];
+/* 띠그래프: it=[{nm,p}] (p=백분율), lab=이름 표시 */
+function drawBand(it,x,y,w,h,lab,upto){ var acc=0, i; for(i=0;i<=20;i++){ line(x+w*i/20,y-(i%2?5:9),x+w*i/20,y,INK,1); if(i%2===0) txt(''+(i*5),x+w*i/20,y-18,MUTED,12); } txt('(%)',x+w+16,y-18,MUTED,12);
+  it.forEach(function(o,k){ if(upto!=null&&k>=upto) return; var sw=w*o.p/100; rect(x+w*acc/100,y,sw,h,rgba(GC[k%GC.length],0.9),INK,1.5); if(lab&&sw>26){ txt(o.nm,x+w*acc/100+sw/2,y+h/2-(sw>44?9:0),INK,Math.min(15,sw/3.2+5)); if(sw>44) txt('('+DD(o.p)+'%)',x+w*acc/100+sw/2,y+h/2+10,INK,12); } acc+=o.p; });
+  rect(x,y,w,h,null,INK,2.4); }
+/* 원그래프: 위쪽에서 시계 방향 */
+function drawPie(it,cx,cy,r,lab,upto){ var acc=0, i, A=function(p){ return -Math.PI/2+Math.PI*2*p/100; };
+  it.forEach(function(o,k){ if(upto!=null&&k>=upto) return; g.beginPath(); g.moveTo(cx,cy); g.arc(cx,cy,r,A(acc),A(acc+o.p)); g.closePath(); g.fillStyle=rgba(GC[k%GC.length],0.9); g.fill(); g.strokeStyle=INK; g.lineWidth=1.5; g.stroke();
+    if(lab&&o.p>=5){ var m=A(acc+o.p/2), rr=r*(o.p>=15?0.62:0.78); txt(o.nm,cx+rr*Math.cos(m),cy+rr*Math.sin(m)-(o.p>=10?8:0),INK,o.p>=15?15:12); if(o.p>=10) txt('('+DD(o.p)+'%)',cx+rr*Math.cos(m),cy+rr*Math.sin(m)+9,INK,12); } acc+=o.p; });
+  g.beginPath(); g.arc(cx,cy,r,0,7); g.strokeStyle=INK; g.lineWidth=2.4; g.stroke();
+  for(i=0;i<20;i++){ var a=A(i*5); line(cx+r*Math.cos(a),cy+r*Math.sin(a),cx+(r+(i%5?5:9))*Math.cos(a),cy+(r+(i%5?5:9))*Math.sin(a),INK,1.2); if(i%5===0) txt(''+(i*5),cx+(r+22)*Math.cos(a),cy+(r+22)*Math.sin(a),MUTED,12); } }
+/* 낱말 뒤 조사 (받침 있으면 앞의 것) */
+function KP(w,a,b){ var c=(''+w).charCodeAt((''+w).length-1); if(c>=0xAC00&&c<=0xD7A3) return (c-0xAC00)%28?a:b; return P(w,a,b); }
+
+/* 평균과 가능성 (5학년 2학기) */
+var RED=[236,112,99];
+function barsDraw(vals,t,mean){ var n=vals.length, mx=Math.max.apply(null,vals.concat([mean,4])), gap=(W-80)/n, bw=Math.min(74,gap*0.62), x0=40, yb=H-44, u=(H-100)/mx, k;
+  line(x0-10,yb,W-30,yb,INK,2);
+  vals.forEach(function(v,i){ var h=v+(mean-v)*t, x=x0+i*gap+(gap-bw)/2, lo=Math.min(v,h);
+    rect(x,yb-lo*u,bw,lo*u,rgba(BLUE,0.9)); if(h>v) rect(x,yb-h*u,bw,(h-v)*u,rgba(ORANGE,0.9)); if(v>h&&t<1){ g.globalAlpha=1-t; rect(x,yb-v*u,bw,(v-h)*u,rgba(ORANGE,0.9)); g.globalAlpha=1; }
+    var top=Math.max(h,t<1?v:h); for(k=1;k<top;k++) line(x,yb-k*u,x+bw,yb-k*u,INK,0.8); rect(x,yb-top*u,bw,top*u,null,INK,1.6);
+    txt((i+1)+'회',x+bw/2,yb+16,MUTED,14); txt(DD(Math.round(h*10)/10),x+bw/2,yb-top*u-12,INK,17); });
+  return {yb:yb,u:u,x0:x0}; }
+function meanLine(o,mean,col){ line(o.x0-10,o.yb-mean*o.u,W-30,o.yb-mean*o.u,col||HOT,2.2,[8,6]); txt('평균 '+DD(mean),W-34,o.yb-mean*o.u-12,col||HOT,15,'right'); }
+
+/* ───────── 1. 평균의 뜻 ───────── */
+var lv=[4,7,5,9,5], lt=0;
+function lvNew(){ var n=ri(3,6), m=ri(3,7), v, s, tries=0; do{ v=[]; s=0; for(var i=0;i<n-1;i++){ var x=ri(1,10); v.push(x); s+=x; } var last=m*n-s; tries++; }while((last<1||last>10||v.concat([last]).every(function(x){ return x===m; }))&&tries<200); v.push(last); lv=v; lt=0; }
+function lvDraw(){ var n=lv.length, sum=lv.reduce(function(a,b){ return a+b; },0), m=sum/n, o=barsDraw(lv,lt,m); if(lt>0.02) meanLine(o,m);
+  var b=$('lvGo'); if(b&&!anT) b.textContent=lt>0.5?'◀ 되돌리기':'▶ 고르게 하기';
+  $('say').innerHTML=lt<0.99?('제기차기 기록이 '+lv.join(', ')+'개예요. 기록을 대표하는 값을 정하려면 어떻게 하면 좋을까요?<small>높은 막대에서 덜어 내어 낮은 막대에 채우면 높이를 고르게 만들 수 있어요. ▶ 고르게 하기를 눌러 보세요.</small>'):
+    ('많은 쪽에서 덜어 적은 쪽에 채웠더니 모두 <b class="r">'+DD(m)+'개</b>로 고르게 되었어요. 이 값이 평균이에요.<small style="font-size:15.5px;color:var(--ink)">자료의 값을 모두 더해 자료의 수로 나눈 값을 <b>평균</b>이라고 해요. 평균은 자료를 대표하는 값으로 쓸 수 있어요.<br>('+lv.join(' + ')+') ÷ '+n+' = '+sum+' ÷ '+n+' = '+DD(m)+'</small>'); }
+function lvUI(){ $('top').innerHTML=''; $('ctl').innerHTML='<div class="row" style="margin-top:8px"><button class="btn primary" id="lvGo">▶ 고르게 하기</button><button class="btn" id="lvNew">다른 자료</button></div>';
+  $('lvGo').onclick=function(){ anim(function(){ return lt; },function(v){ lt=v; },lt>0.5?0:1,1800); }; $('lvNew').onclick=function(){ anStop(); lvNew(); draw(); }; }
+
+/* ───────── 2. 평균 구하기 ───────── */
+var cv2=[82,90,76,88,84], cn=['국어','수학','사회','과학','영어'];
+function clDraw(){ var v=cv2.filter(function(x){ return x!==''; }).map(Number), n=v.length; if(!n){ $('say').innerHTML='점수를 써 보세요.'; return; } var sum=v.reduce(function(a,b){ return a+b; },0), m=sum/n, o=barsDraw0(v,cn.filter(function(x,i){ return cv2[i]!==''; })); meanLine(o,m);
+  $('say').innerHTML='점수의 평균은 <b class="r">'+DD(Math.round(m*100)/100)+'점</b>이에요.<small style="font-size:15.5px;color:var(--ink)">(평균) = (자료의 값을 모두 더한 수) ÷ (자료의 수)<br>('+v.join(' + ')+') ÷ '+n+' = '+sum+' ÷ '+n+' = '+DD(Math.round(m*100)/100)+'<br>점수 하나를 바꾸면 평균이 어떻게 달라지는지 살펴보세요. 평균보다 높은 점수와 낮은 점수가 함께 있어요.</small>'; }
+function barsDraw0(vals,labels){ var n=vals.length, mx=Math.max.apply(null,vals.concat([10])), gap=(W-80)/n, bw=Math.min(74,gap*0.62), x0=40, yb=H-44, u=(H-100)/mx;
+  line(x0-10,yb,W-30,yb,INK,2); vals.forEach(function(v,i){ var x=x0+i*gap+(gap-bw)/2; rect(x,yb-v*u,bw,v*u,rgba(GC[i%GC.length],0.9),INK,1.5); txt(labels[i],x+bw/2,yb+16,MUTED,14); txt(''+v,x+bw/2,yb-v*u-12,INK,17); }); return {yb:yb,u:u,x0:x0}; }
+function clUI(){ $('top').innerHTML=''; $('ctl').innerHTML='<div class="row" style="margin-top:8px">'+cn.map(function(nm,i){ return '<label style="min-width:0">'+nm+' <input type="number" data-i="'+i+'" value="'+cv2[i]+'" min="0" max="100" inputmode="numeric"></label>'; }).join('')+'</div><p class="note">칸을 비우면 그 과목은 빼고 계산해요.</p>';
+  $('ctl').querySelectorAll('[data-i]').forEach(function(el){ el.oninput=function(){ cv2[+el.dataset.i]=el.value===''?'':Math.max(0,Math.min(100,+el.value)); draw(); }; }); }
+
+/* ───────── 3. 평균 이용하기 ───────── */
+var quiz=QZ(function(){ var t=rnd(4), n=ri(3,5), m=ri(6,18), v=[], s=0, i, q, w=pick([['줄넘기 기록','번'],['읽은 책의 수','권'],['넣은 공의 수','개'],['턱걸이 기록','회']]);
+  for(i=0;i<n-1;i++){ var x=Math.max(1,m+ri(-4,4)); v.push(x); s+=x; } var last=m*n-s; if(last<1){ v[0]+=1-last; last=1; } v.push(last); s=m*n;
+  if(t===0) q={lines:[w[0],v.join(',  ')+' ('+w[1]+')'],ask:'평균은 몇 '+w[1]+'일까요?',kind:'num',unit:w[1],ans:m,show:m+w[1],why:'('+v.join(' + ')+') ÷ '+n+' = '+s+' ÷ '+n+' = '+m,hint:'모두 더한 다음 자료의 수 '+n+Pr(n)+' 나누어요.'};
+  else if(t===1){ var h=rnd(n), sh=v.map(function(x,j){ return j===h?'□':x; }); q={lines:[w[0]+'의 평균이 '+m+w[1],sh.join(',  ')+' ('+w[1]+')'],ask:'□ 안에 알맞은 수는 얼마일까요?',kind:'num',unit:w[1],ans:v[h],show:v[h]+w[1],why:'자료의 값을 모두 더한 수는 평균 × 자료의 수 = '+m+' × '+n+' = '+J(s,'이에요','예요')+'. 여기에서 나머지 값을 모두 빼면 '+v[h]+P(v[h],'이에요','예요')+'.',hint:'(자료의 값을 모두 더한 수) = (평균) × (자료의 수)'}; }
+  else if(t===2){ var n2=n+pick([-1,1]), m2=m+pick([-2,-1,1,2]), big=m>m2?'가 모둠':'나 모둠'; q={lines:['가 모둠: '+n+'명이 모두 '+s+w[1],'나 모둠: '+n2+'명이 모두 '+(m2*n2)+w[1]],ask:w[0]+'의 평균이 더 높은 모둠은 어느 모둠일까요?',kind:'mc',opts:['가 모둠','나 모둠'],ans:big,show:big,why:'가 모둠 평균: '+s+' ÷ '+n+' = '+m+'　　나 모둠 평균: '+(m2*n2)+' ÷ '+n2+' = '+m2+'<br>사람 수가 다를 때는 합계가 아니라 평균으로 비교해요.'}; }
+  else q={lines:[n+'명의 '+w[0]+' 평균이 '+m+w[1]],ask:n+'명의 기록을 모두 더하면 몇 '+w[1]+'일까요?',kind:'num',unit:w[1],ans:s,show:s+w[1],why:'(평균) × (자료의 수) = '+m+' × '+n+' = '+s,hint:'평균에 자료의 수를 곱해요.'};
+  return q; });
+
+/* ───────── 4. 가능성을 말로 ───────── */
+var WD=['불가능하다','~아닐 것 같다','반반이다','~일 것 같다','확실하다'];
+var WS=[['내일 아침에 해가','서쪽에서 뜰 것이다.',0],['주사위를 던지면','눈의 수가 7이 나올 것이다.',0],['동전을 던지면','그림 면이 나올 것이다.',2],['주사위를 던지면','눈의 수가 짝수일 것이다.',2],['내년에는 12월이','11월보다 늦게 올 것이다.',4],['오늘이 월요일이면','내일은 화요일일 것이다.',4],['주사위를 던지면','눈의 수가 1이 나올 것이다.',1],['주사위를 던지면','눈의 수가 2 이상일 것이다.',3],
+  ['빨간 구슬 2개, 파란 구슬 2개가 든 주머니에서','꺼낸 구슬이 빨간색일 것이다.',2],['빨간 구슬 4개만 든 주머니에서','꺼낸 구슬이 파란색일 것이다.',0],['빨간 구슬 1개, 파란 구슬 9개가 든 주머니에서','꺼낸 구슬이 빨간색일 것이다.',1],['당첨 제비 9개, 꽝 1개가 든 상자에서','뽑은 제비가 당첨일 것이다.',3],['계산기에 1 + 1을 누르면','2가 나올 것이다.',4],['1부터 10까지 쓴 카드 중 한 장을 뽑으면','10보다 큰 수가 나올 것이다.',0]], wI=-1;
+var WHY=['절대 일어날 수 없는 일이에요.','일어날 수는 있지만 일어나지 않을 때가 더 많아요.','일어날 때와 일어나지 않을 때가 절반씩이에요.','일어나지 않을 수도 있지만 일어날 때가 더 많아요.','반드시 일어나는 일이에요.'];
+var wq=QZ(function(){ var i; do{ i=rnd(WS.length); }while(i===wI); wI=i; var s=WS[i]; return {lines:[s[0],s[1]],ask:'이 일이 일어날 <b>가능성</b>을 알맞게 표현한 말을 고르세요.<small>가능성은 어떤 상황에서 특정한 일이 일어나길 기대할 수 있는 정도예요.</small>',kind:'mc',opts:WD,ans:WD[s[2]],show:WD[s[2]],why:WHY[s[2]]}; });
+
+/* ───────── 5. 가능성을 수로 ───────── */
+var nk='bag', nr=2, nc='red';
+function spinner(cx,cy,r,p,ang){ g.beginPath(); g.moveTo(cx,cy); g.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*p); g.closePath(); g.fillStyle=rgba(RED,0.95); g.fill(); g.beginPath(); g.moveTo(cx,cy); g.arc(cx,cy,r,-Math.PI/2+Math.PI*2*p,Math.PI*1.5); g.closePath(); g.fillStyle=rgba(BLUE,0.95); g.fill();
+  g.beginPath(); g.arc(cx,cy,r,0,7); g.strokeStyle=INK; g.lineWidth=2.6; g.stroke(); if(p>0&&p<1){ line(cx,cy,cx,cy-r,INK,1.6); line(cx,cy,cx+r*Math.cos(-Math.PI/2+Math.PI*2*p),cy+r*Math.sin(-Math.PI/2+Math.PI*2*p),INK,1.6); }
+  if(ang!=null){ line(cx,cy,cx+r*0.82*Math.cos(ang),cy+r*0.82*Math.sin(ang),INK,5); g.beginPath(); g.arc(cx,cy,7,0,7); g.fillStyle=INK; g.fill(); } }
+function nmDraw(){ var p=nr/4, v=nc==='red'?p:1-p, cx=W*0.3, cy=H*0.4, r=Math.min(H*0.28,W*0.17), i;
+  if(nk==='spin') spinner(cx,cy,r,p,-Math.PI/4); else { g.beginPath(); g.moveTo(cx-r,cy-r*0.7); g.quadraticCurveTo(cx-r*1.3,cy+r*1.2,cx,cy+r*1.15); g.quadraticCurveTo(cx+r*1.3,cy+r*1.2,cx+r,cy-r*0.7); g.closePath(); g.fillStyle=rgba(GRAY,0.3); g.fill(); g.strokeStyle=INK; g.lineWidth=2.4; g.stroke();
+    for(i=0;i<4;i++){ g.beginPath(); g.arc(cx+(i%2?1:-1)*r*0.38,cy+(i<2?0:1)*r*0.62-r*0.05,r*0.26,0,7); g.fillStyle=rgba(i<nr?RED:BLUE,0.95); g.fill(); g.strokeStyle=INK; g.lineWidth=1.6; g.stroke(); } }
+  var x1=W*0.56, x2=W-40, y=H*0.42; line(x1,y,x2,y,INK,3); [[0,'0','불가능하다'],[0.5,'1/2','반반이다'],[1,'1','확실하다']].forEach(function(t){ var x=x1+(x2-x1)*t[0]; line(x,y-10,x,y+10,INK,2.4); if(t[1]==='1/2') cfr(1,2,x,y+34,INK,15); else txt(t[1],x,y+30,INK,18); txt(t[2],x,y+62,MUTED,13); });
+  var mx=x1+(x2-x1)*v; g.beginPath(); g.moveTo(mx,y-12); g.lineTo(mx-11,y-34); g.lineTo(mx+11,y-34); g.closePath(); g.fillStyle=HOT; g.fill();
+  var what=(nk==='spin'?'화살이 ':'꺼낸 구슬이 ')+(nc==='red'?'빨간색':'파란색')+(nk==='spin'?'에 멈출':'일')+' 가능성', word=v===0?'불가능하다':(v===1?'확실하다':'반반이다'), num=v===0?'0':(v===1?'1':F(1,2));
+  $('say').innerHTML=what+'은 「'+word+'」이고, 수로 나타내면 <b class="r">'+num+'</b>이에요.<small style="font-size:15.5px;color:var(--ink)">일이 일어날 가능성을 0부터 1까지의 수로 표현할 수 있어요. 「불가능하다」는 0, 「반반이다」는 '+F(1,2)+', 「확실하다」는 1이에요.</small>'; }
+function nmUI(){ $('top').innerHTML=chipsH([['bag','구슬 주머니'],['spin','회전판']],nk,'k');
+  $('ctl').innerHTML=chipsH([[0,'빨강 없음'],[2,'빨강 절반'],[4,'모두 빨강']],nr,'r','margin-top:8px')+chipsH([['red','빨간색이 나올 가능성'],['blue','파란색이 나올 가능성']],nc,'c');
+  $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ nk=b.dataset.k; nmUI(); draw(); }; });
+  $('ctl').querySelectorAll('[data-r]').forEach(function(b){ b.onclick=function(){ nr=+b.dataset.r; nmUI(); draw(); }; }); $('ctl').querySelectorAll('[data-c]').forEach(function(b){ b.onclick=function(){ nc=b.dataset.c; nmUI(); draw(); }; }); }
+
+/* ───────── 6. 실험하기 ───────── */
+var xp=2, xr=0, xn=0, xa=-Math.PI/4;
+function xpDraw(){ var p=xp/4, cx=W*0.27, cy=H*0.46, r=Math.min(H*0.34,W*0.2), bx=W*0.54, bw=W-bx-36, y=H*0.34, hh=46;
+  spinner(cx,cy,r,p,xa); txt('돌린 횟수 '+xn+'번',bx,y-56,INK,18,'left');
+  rect(bx,y,bw,hh,rgba(BLUE,0.9)); if(xn) rect(bx,y,bw*xr/xn,hh,rgba(RED,0.95)); rect(bx,y,bw,hh,null,INK,2.2); line(bx+bw*p,y-12,bx+bw*p,y+hh+12,INK,2.4,[6,4]); txt('예상',bx+bw*p,y-22,INK,13);
+  txt('빨강 '+xr+'번',bx,y+hh+34,HOT,17,'left'); txt('파랑 '+(xn-xr)+'번',bx+bw,y+hh+34,ACC,17,'right'); if(xn) txt('빨강의 비율 '+(xr/xn*100).toFixed(1)+'%',bx,y+hh+66,INK,17,'left');
+  var ex=['0','1/4','1/2','3/4','1'][xp];
+  $('say').innerHTML=xn===0?('회전판을 돌리면 화살이 빨간색에 멈출 가능성은 '+(xp===0?'0 (불가능하다)':(xp===4?'1 (확실하다)':(xp===2?F(1,2)+' (반반이다)':(xp===1?'「~아닐 것 같다」':'「~일 것 같다」'))))+'예요. 정말 그럴까요?<small>아래 버튼으로 여러 번 돌려 보세요.</small>'):
+    (xn+'번 돌려서 빨간색이 '+xr+'번 나왔어요. 빨간색의 비율은 <b class="r">'+(xr/xn*100).toFixed(1)+'%</b>이고, 예상한 비율은 '+(p*100)+'%예요.<small style="font-size:15.5px;color:var(--ink)">'+(xn<50?'돌린 횟수가 적으면 예상과 많이 다를 수 있어요. 더 많이 돌려 보세요.':'돌린 횟수가 많아질수록 결과가 예상한 비율에 가까워져요.')+'</small>'); }
+function xpSpin(k){ var p=xp/4, last=0; for(var i=0;i<k;i++){ last=Math.random(); if(last<p) xr++; xn++; } xa=-Math.PI/2+Math.PI*2*last; draw(); }
+function xpUI(){ $('top').innerHTML=chipsH([[0,'빨강 없음'],[1,'빨강 1/4'],[2,'빨강 절반'],[3,'빨강 3/4'],[4,'모두 빨강']],xp,'p');
+  $('ctl').innerHTML='<div class="row" style="margin-top:8px"><button class="btn primary" data-k="1">1번 돌리기</button><button class="btn primary" data-k="10">10번</button><button class="btn primary" data-k="100">100번</button><button class="btn primary" data-k="1000">1000번</button><button class="btn" id="xClr">처음부터</button></div>';
+  $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ xp=+b.dataset.p; xr=0; xn=0; xpUI(); draw(); }; });
+  $('ctl').querySelectorAll('[data-k]').forEach(function(b){ b.onclick=function(){ xpSpin(+b.dataset.k); }; }); $('xClr').onclick=function(){ xr=0; xn=0; draw(); }; }
+
+var UIS={level:lvUI,calc:clUI,use:function(){ $('top').innerHTML=''; quiz.ui(); },word:function(){ $('top').innerHTML=''; wq.ui(); },num:nmUI,exp:xpUI}, DRS={level:lvDraw,calc:clDraw,use:quiz.draw,word:wq.draw,num:nmDraw,exp:xpDraw};
+function ui(){ UIS[tab](); }
+function draw(){ tone(); g.clearRect(0,0,W,H); DRS[tab](); }
+function setTab(t){ anStop(); tab=t; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+
+document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+var drag=null, moved=0;
+cv.addEventListener('pointerdown',function(e){ drag=[e.clientX,e.clientY]; moved=0; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
+cv.addEventListener('pointermove',function(e){ if(!drag) return; var dx=e.clientX-drag[0], dy=e.clientY-drag[1]; moved+=Math.abs(dx)+Math.abs(dy); drag=[e.clientX,e.clientY];
+  if(D3&&!(window.noDrag&&noDrag())){ yaw+=dx*0.011; pit=Math.max(-0.5,Math.min(1.5,pit+dy*0.009)); draw(); } });
+cv.addEventListener('pointerup',function(e){ if(drag&&moved<10&&window.onTap){ var r=cv.getBoundingClientRect(); onTap(e.clientX-r.left,e.clientY-r.top); } drag=null; });
+cv.addEventListener('pointercancel',function(){ drag=null; });
+window.addEventListener('resize',fit); try{ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw); }catch(_){}
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+setTab(TAB0); fit();
+</script></body></html>
