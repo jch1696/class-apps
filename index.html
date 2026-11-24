@@ -22,35 +22,44 @@ section>.grid:first-of-type{margin-top:12px}
 .tags{display:flex;align-items:center;gap:7px}
 .no{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;border:2px solid var(--c);color:var(--c);font-weight:800;font-size:13px;filter:brightness(1.1)}
 .card h2{margin:2px 0 0;font-size:19px}
+.area{background:color-mix(in srgb,var(--c) 9%,var(--bg));border:1.5px solid color-mix(in srgb,var(--c) 35%,var(--line));border-radius:18px;padding:0 14px 16px;margin-top:16px;scroll-margin-top:64px;overflow:hidden}
+.area h3{margin:0 -14px 14px;padding:10px 16px;background:var(--c);color:#fff;font-size:19px;display:flex;align-items:center;gap:8px}
+.area h3 small{color:#fff;opacity:.9;margin-left:auto;font-size:13px}
+.ic{font-size:20px}
+.tag.g5{background:transparent;color:var(--c);box-shadow:inset 0 0 0 1.8px var(--c)}
+.no{background:var(--c);color:#fff!important;border-color:var(--c);filter:none}
+.jump{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.jump a{font-weight:700;font-size:14.5px;text-decoration:none;color:#fff;background:var(--c);border-radius:10px;padding:6px 14px}
 footer{margin-top:26px;color:var(--muted);font-size:13px}
 </style></head><body><main>
 <h1>우리 반 수업 앱</h1><p class="sub">월항초등학교 6학년 1반 · 수업에서 쓰는 앱을 모아 둔 곳이에요.</p>
 <nav class="filter" id="filter" aria-label="과목 고르기"><button data-f="all" aria-pressed="true">전체</button><button data-f="math" aria-pressed="false" style="--c:#C08A2B">수학 15</button><button data-f="soc" aria-pressed="false" style="--c:#2A5E63">사회 1</button><button data-f="mus" aria-pressed="false" style="--c:#3d5a98">음악 4</button></nav>
 <section data-s="math" style="--c:#C08A2B"><h2 class="sec">수학</h2>
-<h3>수와 연산 <small>4개 · 배우는 순서대로</small></h3>
+<nav class="jump" aria-label="수학 영역으로 가기"><a href="#num" style="--c:#2F6FDB">➗ 수와 연산</a><a href="#rel" style="--c:#1E8E5A">🔁 변화와 관계</a><a href="#geo" style="--c:#C2571A">📐 도형과 측정</a></nav>
+<div class="area" id="num" style="--c:#2F6FDB"><h3><span class="ic">➗</span>수와 연산<small>4개 · 번호는 배우는 순서</small></h3>
 <div class="grid">
-<a class="card" href="fracadd.html" style="--c:#C08A2B"><span class="tags"><span class="no">1</span><span class="tag">5학년 1학기</span></span><h2>약분과 통분, 분수의 덧셈과 뺄셈</h2><p>분수 막대를 나누고 합치며 약분과 통분, 덧셈과 뺄셈을 알아봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="mult.html" style="--c:#C08A2B"><span class="tags"><span class="no">2</span><span class="tag">5학년 2학기</span></span><h2>분수의 곱셈과 소수의 곱셈</h2><p>넓이 그림으로 분수와 소수의 곱셈, 소수점 위치의 규칙을 알아봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="fracdiv.html" style="--c:#C08A2B"><span class="tags"><span class="no">3</span><span class="tag">6학년 1·2학기</span></span><h2>분수의 나눗셈</h2><p>그림으로 나누어 보며 분수의 나눗셈을 곱셈으로 바꾸는 까닭을 알아봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="decdiv.html" style="--c:#C08A2B"><span class="tags"><span class="no">4</span><span class="tag">6학년 1·2학기</span></span><h2>소수의 나눗셈</h2><p>소수점을 옮기는 까닭과 세로셈, 어림하기, 몫과 나머지를 알아봐요.</p><span class="go">열기 →</span></a>
-</div>
-<h3>변화와 관계 <small>3개 · 배우는 순서대로</small></h3>
+<a class="card" href="fracadd.html"><span class="tags"><span class="no">1</span><span class="tag g5">5학년 1학기</span></span><h2>약분과 통분, 분수의 덧셈과 뺄셈</h2><p>분수 막대를 나누고 합치며 약분과 통분, 덧셈과 뺄셈을 알아봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="mult.html"><span class="tags"><span class="no">2</span><span class="tag g5">5학년 2학기</span></span><h2>분수의 곱셈과 소수의 곱셈</h2><p>넓이 그림으로 분수와 소수의 곱셈, 소수점 위치의 규칙을 알아봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="fracdiv.html"><span class="tags"><span class="no">3</span><span class="tag">6학년 1·2학기</span></span><h2>분수의 나눗셈</h2><p>그림으로 나누어 보며 분수의 나눗셈을 곱셈으로 바꾸는 까닭을 알아봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="decdiv.html"><span class="tags"><span class="no">4</span><span class="tag">6학년 1·2학기</span></span><h2>소수의 나눗셈</h2><p>소수점을 옮기는 까닭과 세로셈, 어림하기, 몫과 나머지를 알아봐요.</p><span class="go">열기 →</span></a>
+</div></div>
+<div class="area" id="rel" style="--c:#1E8E5A"><h3><span class="ic">🔁</span>변화와 관계<small>3개 · 번호는 배우는 순서</small></h3>
 <div class="grid">
-<a class="card" href="pattern.html" style="--c:#C08A2B"><span class="tags"><span class="no">1</span><span class="tag">5학년 1학기</span></span><h2>규칙과 대응</h2><p>두 양 사이의 대응 관계를 찾아 □와 △를 쓴 식으로 나타내 봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="ratio.html" style="--c:#C08A2B"><span class="tags"><span class="no">2</span><span class="tag">6학년 1학기</span></span><h2>비와 비율</h2><p>두 양을 나눗셈으로 비교하고, 비와 비율, 백분율을 알아봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="proportion.html" style="--c:#C08A2B"><span class="tags"><span class="no">3</span><span class="tag">6학년 2학기</span></span><h2>비례식과 비례배분</h2><p>비의 성질과 비례식, 비례배분을 구슬로 알아봐요.</p><span class="go">열기 →</span></a>
-</div>
-<h3>도형과 측정 <small>8개 · 배우는 순서대로</small></h3>
+<a class="card" href="pattern.html"><span class="tags"><span class="no">1</span><span class="tag g5">5학년 1학기</span></span><h2>규칙과 대응</h2><p>두 양 사이의 대응 관계를 찾아 □와 △를 쓴 식으로 나타내 봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="ratio.html"><span class="tags"><span class="no">2</span><span class="tag">6학년 1학기</span></span><h2>비와 비율</h2><p>두 양을 나눗셈으로 비교하고, 비와 비율, 백분율을 알아봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="proportion.html"><span class="tags"><span class="no">3</span><span class="tag">6학년 2학기</span></span><h2>비례식과 비례배분</h2><p>비의 성질과 비례식, 비례배분을 구슬로 알아봐요.</p><span class="go">열기 →</span></a>
+</div></div>
+<div class="area" id="geo" style="--c:#C2571A"><h3><span class="ic">📐</span>도형과 측정<small>8개 · 번호는 배우는 순서</small></h3>
 <div class="grid">
-<a class="card" href="area.html" style="--c:#C08A2B"><span class="tags"><span class="no">1</span><span class="tag">5학년 1학기</span></span><h2>다각형의 둘레와 넓이</h2><p>도형을 자르고 붙여 평행사변형, 삼각형, 사다리꼴, 마름모의 넓이를 구해요.</p><span class="go">열기 →</span></a>
-<a class="card" href="symmetry.html" style="--c:#C08A2B"><span class="tags"><span class="no">2</span><span class="tag">5학년 2학기</span></span><h2>합동과 대칭</h2><p>도형을 포개고, 접고, 돌려 보며 합동과 선대칭, 점대칭을 알아봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="cuboid.html" style="--c:#C08A2B"><span class="tags"><span class="no">3</span><span class="tag">5학년 2학기</span></span><h2>직육면체</h2><p>직육면체와 정육면체의 구성 요소, 겨냥도, 전개도 11가지를 알아봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="prism.html" style="--c:#C08A2B"><span class="tags"><span class="no">4</span><span class="tag">6학년 1학기</span></span><h2>각기둥과 각뿔</h2><p>밑면의 모양을 바꿔 가며 이름과 구성 요소, 면·모서리·꼭짓점 수의 규칙, 전개도를 알아봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="volume.html" style="--c:#C08A2B"><span class="tags"><span class="no">5</span><span class="tag">6학년 1학기</span></span><h2>직육면체의 부피와 겉넓이</h2><p>쌓기나무로 상자를 채워 부피를 구하고, 전개도로 겉넓이를 알아봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="blocks.html" style="--c:#C08A2B"><span class="tags"><span class="no">6</span><span class="tag">6학년 2학기</span></span><h2>쌓기나무 관찰실</h2><p>쌓기나무를 쌓고 돌려 보며 위·앞·옆에서 본 모양과 층별 모양을 알아봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="circle.html" style="--c:#C08A2B"><span class="tags"><span class="no">7</span><span class="tag">6학년 2학기</span></span><h2>원주와 원의 넓이</h2><p>원을 굴려 원주율을 찾고, 원을 잘라 붙여 넓이 구하는 방법을 알아봐요.</p><span class="go">열기 →</span></a>
-<a class="card" href="solid.html" style="--c:#C08A2B"><span class="tags"><span class="no">8</span><span class="tag">6학년 2학기</span></span><h2>원기둥, 원뿔, 구</h2><p>평면도형을 돌려 입체도형을 만들고, 구성 요소와 전개도, 위·앞·옆에서 본 모양을 알아봐요.</p><span class="go">열기 →</span></a>
-</div>
+<a class="card" href="area.html"><span class="tags"><span class="no">1</span><span class="tag g5">5학년 1학기</span></span><h2>다각형의 둘레와 넓이</h2><p>도형을 자르고 붙여 평행사변형, 삼각형, 사다리꼴, 마름모의 넓이를 구해요.</p><span class="go">열기 →</span></a>
+<a class="card" href="symmetry.html"><span class="tags"><span class="no">2</span><span class="tag g5">5학년 2학기</span></span><h2>합동과 대칭</h2><p>도형을 포개고, 접고, 돌려 보며 합동과 선대칭, 점대칭을 알아봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="cuboid.html"><span class="tags"><span class="no">3</span><span class="tag g5">5학년 2학기</span></span><h2>직육면체</h2><p>직육면체와 정육면체의 구성 요소, 겨냥도, 전개도 11가지를 알아봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="prism.html"><span class="tags"><span class="no">4</span><span class="tag">6학년 1학기</span></span><h2>각기둥과 각뿔</h2><p>밑면의 모양을 바꿔 가며 이름과 구성 요소, 면·모서리·꼭짓점 수의 규칙, 전개도를 알아봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="volume.html"><span class="tags"><span class="no">5</span><span class="tag">6학년 1학기</span></span><h2>직육면체의 부피와 겉넓이</h2><p>쌓기나무로 상자를 채워 부피를 구하고, 전개도로 겉넓이를 알아봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="blocks.html"><span class="tags"><span class="no">6</span><span class="tag">6학년 2학기</span></span><h2>쌓기나무 관찰실</h2><p>쌓기나무를 쌓고 돌려 보며 위·앞·옆에서 본 모양과 층별 모양을 알아봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="circle.html"><span class="tags"><span class="no">7</span><span class="tag">6학년 2학기</span></span><h2>원주와 원의 넓이</h2><p>원을 굴려 원주율을 찾고, 원을 잘라 붙여 넓이 구하는 방법을 알아봐요.</p><span class="go">열기 →</span></a>
+<a class="card" href="solid.html"><span class="tags"><span class="no">8</span><span class="tag">6학년 2학기</span></span><h2>원기둥, 원뿔, 구</h2><p>평면도형을 돌려 입체도형을 만들고, 구성 요소와 전개도, 위·앞·옆에서 본 모양을 알아봐요.</p><span class="go">열기 →</span></a>
+</div></div>
 </section>
 <section data-s="soc" style="--c:#2A5E63"><h2 class="sec">사회</h2>
 <div class="grid">
