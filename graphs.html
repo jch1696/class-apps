@@ -63,14 +63,15 @@ input.wide{width:130px}
 canvas{cursor:default}
 </style></head><body>
 <div class="app">
-  <header><h1>여러 가지 그래프</h1><p>그림그래프, 띠그래프, 원그래프를 만들고 읽어 봐요</p></header>
+  <header><h1>여러 가지 그래프</h1><p>그림, 막대, 꺾은선, 띠, 원그래프를 만들고 읽어 봐요</p></header>
   <div class="card"><div class="tabs" id="tabs" role="tablist">
     <button data-t="pic" role="tab" aria-selected="true">① 그림그래프</button>
-    <button data-t="band" role="tab" aria-selected="false">② 띠그래프</button>
-    <button data-t="pie" role="tab" aria-selected="false">③ 원그래프</button>
-    <button data-t="read" role="tab" aria-selected="false">④ 그래프 해석하기</button>
-    <button data-t="pick" role="tab" aria-selected="false">⑤ 알맞은 그래프</button>
-    <button data-t="mine" role="tab" aria-selected="false">⑥ 우리 반 자료</button>
+    <button data-t="xy" role="tab" aria-selected="false">② 막대와 꺾은선</button>
+    <button data-t="band" role="tab" aria-selected="false">③ 띠그래프</button>
+    <button data-t="pie" role="tab" aria-selected="false">④ 원그래프</button>
+    <button data-t="read" role="tab" aria-selected="false">⑤ 그래프 해석하기</button>
+    <button data-t="pick" role="tab" aria-selected="false">⑥ 알맞은 그래프</button>
+    <button data-t="mine" role="tab" aria-selected="false">⑦ 우리 반 자료</button>
   </div></div>
   <section class="card"><div class="stage">
     <div id="top"></div>
@@ -88,7 +89,7 @@ var INK='#1D2B36', HOT='#D9482B', ACC='#2F6FDB', HALO='#EDF1F3', MUTED='#5C6B77'
 function tone(){ var c=getComputedStyle(document.documentElement), v=function(n,d){ return (c.getPropertyValue(n)||'').trim()||d; }; INK=v('--ink',INK); HOT=v('--c1',HOT); ACC=v('--accent',ACC); HALO=v('--surface2',HALO); MUTED=v('--muted',MUTED); LINE=v('--line',LINE); }
 function rnd(n){ return Math.floor(Math.random()*n); }
 function rgba(c,a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+(a==null?1:a)+')'; }
-function fit(){ var w=cv.clientWidth||640, d=window.devicePixelRatio||1; W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
+function fit(){ var w=cv.clientWidth||640, d=(window.devicePixelRatio||1)*(window.__zoom||1); W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
 var D3=false, TAB0="pic";
 /* 수와 연산 앱 공통: 분수 표시, 막대 그리기, 입력 */
 function gcd(a,b){ return b?gcd(b,a%b):Math.abs(a); }
@@ -186,6 +187,38 @@ function pgDraw(){ if(!pg) pgNew(); var rh=Math.min(64,(H-70)/4), x0=Math.max(70
 function pgUI(){ $('top').innerHTML=''; $('ctl').innerHTML='<div class="row" style="margin-top:8px"><button class="btn primary" id="pgNum">'+(pgNum?'수 숨기기':'수 보이기')+'</button><button class="btn" id="pgNew">다른 자료</button></div>';
   $('pgNum').onclick=function(){ pgNum=!pgNum; pgUI(); draw(); }; $('pgNew').onclick=function(){ pgNew(); pgNum=false; pgUI(); draw(); }; }
 
+/* ───────── 막대그래프와 꺾은선그래프 ───────── */
+function niceStep(r){ var c=[1,2,5,10,20,25,50,100,200,500,1000,2000,5000], i; for(i=0;i<c.length;i++) if(r/c[i]<=8) return c[i]; return Math.ceil(r/8); }
+/* o: {u:단위, wave:물결선, pts:찍을 점 수, segs:이을 선 수, hl:강조할 선 번호, vals:값 표시, top} → 세로 눈금 한 칸 크기를 돌려줌 */
+function drawXY(kind,labs,vals,o){ o=o||{}; var x0=Math.max(58,W*0.1), x1=W-26, y0=o.top||50, y1=H-46, mx=Math.max.apply(null,vals), mn=Math.min.apply(null,vals), lo=0, st, hi, i, n=vals.length;
+  if(o.wave&&kind==='line'){ st=niceStep((mx-mn)||1); lo=Math.max(0,Math.floor(mn/st)*st-st); }
+  st=niceStep((mx-lo)||1); hi=Math.max(lo+st,Math.ceil(mx/st)*st); var gy=lo>0?y1-30:y1, Y=function(v){ return gy-(v-lo)/(hi-lo)*(gy-y0); }, gx=(x1-x0)/n, X=function(k){ return x0+gx*(k+0.5); };
+  for(i=0;i<=Math.round((hi-lo)/st);i++){ var v=lo+i*st; line(x0,Y(v),x1,Y(v),LINE,1); txt(''+v,x0-8,Y(v),MUTED,13,'right'); }
+  if(kind==='line') for(i=0;i<n;i++) line(X(i),y0,X(i),gy,LINE,1);
+  line(x0,y0-8,x0,y1,INK,2); line(x0,y1,x1,y1,INK,2); txt('('+(o.u||'')+')',x0-8,y0-24,MUTED,13,'right');
+  if(lo>0){ txt('0',x0-8,y1,MUTED,13,'right'); g.beginPath(); for(var x=x0-6;x<=x1;x+=4){ var yy=(y1+gy)/2+Math.sin((x-x0)/9)*4; if(x===x0-6) g.moveTo(x,yy); else g.lineTo(x,yy); } g.strokeStyle=HOT; g.lineWidth=2; g.stroke(); }
+  labs.forEach(function(s,k){ txt(s,X(k),y1+16,INK,Math.min(15,gx/3+6)); });
+  if(kind==='bar'){ var bw=Math.min(64,gx*0.56); vals.forEach(function(v2,k){ rect(X(k)-bw/2,Y(v2),bw,y1-Y(v2),rgba(GC[k%GC.length],0.9),INK,1.6); if(o.vals) txt(''+v2,X(k),Y(v2)-12,INK,15); }); }
+  else { var np=o.pts==null?n:o.pts, ns=o.segs==null?n-1:o.segs; for(i=0;i<ns&&i<n-1;i++) line(X(i),Y(vals[i]),X(i+1),Y(vals[i+1]),i===o.hl?HOT:ACC,i===o.hl?5:3);
+    for(i=0;i<np&&i<n;i++){ g.beginPath(); g.arc(X(i),Y(vals[i]),6,0,7); g.fillStyle=ACC; g.fill(); g.strokeStyle=HALO; g.lineWidth=2; g.stroke(); if(o.vals) txt(''+vals[i],X(i),Y(vals[i])-15,INK,15); } }
+  return st; }
+var XD=[{t:'교실의 온도',u:'℃',xn:'시각',x:['9시','10시','11시','12시','1시','2시','3시'],v:[12,14,17,21,23,24,22]},{t:'나의 몸무게',u:'kg',xn:'월',x:['3월','4월','5월','6월','7월','8월'],v:[36,37,37,39,40,42]},
+  {t:'강낭콩의 키',u:'cm',xn:'날짜',x:['1일','3일','5일','7일','9일','11일'],v:[1,3,7,13,18,21]},{t:'도서관 방문자 수',u:'명',xn:'요일',x:['월','화','수','목','금'],v:[120,135,128,150,172]}], xi=0, xk='line', xs=3, xw=false;
+function xyDraw(){ var o=XD[xi], n=o.v.length, hl=-1, d=0, i; for(i=0;i<n-1;i++) if(Math.abs(o.v[i+1]-o.v[i])>d){ d=Math.abs(o.v[i+1]-o.v[i]); hl=i; }
+  txt(o.t,W/2,22,INK,18); var line_=xk==='line', st=drawXY(xk,o.x,o.v,line_?{u:o.u,wave:xw,pts:xs>=1?n:0,segs:xs>=2?n-1:0,hl:xs>=3?hl:-1,vals:xs>=3}:{u:o.u,vals:true});
+  var mxI=o.v.indexOf(Math.max.apply(null,o.v)), mnI=o.v.indexOf(Math.min.apply(null,o.v)), up=o.v[hl+1]>o.v[hl], canWave=Math.min.apply(null,o.v)>=niceStep(Math.max.apply(null,o.v)-Math.min.apply(null,o.v)||1)*2;
+  $('say').innerHTML=!line_?('<b class="r">막대그래프</b>는 막대의 길이로 크기를 비교하기 좋아요. 가장 큰 때는 <b>'+o.x[mxI]+'</b>('+o.v[mxI]+o.u+')이고, 가장 작은 때는 <b>'+o.x[mnI]+'</b>('+o.v[mnI]+o.u+')이에요.<small style="font-size:15.5px;color:var(--ink)">세로 눈금 한 칸의 크기는 '+st+o.u+'. 그런데 시간에 따라 어떻게 변하는지는 한눈에 보기 어려워요. 꺾은선그래프로 바꿔 보세요.</small>'):
+    ([ '가로에는 '+o.xn+KP(o.xn,'을','를')+', 세로에는 '+o.t+KP(o.t,'을','를')+' 나타내요. 세로 눈금 한 칸의 크기는 '+st+o.u+'.<small>[다음 ▶]을 눌러 꺾은선그래프를 그려 보세요.</small>',
+       '가로 눈금과 세로 눈금이 만나는 자리에 <b class="r">점</b>을 찍어요.',
+       '점들을 <b class="r">선분</b>으로 차례로 이어요. 수량을 점으로 표시하고 그 점들을 선분으로 이어 그린 그래프를 <b class="r">꺾은선그래프</b>라고 해요.',
+       '선이 많이 기울어질수록 변화가 커요. 가장 많이 변한 때는 <b class="r">'+o.x[hl]+KP(o.x[hl],'과','와')+' '+o.x[hl+1]+' 사이</b>이고, '+d+o.u+'만큼 '+(up?'늘었어요':'줄었어요')+'.<small style="font-size:15.5px;color:var(--ink)">꺾은선그래프는 시간에 따라 변하는 모습을 알아보기 쉽고, 조사하지 않은 중간의 값도 예상할 수 있어요.'+(xw?' 필요 없는 부분을 <b>물결선</b>으로 줄였더니 세로 눈금 한 칸이 '+st+o.u+'씩으로 작아져 변화가 더 뚜렷하게 보여요.':(canWave?' [물결선으로 줄이기]를 눌러 보세요.':''))+'</small>'][xs]); }
+function xyUI(){ $('top').innerHTML=chipsH(XD.map(function(x,i){ return [i,x.t]; }),xi,'i');
+  $('ctl').innerHTML=chipsH([['bar','막대그래프'],['line','꺾은선그래프']],xk,'k','margin-top:8px')+(xk==='line'?'<div class="row"><button class="btn" id="xPrev">◀ 이전</button><button class="btn primary" id="xNext">다음 ▶</button><button class="chip" id="xWave" aria-pressed="'+xw+'">물결선으로 줄이기</button></div>':'');
+  $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ xi=+b.dataset.i; xw=false; xyUI(); draw(); }; });
+  $('ctl').querySelectorAll('[data-k]').forEach(function(b){ b.onclick=function(){ xk=b.dataset.k; if(xk==='line') xs=0; xyUI(); draw(); }; });
+  if(xk==='line'){ $('xPrev').onclick=function(){ xs=Math.max(0,xs-1); draw(); }; $('xNext').onclick=function(){ xs=Math.min(3,xs+1); draw(); }; $('xWave').onclick=function(){ xw=!xw; this.setAttribute('aria-pressed',xw); draw(); }; } }
+
+
 /* ───────── 2. 띠그래프 ───────── */
 var bs=0;
 function dsChips(){ $('top').innerHTML=chipsH(DS.map(function(x,i){ return [i,x.t]; }),ds,'i'); $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ ds=+b.dataset.i; bs=0; ps=0; pm={}; pchk=false; ui(); draw(); }; }); }
@@ -244,9 +277,10 @@ function myItems(){ var r=my.r.filter(function(x){ return x[0]&&x[1]>0; }), T=r.
   var raw=r.map(function(x){ return x[1]/T*100; }), fl=raw.map(Math.floor), left=100-fl.reduce(function(a,b){ return a+b; },0), ord=raw.map(function(v,i){ return [v-Math.floor(v),i]; }).sort(function(a,b){ return b[0]-a[0]; });
   for(var i=0;i<left;i++) fl[ord[i%ord.length][1]]++; return {T:T,it:r.map(function(x,i){ return {nm:x[0],p:fl[i],n:x[1]}; })}; }
 function myDraw(){ var m=myItems(); txt(my.t||'제목',W/2,24,INK,20); if(!m.T){ txt('아래 표에 항목과 수를 써 보세요.',W/2,H/2,MUTED,17); $('say').innerHTML='항목 이름과 수를 쓰면 그래프가 그려져요.'; return; }
+  if(my.k==='bar'||my.k==='line'){ drawXY(my.k,m.it.map(function(x){ return x.nm; }),m.it.map(function(x){ return x.n; }),{vals:true,u:'수',top:64}); $('say').innerHTML=m.it.map(function(x){ return x.nm+' '+x.n; }).join(', ')+' (합계 '+m.T+')<small>'+(my.k==='bar'?'막대그래프는 항목별 크기를 비교할 때 알맞아요.':'꺾은선그래프는 시간에 따라 변하는 자료에 알맞아요. 항목을 날짜나 시각 순서로 써 보세요.')+' 쓴 내용은 이 기기에 저장돼요.</small>'; return; }
   if(my.k==='band') drawBand(m.it,(W-BWd())/2,H/2-30,BWd(),80,true,null); else drawPie(m.it,W/2,H/2+16,Math.min(H/2-54,W*0.3),true,null);
   $('say').innerHTML='전체 '+m.T+' 가운데 '+m.it.map(function(x){ return x.nm+' '+x.p+'%'; }).join(', ')+'<small>백분율은 합계가 100%가 되도록 자연수로 어림했어요. 쓴 내용은 이 기기에 저장돼요.</small>'; }
-function myUI(){ $('top').innerHTML=chipsH([['band','띠그래프'],['pie','원그래프']],my.k,'k');
+function myUI(){ $('top').innerHTML=chipsH([['band','띠그래프'],['pie','원그래프'],['bar','막대그래프'],['line','꺾은선그래프']],my.k,'k');
   $('ctl').innerHTML='<div class="row"><label>제목</label><input type="text" id="myT" value="'+my.t.replace(/"/g,'&quot;')+'" maxlength="30" style="flex:1;min-width:180px;font:inherit;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink)"></div><table><thead><tr><th style="white-space:nowrap">항목</th>'+my.r.map(function(x,i){ return '<td><input type="text" data-n="'+i+'" value="'+x[0].replace(/"/g,'&quot;')+'" maxlength="8" style="width:100%;min-width:60px;font:inherit;padding:6px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);text-align:center"></td>'; }).join('')+'</tr></thead><tbody><tr><th style="white-space:nowrap">수</th>'+my.r.map(function(x,i){ return '<td><input type="number" data-v="'+i+'" value="'+(x[1]||'')+'" min="0" max="9999" style="width:100%;min-width:60px;margin:0;text-align:center"></td>'; }).join('')+'</tr></tbody></table>';
   var save=function(){ try{ localStorage.setItem('graphsMine',JSON.stringify(my)); }catch(e){} draw(); };
   $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ my.k=b.dataset.k; myUI(); save(); }; });
@@ -254,7 +288,7 @@ function myUI(){ $('top').innerHTML=chipsH([['band','띠그래프'],['pie','원�
   $('ctl').querySelectorAll('[data-n]').forEach(function(el){ el.oninput=function(){ my.r[+el.dataset.n][0]=el.value.trim(); save(); }; });
   $('ctl').querySelectorAll('[data-v]').forEach(function(el){ el.oninput=function(){ my.r[+el.dataset.v][1]=Math.max(0,Math.floor(+el.value||0)); save(); }; }); }
 
-var UIS={pic:pgUI,band:bdUI,pie:piUI,read:function(){ $('top').innerHTML=''; quiz.ui(); },pick:function(){ $('top').innerHTML=''; pkq.ui(); },mine:myUI}, DRS={pic:pgDraw,band:bdDraw,pie:piDraw,read:rdDraw,pick:pkq.draw,mine:myDraw};
+var UIS={xy:xyUI,pic:pgUI,band:bdUI,pie:piUI,read:function(){ $('top').innerHTML=''; quiz.ui(); },pick:function(){ $('top').innerHTML=''; pkq.ui(); },mine:myUI}, DRS={xy:xyDraw,pic:pgDraw,band:bdDraw,pie:piDraw,read:rdDraw,pick:pkq.draw,mine:myDraw};
 function ui(){ UIS[tab](); }
 function draw(){ tone(); g.clearRect(0,0,W,H); DRS[tab](); }
 function setTab(t){ anStop(); tab=t; $('hint').textContent=t==='pie'?'직접 그리기에서는 원 둘레의 눈금 근처를 눌러요.':''; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
@@ -264,9 +298,10 @@ var drag=null, moved=0;
 cv.addEventListener('pointerdown',function(e){ drag=[e.clientX,e.clientY]; moved=0; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
 cv.addEventListener('pointermove',function(e){ if(!drag) return; var dx=e.clientX-drag[0], dy=e.clientY-drag[1]; moved+=Math.abs(dx)+Math.abs(dy); drag=[e.clientX,e.clientY];
   if(D3&&!(window.noDrag&&noDrag())){ yaw+=dx*0.011; pit=Math.max(-0.5,Math.min(1.5,pit+dy*0.009)); draw(); } });
-cv.addEventListener('pointerup',function(e){ if(drag&&moved<10&&window.onTap){ var r=cv.getBoundingClientRect(); onTap(e.clientX-r.left,e.clientY-r.top); } drag=null; });
+cv.addEventListener('pointerup',function(e){ if(drag&&moved<10&&window.onTap){ var r=cv.getBoundingClientRect(), k=(r.width/(cv.clientWidth||r.width))||1; onTap((e.clientX-r.left)/k,(e.clientY-r.top)/k); } drag=null; });
 cv.addEventListener('pointercancel',function(){ drag=null; });
 window.addEventListener('resize',fit); try{ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw); }catch(_){}
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
 setTab(TAB0); fit();
-</script></body></html>
+</script>
+<script src="zoom.js"></script></body></html>
