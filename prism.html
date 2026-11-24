@@ -171,10 +171,11 @@ function buildNet(sp){ var F=[], w=2*R*Math.sin(Math.PI/N), a=R*Math.cos(Math.PI
       [[np,1],[nn,-1]].forEach(function(o){ var prev=off; for(var k=1;k<=o[0];k++){ var an=k*gam*o[1], rp=function(q){ var x=q[0]-A[0], y=q[1]-A[1]; return [A[0]+x*Math.cos(an)-y*Math.sin(an),A[1]+x*Math.sin(an)+y*Math.cos(an)]; }, q0=rp(T0[0]), q1=rp(T0[1]), pp=F[prev].p;
         var com=[q0,q1].filter(function(q){ return pp.some(function(u){ return Math.hypot(u[0]-q[0],u[1]-q[1])<1e-6; }); })[0]||q0; F.push({p:[q0,q1,A],g:'side',par:prev,hinge:[A,com],ang:ss}); prev=F.length-1; } }); } }
   return F; }
+var ovShow=false;
 function foldNet(F,e,dz){ return F.map(function(f){ var pts=f.p.map(function(q){ return [q[0],q[1],0]; }), nd=f;
   while(nd.par>=0){ var a=[nd.hinge[0][0],nd.hinge[0][1],0], b=nd.hinge[1], d=[b[0]-a[0],b[1]-a[1],0], dl=Math.hypot(d[0],d[1])||1, c=[0,0]; d=[d[0]/dl,d[1]/dl,0]; nd.p.forEach(function(q){ c[0]+=q[0]/nd.p.length; c[1]+=q[1]/nd.p.length; });
-    var sg=(d[0]*(c[1]-a[1])-d[1]*(c[0]-a[0]))>0?1:-1, ang=nd.ang*(1-e)*dz*sg; pts=pts.map(function(q){ return rotAx(q,a,d,ang); }); nd=F[nd.par]; }
-  return {p:pts,c:f.g==='base'?GREEN:BLUE,ol:INK,g:f.g}; }); }
+    var sg=(d[0]*(c[1]-a[1])-d[1]*(c[0]-a[0]))>0?1:-1, ang=(nd.ang-(ovShow&&nd.lift?0.42:0))*(1-e)*dz*sg; pts=pts.map(function(q){ return rotAx(q,a,d,ang); }); nd=F[nd.par]; }
+  return {p:pts,c:(ovShow&&f.ov)?ORANGE:(f.g==='base'?GREEN:BLUE),ol:INK,g:f.g,ov:ovShow&&f.ov,lift:ovShow&&f.lift}; }); }
 function drawNet(F,t,lab){ var e=t*t*(3-2*t), fs=foldNet(F,e,KIND==='prism'?-1:1), sy=yaw, sp=pit, al=-Math.PI/2*(1-e), mn=[1e9,1e9,1e9], mx=[-1e9,-1e9,-1e9], rho=0, texts=[];
   if(KIND!=='prism') fs.forEach(function(f){ f.p=f.p.map(function(q){ return [q[0],q[1]*Math.cos(al)-q[2]*Math.sin(al),q[1]*Math.sin(al)+q[2]*Math.cos(al)]; }); });
   fs.forEach(function(f){ f.p.forEach(function(q){ for(var k=0;k<3;k++){ mn[k]=Math.min(mn[k],q[k]); mx[k]=Math.max(mx[k],q[k]); } }); });
@@ -182,6 +183,7 @@ function drawNet(F,t,lab){ var e=t*t*(3-2*t), fs=foldNet(F,e,KIND==='prism'?-1:1
   fs.forEach(function(f){ f.p=f.p.map(function(q){ var v=[q[0]-c[0],q[1]-c[1],q[2]-c[2]]; rho=Math.max(rho,Math.hypot(v[0],v[1],v[2])); return v; }); });
   var s0=Math.min(W,H)*0.44/rho, s1=Math.min(W*0.88/Math.max(mx[0]-mn[0],0.1),H*0.86/Math.max(mx[1]-mn[1],0.1)); S=Math.min(130,s0+(s1-s0)*e);
   if(lab&&e>0.97){ var sd=fs.filter(function(f){ return f.g==='side'; }); fs.forEach(function(f){ if(f.g==='base') texts.push({p:cen(f.p),t:'밑면',c:INK,s:15}); }); if(sd.length) texts.push({p:cen(sd[KIND==='prism'?Math.floor((sd.length-1)/2):0].p),t:'옆면',c:INK,s:15}); }
+  fs.forEach(function(f){ if(f.lift&&e<0.5) texts.push({p:cen(f.p),t:'겹치는 면',s:16}); else if(f.ov&&e>0.97) texts.push({p:cen(f.p),t:'겹쳐요',s:15}); });
   yaw=sy*(1-e); pit=sp*(1-e); paint(fs,[],[],texts); yaw=sy; pit=sp; }
 function rnd(n){ return Math.floor(Math.random()*n); }
 
@@ -206,14 +208,14 @@ function qzNew(){ var ok=Math.random()<0.5, sp, why, sg=Math.random()<0.5?1:-1;
   if(KIND==='prism'){ if(ok){ sp={M:N,bases:[[rnd(N),1],[rnd(N),-1]]}; why='밑면 2개가 옆면의 위와 아래에 하나씩 있고, 옆면이 '+N+'개예요.'; }
     else { var t=rnd(4); if(t===0){ sp={M:N,bases:[[0,sg],[N-1,sg]]}; why='두 밑면이 같은 쪽에 붙어 있어요. 접으면 한쪽은 겹치고 반대쪽은 뚫려요.'; }
       else if(t===1){ sp={M:N-1,bases:[[rnd(N-1),1],[rnd(N-1),-1]]}; why='옆면이 '+N+'개 있어야 하는데 '+(N-1)+'개뿐이에요.'; }
-      else if(t===2){ sp={M:N+1,bases:[[rnd(N+1),1],[rnd(N+1),-1]]}; why='옆면이 '+(N+1)+'개라서 접으면 옆면끼리 겹쳐요.'; }
+      else if(t===2){ sp={M:N+1,bases:[[1+rnd(N-1),1],[1+rnd(N-1),-1]],ov:[0,N]}; why='옆면이 '+(N+1)+'개라서 접으면 옆면끼리 겹쳐요. 주황색으로 칠한 두 면이 서로 겹치는 면이에요.'; }
       else { sp={M:N,bases:[[rnd(N),sg]]}; why='밑면이 1개뿐이에요. 각기둥의 밑면은 2개예요.'; } } }
   else { if(ok){ sp=Math.random()<0.5?{type:'star',base:true,skip:-1}:{type:'fan',base:true,T:N}; why='밑면 1개와 옆면(삼각형) '+N+'개가 모두 있고, 접으면 삼각형의 꼭짓점이 한 점에서 만나요.'; }
     else { var u=rnd(3); if(u===0){ sp={type:'star',base:true,skip:rnd(N)}; why='옆면이 '+N+'개 있어야 하는데 '+(N-1)+'개뿐이에요.'; }
-      else if(u===1){ sp={type:'fan',base:true,T:N+1}; why='옆면이 '+(N+1)+'개라서 접으면 옆면끼리 겹쳐요.'; }
+      else if(u===1){ var np=Math.ceil(N/2); sp={type:'fan',base:true,T:N+1,ov:[1+np,1+N]}; why='옆면이 '+(N+1)+'개라서 접으면 옆면끼리 겹쳐요. 주황색으로 칠한 두 면이 서로 겹치는 면이에요.'; }
       else { sp={type:'fan',base:false,T:N}; why='밑면이 없어요.'; } } }
-  qzStop(); qz={F:buildNet(sp),ok:ok,why:why,done:false,right:false}; qzE=1; }
-function qzDraw(){ if(!qz) qzNew(); drawNet(qz.F,qzE,false);
+  qzStop(); qz={F:buildNet(sp),ok:ok,why:why,done:false,right:false}; qzE=1; if(sp.ov){ qz.F[sp.ov[0]].ov=true; qz.F[sp.ov[1]].ov=true; qz.F[sp.ov[1]].lift=true; } }
+function qzDraw(){ if(!qz) qzNew(); ovShow=qz.done; drawNet(qz.F,qzE,false); ovShow=false;
   $('say').innerHTML=qz.done?((qz.right?'<b class="r">정답이에요!</b> ':'아쉬워요. ')+nm()+'을 '+(qz.ok?'만들 수 있어요.':'만들 수 없어요.')+'<small style="font-size:15.5px;color:var(--ink)">'+qz.why+'</small>'):('이 전개도를 접으면 <b>'+nm()+'</b>을 만들 수 있을까요?<small>밑면과 옆면의 수, 붙어 있는 자리를 잘 살펴보세요.</small>'); }
 function qzUI(){ if(!qz) qzNew();
   $('ctl').innerHTML='<div class="row" style="margin-top:8px">'+(qz.done?('<button class="btn" id="qzFold">'+(qzE>0.5?'접어서 확인하기':'다시 펼치기')+'</button><button class="btn primary" id="qzNext">다음 문제 ▶</button>'):('<button class="btn primary" id="qzO">⭕ 만들 수 있어요</button><button class="btn primary" id="qzX">❌ 만들 수 없어요</button>'))+'<span style="margin-left:auto;font-family:var(--display)">맞힌 문제 '+qzScore[0]+' / '+qzScore[1]+'</span></div>';
