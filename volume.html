@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>직육면체의 부피와 겉넓이</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 다른 수업 앱(쌓기나무·원주와 원의 넓이)과 같은 색·글꼴 */
+:root{--bg:#EDF1F3;--surface:#FFFFFF;--surface2:#EDF1F3;--ink:#1D2B36;--muted:#5C6B77;--line:#C9D3DA;--accent:#2F6FDB;--accent-ink:#fff;--c1:#D9482B;--sel:#DCEAFF;--sel-ink:#1B4FB0;
+ --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4vw,36px)}
+header p{margin:0;color:var(--muted);font-size:15px}
+h1,button,label,output,select{font-family:var(--display);font-weight:400}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stage{max-width:760px;width:100%;margin:0 auto}
+button{font:inherit;font-family:var(--display);cursor:pointer}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs button{font-size:17px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.btn,.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:16px}
+.tabs button:hover,.btn:hover,.chip:hover{border-color:var(--ink)}
+.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+canvas{display:block;width:100%;border-radius:12px;background:var(--surface2);touch-action:none;cursor:grab}
+.hint{font-size:14px;color:var(--muted);margin:6px 0}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.row label{font-size:15px;min-width:64px}
+.row input[type=range]{flex:1;min-width:140px;height:28px;accent-color:var(--accent)}
+.row output{font-size:17px;min-width:56px;text-align:right}
+.say{background:var(--bg);border-left:6px solid var(--accent);border-radius:8px;padding:9px 12px;margin:10px 0 0;font-size:16px;font-weight:700;min-height:46px}
+.say small{display:block;font-weight:400;color:var(--muted);margin-top:2px;font-size:14.5px}
+.say b.r{color:var(--c1)}
+select{font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:15.5px}
+th{background:var(--surface2);font-family:var(--display);font-weight:400}
+td.st{text-align:left;font-weight:700}
+.ck{min-width:46px;min-height:36px;padding:4px 8px;font-size:19px;line-height:1}
+td.res{width:44px;font-size:18px}
+.vt td{height:92px;font-family:var(--display);font-size:17px;width:33.3%}
+.vt td.no{color:var(--muted);font-size:26px}
+.vt svg{display:block;margin:0 auto 2px;width:54px;height:46px;color:var(--accent)}
+input[type=number]{font:inherit;width:74px;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);margin-left:4px}
+input.ok{border-color:#1E8E5A;background:rgba(30,142,90,.12)}input.bad{border-color:var(--c1);background:rgba(217,72,43,.12)}
+.msg{font-weight:700;min-height:24px;margin:6px 0 0}.msg.ok{color:#1E8E5A}.msg.bad{color:var(--c1)}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+.found{background:var(--surface2);border:2px solid #1E8E5A;border-radius:10px;padding:10px 13px;margin:10px 0 0;font-size:16px;font-weight:700;line-height:1.8}
+.found small{display:block;color:#1E8E5A;font-size:13px}.found i{font-style:normal;color:var(--c1)}
+.dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 16px}
+.dims .row label{min-width:40px}
+.score{margin-left:auto;font-family:var(--display)}
+input.wide{width:130px}
+</style></head><body>
+<div class="app">
+  <header><h1>직육면체의 부피와 겉넓이</h1><p>쌓기나무로 상자를 채워 부피를 구하고, 전개도로 겉넓이를 알아봐요</p></header>
+  <div class="card"><div class="tabs" id="tabs" role="tablist">
+    <button data-t="fill" role="tab" aria-selected="true">① 쌓아서 부피 구하기</button>
+    <button data-t="cmp" role="tab" aria-selected="false">② 부피 비교하기</button>
+    <button data-t="sa" role="tab" aria-selected="false">③ 겉넓이</button>
+    <button data-t="unit" role="tab" aria-selected="false">④ 1㎥와 1㎤</button>
+  </div></div>
+  <section class="card"><div class="stage">
+    <div id="top"></div>
+    <canvas id="cv"></canvas>
+    <p class="hint" id="hint">그림을 손가락이나 마우스로 끌면 돌려 볼 수 있어요.</p>
+    <div id="ctl"></div>
+    <div class="say" id="say"></div>
+  </div></section>
+</div>
+<script>
+var $=function(id){ return document.getElementById(id); };
+var cv=$('cv'), g=cv.getContext('2d'), W=640, H=440, S=100, yaw=-0.5, pit=0.36, tab='';
+var BLUE=[125,180,245], GREEN=[120,210,165], ORANGE=[251,146,60], GRAY=[185,196,206], PINK=[236,150,190], YEL=[240,200,95];
+var INK='#1D2B36', HOT='#D9482B', ACC='#2F6FDB', HALO='#EDF1F3', MUTED='#5C6B77', LINE='#C9D3DA';
+function tone(){ var c=getComputedStyle(document.documentElement), v=function(n,d){ return (c.getPropertyValue(n)||'').trim()||d; }; INK=v('--ink',INK); HOT=v('--c1',HOT); ACC=v('--accent',ACC); HALO=v('--surface2',HALO); MUTED=v('--muted',MUTED); LINE=v('--line',LINE); }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function rgba(c,a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+(a==null?1:a)+')'; }
+function fit(){ var w=cv.clientWidth||640, d=window.devicePixelRatio||1; W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
+function rot(p){ var cy=Math.cos(yaw), sy=Math.sin(yaw), cp=Math.cos(pit), sp=Math.sin(pit); var x=p[0]*cy+p[2]*sy, z=-p[0]*sy+p[2]*cy; return [x, p[1]*cp-z*sp, p[1]*sp+z*cp]; }
+function scr(q){ return [W/2+q[0]*S, H/2-q[1]*S]; }
+var L=(function(){ var v=[-0.35,0.6,0.72], n=Math.hypot(v[0],v[1],v[2]); return [v[0]/n,v[1]/n,v[2]/n]; })();
+function paint(faces,lines,dots,texts){
+  g.clearRect(0,0,W,H);
+  var fs=faces.map(function(f){ var q=f.p.map(rot), z=0; q.forEach(function(v){ z+=v[2]; }); z/=q.length;
+    var a=q[0], b=q[1], c=q[q.length-1], ux=b[0]-a[0], uy=b[1]-a[1], uz=b[2]-a[2], vx=c[0]-a[0], vy=c[1]-a[1], vz=c[2]-a[2];
+    var nx=uy*vz-uz*vy, ny=uz*vx-ux*vz, nz=ux*vy-uy*vx, nl=Math.hypot(nx,ny,nz)||1, k=0.6+0.4*Math.abs((nx*L[0]+ny*L[1]+nz*L[2])/nl);
+    return {q:q,z:z,k:k,f:f}; }).sort(function(a,b){ return a.z-b.z; });
+  fs.forEach(function(o){ var c=o.f.c, al=o.f.a==null?1:o.f.a, col='rgba('+Math.round(c[0]*o.k)+','+Math.round(c[1]*o.k)+','+Math.round(c[2]*o.k)+','+al+')';
+    g.beginPath(); o.q.forEach(function(v,i){ var s=scr(v); if(i) g.lineTo(s[0],s[1]); else g.moveTo(s[0],s[1]); }); g.closePath(); g.fillStyle=col; g.fill();
+    if(o.f.ol){ g.strokeStyle=o.f.ol; g.lineWidth=1.8; g.lineJoin='round'; g.stroke(); } });
+  (lines||[]).forEach(function(l){ g.beginPath(); l.p.forEach(function(v,i){ var s=scr(rot(v)); if(i) g.lineTo(s[0],s[1]); else g.moveTo(s[0],s[1]); }); g.strokeStyle=l.c||INK; g.lineWidth=l.w||2; g.setLineDash(l.dash||[]); g.lineCap='round'; g.lineJoin='round'; g.stroke(); g.setLineDash([]); });
+  (dots||[]).forEach(function(d){ var s=scr(rot(d.p)); g.beginPath(); g.arc(s[0],s[1],d.r||6,0,7); g.fillStyle=d.c||'#DC2626'; g.fill(); g.strokeStyle=HALO; g.lineWidth=2; g.stroke(); });
+  (texts||[]).forEach(function(t){ var s=scr(rot(t.p)); g.font=(t.s||17)+'px Jua,"Malgun Gothic",sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.lineWidth=5; g.lineJoin='round'; g.strokeStyle=HALO; g.strokeText(t.t,s[0]+(t.dx||0),s[1]+(t.dy||0)); g.fillStyle=t.c||HOT; g.fillText(t.t,s[0]+(t.dx||0),s[1]+(t.dy||0)); });
+}
+function P(r,y,th){ return [r*Math.sin(th),y,r*Math.cos(th)]; }
+function cen(ps){ var c=[0,0,0]; ps.forEach(function(p){ c[0]+=p[0]; c[1]+=p[1]; c[2]+=p[2]; }); return [c[0]/ps.length,c[1]/ps.length,c[2]/ps.length]; }
+
+var D3=true, TAB0="fill";
+/* 전개도 접기: 면 {p:[[x,y]..], par:붙은 면 번호(-1=바닥), hinge:[[x,y],[x,y]], ang, c:색, t:이름표} */
+function rotAx(p,a,d,ang){ var v=[p[0]-a[0],p[1]-a[1],p[2]-a[2]], c=Math.cos(ang), sn=Math.sin(ang), dot=v[0]*d[0]+v[1]*d[1]+v[2]*d[2], cr=[d[1]*v[2]-d[2]*v[1],d[2]*v[0]-d[0]*v[2],d[0]*v[1]-d[1]*v[0]];
+  return [a[0]+v[0]*c+cr[0]*sn+d[0]*dot*(1-c),a[1]+v[1]*c+cr[1]*sn+d[1]*dot*(1-c),a[2]+v[2]*c+cr[2]*sn+d[2]*dot*(1-c)]; }
+function foldNet(F,e){ return F.map(function(f){ var pts=f.p.map(function(q){ return [q[0],q[1],0]; }), nd=f;
+  while(nd.par>=0){ var a=[nd.hinge[0][0],nd.hinge[0][1],0], b=nd.hinge[1], d=[b[0]-a[0],b[1]-a[1],0], dl=Math.hypot(d[0],d[1])||1, c=[0,0]; d=[d[0]/dl,d[1]/dl,0]; nd.p.forEach(function(q){ c[0]+=q[0]/nd.p.length; c[1]+=q[1]/nd.p.length; });
+    var sg=(d[0]*(c[1]-a[1])-d[1]*(c[0]-a[0]))>0?1:-1, ang=(nd.ang||Math.PI/2)*(1-e)*sg; pts=pts.map(function(q){ return rotAx(q,a,d,ang); }); nd=F[nd.par]; }
+  return {p:pts,c:f.c||BLUE,ol:INK,src:f}; }); }
+/* t: 0=접힌 입체, 1=펼친 전개도 */
+function drawNet(F,t,lab){ var e=t*t*(3-2*t), fs=foldNet(F,e), sy=yaw, sp=pit, al=-Math.PI/2*(1-e), mn=[1e9,1e9,1e9], mx=[-1e9,-1e9,-1e9], rho=0, texts=[];
+  fs.forEach(function(f){ f.p=f.p.map(function(q){ return [q[0],q[1]*Math.cos(al)-q[2]*Math.sin(al),q[1]*Math.sin(al)+q[2]*Math.cos(al)]; }); });
+  fs.forEach(function(f){ f.p.forEach(function(q){ for(var k=0;k<3;k++){ mn[k]=Math.min(mn[k],q[k]); mx[k]=Math.max(mx[k],q[k]); } }); });
+  var c=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2];
+  fs.forEach(function(f){ f.p=f.p.map(function(q){ var v=[q[0]-c[0],q[1]-c[1],q[2]-c[2]]; rho=Math.max(rho,Math.hypot(v[0],v[1],v[2])); return v; }); });
+  var s0=Math.min(W,H)*0.42/rho, s1=Math.min(W*0.88/Math.max(mx[0]-mn[0],0.1),H*0.86/Math.max(mx[1]-mn[1],0.1)); S=Math.min(130,s0+(s1-s0)*e);
+  if(lab&&e>0.97) fs.forEach(function(f){ if(f.src.t) texts.push({p:cen(f.p),t:f.src.t,c:INK,s:15}); });
+  yaw=sy*(1-e); pit=sp*(1-e); paint(fs,[],[],texts); yaw=sy; pit=sp; }
+function boxNet(a,b,c){ var Q=function(x0,y0,x1,y1){ return [[x0,y0],[x1,y0],[x1,y1],[x0,y1]]; };
+  return [{p:Q(0,0,a,b),par:-1,c:GREEN,t:a+'×'+b},{p:Q(0,-c,a,0),par:0,hinge:[[0,0],[a,0]],c:BLUE,t:a+'×'+c},{p:Q(0,b,a,b+c),par:0,hinge:[[0,b],[a,b]],c:BLUE,t:a+'×'+c},
+    {p:Q(-c,0,0,b),par:0,hinge:[[0,0],[0,b]],c:ORANGE,t:c+'×'+b},{p:Q(a,0,a+c,b),par:0,hinge:[[a,0],[a,b]],c:ORANGE,t:c+'×'+b},{p:Q(0,b+c,a,2*b+c),par:2,hinge:[[0,b+c],[a,b+c]],c:GREEN,t:a+'×'+b}]; }
+
+/* 직육면체의 부피와 겉넓이 (6학년 1학기). x=가로, y=높이, z=세로 */
+var A=4, B=3, C=3;
+var DIRS=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+function quad(c,d,h){ var u=[d[1],d[2],d[0]], v=[d[2],d[0],d[1]], m=[c[0]+d[0]*h[0],c[1]+d[1]*h[1],c[2]+d[2]*h[2]], pt=function(a,b){ return [m[0]+a*u[0]*h[0]+b*v[0]*h[0],m[1]+a*u[1]*h[1]+b*v[1]*h[1],m[2]+a*u[2]*h[2]+b*v[2]*h[2]]; };
+  return [pt(1,1),pt(1,-1),pt(-1,-1),pt(-1,1)]; }
+/* 쌓기나무 n개(아래층부터)의 겉면 가운데 보이는 면만 */
+function cubes(a,b,c,n,ox,oy,col){ var fs=[], has=function(x,y,z){ return x>=0&&y>=0&&z>=0&&x<a&&y<c&&z<b&&(y*a*b+z*a+x)<n; }, hh=[0.5,0.5,0.5];
+  for(var k=0;k<n;k++){ var x=k%a, z=Math.floor(k/a)%b, y=Math.floor(k/(a*b));
+    DIRS.forEach(function(d){ if(has(x+d[0],y+d[1],z+d[2])||rot(d)[2]<=1e-6) return; fs.push({p:quad([x+0.5-a/2+ox,y+0.5-c/2+oy,z+0.5-b/2],d,hh),c:col,ol:INK}); }); }
+  return fs; }
+function boxFaces(c,h,col,al){ return DIRS.map(function(d){ return {p:quad(c,d,h),c:col,a:al,ol:INK}; }); }
+function boxEdges(a,b,c,ox,oy,hideBack){ var ls=[], h=[a/2,c/2,b/2];
+  for(var i=0;i<8;i++) for(var k=0;k<3;k++){ if(i&(1<<k)) continue; var j=i|(1<<k), vis=false, P1=[], P2=[];
+    for(var m=0;m<3;m++){ var s=(i&(1<<m))?1:-1; P1.push(s*h[m]); P2.push(m===k?h[m]:s*h[m]); if(m!==k){ var n=[0,0,0]; n[m]=s; if(rot(n)[2]>1e-6) vis=true; } }
+    P1[0]+=ox; P2[0]+=ox; P1[1]+=oy; P2[1]+=oy; if(!vis&&hideBack) continue; ls.push({p:[P1,P2],w:vis?2:1.3,dash:vis?[]:[5,5]}); }
+  return ls; }
+function dimTexts(a,b,c,ox,oy){ return [{p:[ox,-c/2+oy,b/2],t:'가로 '+a+'cm',dy:16,c:INK,s:15},{p:[a/2+ox,-c/2+oy,0],t:'세로 '+b+'cm',dx:34,dy:10,c:INK,s:15},{p:[-a/2+ox,oy,b/2],t:'높이 '+c+'cm',dx:-40,c:INK,s:15}]; }
+function dimHTML(){ return '<div class="dims">'+[['A','가로'],['B','세로'],['C','높이']].map(function(d){ return '<div class="row"><label>'+d[1]+'</label><input type="range" id="d'+d[0]+'" min="1" max="6" value="'+window[d[0]]+'"><output>'+window[d[0]]+'cm</output></div>'; }).join('')+'</div>'; }
+function dimBind(cb){ ['A','B','C'].forEach(function(k){ $('d'+k).oninput=function(){ window[k]=+this.value; this.nextElementSibling.textContent=this.value+'cm'; if(cb) cb(); draw(); }; }); }
+
+/* ───────── 1. 쌓아서 부피 구하기 ───────── */
+var fillN=0, fillT=null;
+function fillStop(){ if(fillT){ clearInterval(fillT); fillT=null; } }
+function fillDraw(){ var V=A*B*C, per=A*B; fillN=Math.min(fillN,V); S=Math.min(W/(A+B+3.2),H/(C+(A+B)*0.4+1.8));
+  paint(cubes(A,B,C,fillN,0,0,BLUE),boxEdges(A,B,C,0,0,fillN>0),[],dimTexts(A,B,C,0,0));
+  var cube=A===B&&B===C;
+  $('say').innerHTML=fillN===0?('가로 '+A+'cm, 세로 '+B+'cm, 높이 '+C+'cm인 상자예요. 한 모서리가 1cm인 쌓기나무가 몇 개 들어갈까요?<small>쌓기나무 1개의 부피는 1㎤(1 세제곱센티미터)예요. 먼저 예상해 보고 쌓아 보세요.</small>'):
+    (fillN<V?('쌓기나무 <b class="r">'+fillN+'개</b>를 쌓았어요.<small>한 층에 '+A+' × '+B+' = '+per+'개씩 들어가요. 지금 '+Math.floor(fillN/per)+'층을 다 채웠어요.</small>'):
+    ('한 층에 '+A+' × '+B+' = '+per+'개씩 '+C+'층이므로 쌓기나무는 <b class="r">'+V+'개</b>예요. 부피는 <b class="r">'+V+'㎤</b>예요.<small style="font-size:15.5px;color:var(--ink)">'+(cube?'정육면체의 부피 = 한 모서리의 길이 × 한 모서리의 길이 × 한 모서리의 길이 = ':'직육면체의 부피 = 가로 × 세로 × 높이 = ')+A+' × '+B+' × '+C+' = '+V+'(㎤)</small>')); }
+function fillUI(){ $('top').innerHTML=''; $('ctl').innerHTML=dimHTML()+'<div class="row"><button class="btn primary" id="fGo">▶ 하나씩 쌓기</button><button class="btn" id="fLay">한 층 쌓기</button><button class="btn" id="fAll">가득 채우기</button><button class="btn" id="fClr">비우기</button></div>';
+  dimBind(function(){ fillStop(); fillN=0; });
+  $('fGo').onclick=function(){ fillStop(); var V=A*B*C; if(fillN>=V) fillN=0; fillT=setInterval(function(){ fillN++; if(fillN>=A*B*C) fillStop(); draw(); },Math.max(30,3600/V)); draw(); };
+  $('fLay').onclick=function(){ fillStop(); var per=A*B; fillN=Math.min(A*B*C,(Math.floor(fillN/per)+1)*per); draw(); };
+  $('fAll').onclick=function(){ fillStop(); fillN=A*B*C; draw(); };
+  $('fClr').onclick=function(){ fillStop(); fillN=0; draw(); }; }
+
+/* ───────── 2. 부피 비교하기 ───────── */
+var cm=null, cmScore=[0,0], EQ=[[[2,2,3],[1,3,4]],[[2,4,2],[4,4,1]],[[3,2,2],[1,4,3]],[[2,3,4],[4,2,3]],[[3,3,4],[4,3,3]]];
+function cmNew(){ var r=function(){ return 1+rnd(4); }, a, b; if(Math.random()<0.22){ var q=EQ[rnd(EQ.length)], s=rnd(2); a=q[s]; b=q[1-s]; } else { a=[r(),r(),r()]; do{ b=[r(),r(),r()]; }while(a.join()===b.join()); }
+  cm={a:a,b:b,done:false,right:false,pick:''}; }
+function cmDraw(){ if(!cm) cmNew(); var a=cm.a, b=cm.b, mc=Math.max(a[2],b[2]), ox1=-(a[0]/2+1.1), ox2=b[0]/2+1.1, oy1=(a[2]-mc)/2, oy2=(b[2]-mc)/2;
+  S=Math.min(W/(a[0]+b[0]+7.5),H/(mc+4.5));
+  var fs=cubes(a[0],a[1],a[2],a[0]*a[1]*a[2],ox1,oy1,BLUE).concat(cubes(b[0],b[1],b[2],b[0]*b[1]*b[2],ox2,oy2,GREEN));
+  var tx=[{p:[ox1,-mc/2,a[1]/2],t:'가',dy:24,c:INK,s:20},{p:[ox2,-mc/2,b[1]/2],t:'나',dy:24,c:INK,s:20}];
+  paint(fs,[],[],tx);
+  var va=a[0]*a[1]*a[2], vb=b[0]*b[1]*b[2], ans=va>vb?'가':(va<vb?'나':'같음');
+  $('say').innerHTML=cm.done?((cm.right?'<b class="r">정답이에요!</b> ':'아쉬워요. ')+(ans==='같음'?'두 상자의 부피가 같아요.':(ans+'의 부피가 더 커요.'))+'<small style="font-size:15.5px;color:var(--ink)">가: '+a[0]+' × '+a[1]+' × '+a[2]+' = '+va+'(㎤)　　나: '+b[0]+' × '+b[1]+' × '+b[2]+' = '+vb+'(㎤)'+(ans==='같음'?'<br>모양이 달라도 부피는 같을 수 있어요.':'')+'</small>'):
+    '쌓기나무(1㎤)로 만든 두 직육면체 가운데 어느 쪽의 부피가 더 클까요?<small>그림을 돌려 가로, 세로, 높이에 쌓기나무가 몇 개씩 있는지 살펴보세요.</small>'; }
+function cmUI(){ if(!cm) cmNew(); $('top').innerHTML='';
+  $('ctl').innerHTML='<div class="row" style="margin-top:8px">'+(cm.done?'<button class="btn primary" id="cmNext">다음 문제 ▶</button>':'<button class="btn primary" data-v="가">가가 더 커요</button><button class="btn primary" data-v="나">나가 더 커요</button><button class="btn" data-v="같음">부피가 같아요</button>')+'<span class="score">맞힌 문제 '+cmScore[0]+' / '+cmScore[1]+'</span></div>';
+  if(cm.done) $('cmNext').onclick=function(){ cmNew(); cmUI(); draw(); };
+  else $('ctl').querySelectorAll('[data-v]').forEach(function(b){ b.onclick=function(){ var va=cm.a[0]*cm.a[1]*cm.a[2], vb=cm.b[0]*cm.b[1]*cm.b[2], ans=va>vb?'가':(va<vb?'나':'같음'); cm.done=true; cm.right=b.dataset.v===ans; cmScore[1]++; if(cm.right) cmScore[0]++; cmUI(); draw(); }; }); }
+
+/* ───────── 3. 겉넓이 ───────── */
+var sa=0, saT=null;
+function saStop(){ if(saT){ cancelAnimationFrame(saT); saT=null; } }
+function saDraw(){ drawNet(boxNet(A,B,C),sa,true); var sl=$('saT'); if(sl) sl.value=Math.round(sa*100); var bt=$('saGo'); if(bt&&!saT) bt.textContent=sa>0.5?'◀ 다시 접기':'▶ 펼치기';
+  var x=A*B, y=A*C, z=B*C, cube=A===B&&B===C;
+  $('say').innerHTML=sa<0.03?('가로 '+A+'cm, 세로 '+B+'cm, 높이 '+C+'cm인 직육면체의 겉넓이는 얼마일까요?<small>겉넓이는 여섯 면의 넓이를 모두 더한 것이에요. ▶ 펼치기를 눌러 전개도로 살펴보세요.</small>'):(sa<0.97?'펼치는 중…':
+    (cube?('정육면체는 여섯 면이 모두 합동이에요. 겉넓이는 <b class="r">'+(x*6)+'㎠</b>예요.<small style="font-size:15.5px;color:var(--ink)">정육면체의 겉넓이 = 한 면의 넓이 × 6 = '+A+' × '+A+' × 6 = '+(x*6)+'(㎠)</small>'):
+    ('같은 색 면은 서로 합동이에요. 합동인 면이 3쌍이므로 겉넓이는 <b class="r">'+((x+y+z)*2)+'㎠</b>예요.<small style="font-size:15.5px;color:var(--ink)">직육면체의 겉넓이 = ('+A+' × '+B+' + '+A+' × '+C+' + '+C+' × '+B+') × 2 = ('+x+' + '+y+' + '+z+') × 2 = '+((x+y+z)*2)+'(㎠)</small>'))); }
+function saRun(to){ saStop(); var from=sa, t0=performance.now(), dur=2400*Math.abs(to-from)||1; (function step(now){ var k=Math.min(1,(now-t0)/dur); sa=from+(to-from)*k; if(k<1){ saT=requestAnimationFrame(step); draw(); } else { saT=null; draw(); } })(t0); }
+function saUI(){ $('top').innerHTML=''; $('ctl').innerHTML=dimHTML()+'<div class="row"><label>펼치기</label><input type="range" id="saT" min="0" max="100" value="'+Math.round(sa*100)+'"><button class="btn primary" id="saGo">▶ 펼치기</button></div>';
+  dimBind(function(){ saStop(); }); $('saT').oninput=function(){ saStop(); sa=this.value/100; draw(); }; $('saGo').onclick=function(){ saRun(sa>0.5?0:1); }; }
+
+/* ───────── 4. 1㎥와 1㎤ ───────── */
+var un=0, uq=null, UNS=['1㎤','한 줄','한 층','1㎥ 전체'];
+function uqNew(){ var ns=[1,2,3,4,5,7,10,0.5,1.5,2.4,0.8,12], n=ns[rnd(ns.length)]; uq={n:n,dir:rnd(2)}; }
+function unDraw(){ S=Math.min(W,H)/2.7; var t=0.035, fs=boxFaces([0,0,0],[0.5,0.5,0.5],un===3?ORANGE:GRAY,un===3?0.82:0.16);
+  if(un===0) fs=fs.concat(boxFaces([-0.5+t,-0.5+t,0.5-t],[t,t,t],ORANGE,1));
+  if(un===1) fs=fs.concat(boxFaces([0,-0.5+t,0.5-t],[0.5,t,t],ORANGE,1));
+  if(un===2) fs=fs.concat(boxFaces([0,-0.5+t,0],[0.5,t,0.5],ORANGE,1));
+  paint(fs,[],[],[{p:[0,-0.5,0.5],t:'100cm = 1m',dy:17,c:INK,s:15},{p:[0.5,-0.5,0],t:'100cm = 1m',dx:46,dy:12,c:INK,s:15},{p:[-0.5,0,0.5],t:'100cm = 1m',dx:-50,c:INK,s:15}]);
+  $('say').innerHTML=['한 모서리의 길이가 1m인 정육면체의 부피를 <b class="r">1㎥</b>(1 세제곱미터)라고 해요.<small>구석의 주황색 쌓기나무가 1㎤예요. 실제로는 훨씬 작아서 눈에 보이도록 크게 그렸어요.</small>',
+    '가로 한 줄에 1㎤ 쌓기나무가 <b class="r">100개</b> 놓여요.<small>1m = 100cm이기 때문이에요.</small>',
+    '한 층에는 100 × 100 = <b class="r">10000개</b>가 놓여요.<small>가로로 100개씩, 세로로 100줄이에요.</small>',
+    '100층을 쌓으면 100 × 100 × 100 = <b class="r">1000000개</b>예요.<small style="font-size:15.5px;color:var(--ink)">1㎥ = 1000000㎤</small>'][un]; }
+function unUI(msg,cls){ if(!uq) uqNew(); $('top').innerHTML='<div class="chips">'+UNS.map(function(s,i){ return '<button class="chip" aria-pressed="'+(i===un)+'" data-i="'+i+'">'+s+'</button>'; }).join('')+'</div>';
+  var big=uq.n*1000000, q=uq.dir===0?('<b>'+uq.n+'㎥</b> = <input type="number" class="wide" id="uqIn" inputmode="decimal"> ㎤'):('<b>'+big+'㎤</b> = <input type="number" class="wide" id="uqIn" inputmode="decimal"> ㎥');
+  $('ctl').innerHTML='<div class="row" style="margin-top:10px;font-size:17px"><span>단위 바꾸기　'+q+'</span><button class="btn primary" id="uqGo">확인하기</button><button class="btn" id="uqNext">다른 문제</button></div><p class="msg '+(cls||'')+'" id="uqMsg">'+(msg||'')+'</p>';
+  $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ un=+b.dataset.i; $('top').querySelectorAll('.chip').forEach(function(c){ c.setAttribute('aria-pressed',c===b); }); draw(); }; });
+  $('uqGo').onclick=function(){ var el=$('uqIn'), m=$('uqMsg'), ans=uq.dir===0?big:uq.n; if(el.value===''){ m.className='msg bad'; m.textContent='칸에 수를 써 주세요.'; return; }
+    var ok=Math.abs(+el.value-ans)<1e-6; el.className='wide '+(ok?'ok':'bad'); m.className='msg '+(ok?'ok':'bad'); m.textContent=ok?'맞았어요! 1㎥ = 1000000㎤이므로 '+uq.n+'㎥ = '+big+'㎤예요.':'다시 생각해 보세요. 1㎥ = 1000000㎤예요.'; };
+  $('uqNext').onclick=function(){ uqNew(); unUI(); }; }
+
+function ui(){ if(tab==='fill') fillUI(); else if(tab==='cmp') cmUI(); else if(tab==='sa') saUI(); else unUI(); }
+function draw(){ tone(); if(tab==='fill') fillDraw(); else if(tab==='cmp') cmDraw(); else if(tab==='sa') saDraw(); else unDraw(); }
+function setTab(t){ fillStop(); saStop(); tab=t; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+
+document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+var drag=null, moved=0;
+cv.addEventListener('pointerdown',function(e){ drag=[e.clientX,e.clientY]; moved=0; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
+cv.addEventListener('pointermove',function(e){ if(!drag) return; var dx=e.clientX-drag[0], dy=e.clientY-drag[1]; moved+=Math.abs(dx)+Math.abs(dy); drag=[e.clientX,e.clientY];
+  if(D3&&!(window.noDrag&&noDrag())){ yaw+=dx*0.011; pit=Math.max(-0.5,Math.min(1.5,pit+dy*0.009)); draw(); } });
+cv.addEventListener('pointerup',function(e){ if(drag&&moved<10&&window.onTap){ var r=cv.getBoundingClientRect(); onTap(e.clientX-r.left,e.clientY-r.top); } drag=null; });
+cv.addEventListener('pointercancel',function(){ drag=null; });
+window.addEventListener('resize',fit); try{ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw); }catch(_){}
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+setTab(TAB0); fit();
+</script></body></html>

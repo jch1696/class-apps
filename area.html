@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>다각형의 둘레와 넓이</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 다른 수업 앱(쌓기나무·원주와 원의 넓이)과 같은 색·글꼴 */
+:root{--bg:#EDF1F3;--surface:#FFFFFF;--surface2:#EDF1F3;--ink:#1D2B36;--muted:#5C6B77;--line:#C9D3DA;--accent:#2F6FDB;--accent-ink:#fff;--c1:#D9482B;--sel:#DCEAFF;--sel-ink:#1B4FB0;
+ --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4vw,36px)}
+header p{margin:0;color:var(--muted);font-size:15px}
+h1,button,label,output,select{font-family:var(--display);font-weight:400}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stage{max-width:760px;width:100%;margin:0 auto}
+button{font:inherit;font-family:var(--display);cursor:pointer}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs button{font-size:17px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.btn,.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:16px}
+.tabs button:hover,.btn:hover,.chip:hover{border-color:var(--ink)}
+.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+canvas{display:block;width:100%;border-radius:12px;background:var(--surface2);touch-action:none;cursor:grab}
+.hint{font-size:14px;color:var(--muted);margin:6px 0}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.row label{font-size:15px;min-width:64px}
+.row input[type=range]{flex:1;min-width:140px;height:28px;accent-color:var(--accent)}
+.row output{font-size:17px;min-width:56px;text-align:right}
+.say{background:var(--bg);border-left:6px solid var(--accent);border-radius:8px;padding:9px 12px;margin:10px 0 0;font-size:16px;font-weight:700;min-height:46px}
+.say small{display:block;font-weight:400;color:var(--muted);margin-top:2px;font-size:14.5px}
+.say b.r{color:var(--c1)}
+select{font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:15.5px}
+th{background:var(--surface2);font-family:var(--display);font-weight:400}
+td.st{text-align:left;font-weight:700}
+.ck{min-width:46px;min-height:36px;padding:4px 8px;font-size:19px;line-height:1}
+td.res{width:44px;font-size:18px}
+.vt td{height:92px;font-family:var(--display);font-size:17px;width:33.3%}
+.vt td.no{color:var(--muted);font-size:26px}
+.vt svg{display:block;margin:0 auto 2px;width:54px;height:46px;color:var(--accent)}
+input[type=number]{font:inherit;width:74px;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);margin-left:4px}
+input.ok{border-color:#1E8E5A;background:rgba(30,142,90,.12)}input.bad{border-color:var(--c1);background:rgba(217,72,43,.12)}
+.msg{font-weight:700;min-height:24px;margin:6px 0 0}.msg.ok{color:#1E8E5A}.msg.bad{color:var(--c1)}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+.found{background:var(--surface2);border:2px solid #1E8E5A;border-radius:10px;padding:10px 13px;margin:10px 0 0;font-size:16px;font-weight:700;line-height:1.8}
+.found small{display:block;color:#1E8E5A;font-size:13px}.found i{font-style:normal;color:var(--c1)}
+.dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 16px}
+.dims .row label{min-width:40px}
+.score{margin-left:auto;font-family:var(--display)}
+input.wide{width:130px}
+canvas{cursor:default}
+</style></head><body>
+<div class="app">
+  <header><h1>다각형의 둘레와 넓이</h1><p>도형을 자르고 붙여 넓이 구하는 방법을 찾아봐요</p></header>
+  <div class="card"><div class="tabs" id="tabs" role="tablist">
+    <button data-t="rect" role="tab" aria-selected="true">① 직사각형</button>
+    <button data-t="para" role="tab" aria-selected="false">② 평행사변형</button>
+    <button data-t="tri" role="tab" aria-selected="false">③ 삼각형</button>
+    <button data-t="trap" role="tab" aria-selected="false">④ 사다리꼴</button>
+    <button data-t="rhom" role="tab" aria-selected="false">⑤ 마름모</button>
+    <button data-t="quiz" role="tab" aria-selected="false">⑥ 문제 풀기</button>
+  </div></div>
+  <section class="card"><div class="stage">
+    <div id="top"></div>
+    <canvas id="cv"></canvas>
+    <p class="hint" id="hint">모눈 한 칸은 가로 1cm, 세로 1cm이고 넓이는 1㎠예요.</p>
+    <div id="ctl"></div>
+    <div class="say" id="say"></div>
+  </div></section>
+</div>
+<script>
+var $=function(id){ return document.getElementById(id); };
+var cv=$('cv'), g=cv.getContext('2d'), W=640, H=440, S=100, yaw=-0.5, pit=0.36, tab='';
+var BLUE=[125,180,245], GREEN=[120,210,165], ORANGE=[251,146,60], GRAY=[185,196,206], PINK=[236,150,190], YEL=[240,200,95];
+var INK='#1D2B36', HOT='#D9482B', ACC='#2F6FDB', HALO='#EDF1F3', MUTED='#5C6B77', LINE='#C9D3DA';
+function tone(){ var c=getComputedStyle(document.documentElement), v=function(n,d){ return (c.getPropertyValue(n)||'').trim()||d; }; INK=v('--ink',INK); HOT=v('--c1',HOT); ACC=v('--accent',ACC); HALO=v('--surface2',HALO); MUTED=v('--muted',MUTED); LINE=v('--line',LINE); }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function rgba(c,a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+(a==null?1:a)+')'; }
+function fit(){ var w=cv.clientWidth||640, d=window.devicePixelRatio||1; W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
+var D3=false, TAB0="rect";
+/* 다각형의 둘레와 넓이 (5학년 1학기). 모눈 좌표(cm) → 화면 */
+var GW=16, GH=8, U=40, OX=0, OY=0, X0=2, Y0=1;
+function lay(){ U=Math.min((W-20)/GW,(H-20)/GH); OX=(W-GW*U)/2; OY=H-(H-GH*U)/2; }
+function X(x){ return OX+x*U; } function Y(y){ return OY-y*U; }
+function grid(){ g.strokeStyle=LINE; g.lineWidth=1; g.setLineDash([]); g.beginPath(); for(var i=0;i<=GW;i++){ g.moveTo(X(i),Y(0)); g.lineTo(X(i),Y(GH)); } for(var j=0;j<=GH;j++){ g.moveTo(X(0),Y(j)); g.lineTo(X(GW),Y(j)); } g.stroke(); }
+function poly(pts,fill,stroke,lw,dash){ g.beginPath(); pts.forEach(function(p,i){ if(i) g.lineTo(X(p[0]),Y(p[1])); else g.moveTo(X(p[0]),Y(p[1])); }); g.closePath(); if(fill){ g.fillStyle=fill; g.fill(); } if(stroke){ g.strokeStyle=stroke; g.lineWidth=lw||2.4; g.lineJoin='round'; g.setLineDash(dash||[]); g.stroke(); g.setLineDash([]); } }
+function seg(a,b,col,lw,dash){ g.beginPath(); g.moveTo(X(a[0]),Y(a[1])); g.lineTo(X(b[0]),Y(b[1])); g.strokeStyle=col||INK; g.lineWidth=lw||2; g.setLineDash(dash||[]); g.lineCap='round'; g.stroke(); g.setLineDash([]); }
+function label(t,x,y,col,dx,dy,sz){ g.font=(sz||16)+'px Jua,"Malgun Gothic",sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.lineWidth=5; g.lineJoin='round'; g.strokeStyle=HALO; var px=X(x)+(dx||0), py=Y(y)+(dy||0); g.strokeText(t,px,py); g.fillStyle=col||INK; g.fillText(t,px,py); }
+function rightMark(x,y,sx,sy){ var k=0.28; g.beginPath(); g.moveTo(X(x+sx*k),Y(y)); g.lineTo(X(x+sx*k),Y(y+sy*k)); g.lineTo(X(x),Y(y+sy*k)); g.strokeStyle=HOT; g.lineWidth=1.6; g.stroke(); }
+function fmt(n){ return (Math.round(n*10)/10)+''; }
+function rotP(p,m,th){ var c=Math.cos(th), s=Math.sin(th), x=p[0]-m[0], y=p[1]-m[1]; return [m[0]+x*c-y*s,m[1]+x*s+y*c]; }
+function mid(a,b){ return [(a[0]+b[0])/2,(a[1]+b[1])/2]; }
+var FB=function(a){ return rgba(BLUE,a==null?0.75:a); }, FO=function(a){ return rgba(ORANGE,a==null?0.75:a); };
+function sl(id,lab,min,max,val,step){ return '<div class="row"><label>'+lab+'</label><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" step="'+(step||1)+'" value="'+val+'"><output>'+val+'cm</output></div>'; }
+function slBind(id,fn){ $(id).oninput=function(){ this.nextElementSibling.textContent=this.value+'cm'; fn(+this.value); draw(); }; }
+var anT=null;
+function anStop(){ if(anT){ cancelAnimationFrame(anT); anT=null; } }
+function anim(get,set,to,dur,done){ anStop(); var from=get(), t0=performance.now(); (function step(now){ var k=Math.min(1,(now-t0)/(dur||1500)), e=k*k*(3-2*k); set(from+(to-from)*e); if(k<1){ anT=requestAnimationFrame(step); draw(); } else { anT=null; if(done) done(); draw(); } })(t0); }
+
+/* 도형 그리기 (t: 0~1 움직임) */
+function dRect(w,h,n){ var k; for(k=0;k<n;k++){ var c=k%w, r=Math.floor(k/w); poly([[X0+c,Y0+r],[X0+c+1,Y0+r],[X0+c+1,Y0+r+1],[X0+c,Y0+r+1]],FB(0.6),INK,1); }
+  poly([[X0,Y0],[X0+w,Y0],[X0+w,Y0+h],[X0,Y0+h]],n?null:FB(0.25),INK,2.6); label('가로 '+w+'cm',X0+w/2,Y0,INK,0,15); label('세로 '+h+'cm',X0,Y0+h/2,INK,-36,0); if(n>0&&n<w*h){ var c2=(n-1)%w, r2=Math.floor((n-1)/w); label(n+'',X0+c2+0.5,Y0+r2+0.5,HOT); } }
+function dPara(b,h,s,t){ s=Math.min(s,b); var d=b*t;
+  poly([[X0+s,Y0],[X0+b,Y0],[X0+b+s,Y0+h],[X0+s,Y0+h]],FB(),INK,2.4);
+  if(s>0) poly([[X0+d,Y0],[X0+s+d,Y0],[X0+s+d,Y0+h]],FO(),INK,2.4); else seg([X0,Y0],[X0,Y0+h],INK,2.4);
+  seg([X0+s,Y0],[X0+s,Y0+h],HOT,2.4,[6,5]); rightMark(X0+s,Y0,1,1);
+  label('밑변 '+b+'cm',X0+(t>0.5?s:0)+b/2,Y0,INK,0,15); label('높이 '+h+'cm',X0+s,Y0+h/2,HOT,38,0); }
+function dTri(b,h,p,t){ var Pa=[X0,Y0], Pb=[X0+b,Y0], Pc=[X0+p,Y0+h], M=mid(Pb,Pc);
+  if(t>0) poly([Pa,Pb,Pc].map(function(q){ return rotP(q,M,Math.PI*t); }),FO(0.7),INK,2.4);
+  poly([Pa,Pb,Pc],FB(),INK,2.4); seg(Pc,[X0+p,Y0],HOT,2.4,[6,5]); if(p>0&&p<b) rightMark(X0+p,Y0,1,1);
+  label('밑변 '+b+'cm',X0+b/2,Y0,INK,0,15); label('높이 '+h+'cm',X0+p,Y0+h/2,HOT,(p<=b/2?1:-1)*38,0); }
+function dTrap(a,b,h,t){ var o=1, P=[[X0,Y0],[X0+b,Y0],[X0+o+a,Y0+h],[X0+o,Y0+h]], M=mid(P[1],P[2]);
+  if(t>0) poly(P.map(function(q){ return rotP(q,M,Math.PI*t); }),FO(0.7),INK,2.4);
+  poly(P,FB(),INK,2.4); seg([X0+o,Y0+h],[X0+o,Y0],HOT,2.4,[6,5]); rightMark(X0+o,Y0,1,1);
+  label('아랫변 '+b+'cm',X0+b/2,Y0,INK,0,15); label('윗변 '+a+'cm',X0+o+a/2,Y0+h,INK,0,-14); label('높이 '+h+'cm',X0+o,Y0+h/2,HOT,38,0);
+  if(t>0.97){ label(a+'cm',X0+b+a/2,Y0,INK,0,15); label(b+'cm',X0+o+a+b/2,Y0+h,INK,0,-14); } }
+function dRhom(d1,d2,t){ var cx=8, cy=4, a=d1/2, b=d2/2, P=[[cx-a,cy],[cx,cy-b],[cx+a,cy],[cx,cy+b]];
+  if(t>0){ [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(function(s){ poly([[cx+s[0]*a,cy+s[1]*b],[cx+s[0]*a,cy],[cx,cy+s[1]*b]],FO(0.55*t)); }); g.globalAlpha=t; poly([[cx-a,cy-b],[cx+a,cy-b],[cx+a,cy+b],[cx-a,cy+b]],null,INK,2,[7,5]); g.globalAlpha=1; }
+  poly(P,FB(),INK,2.4); seg(P[0],P[2],HOT,2.2,[6,5]); seg(P[1],P[3],ACC,2.2,[6,5]);
+  label('대각선 '+d1+'cm',cx,cy,HOT,0,-13,15); label('대각선 '+d2+'cm',cx,cy-b/2,ACC,50,8,15); }
+
+/* ───────── 1. 직사각형 ───────── */
+var rw=5, rh=3, rn=0, rT=null;
+function rStop(){ if(rT){ clearInterval(rT); rT=null; } }
+function rectDraw(){ grid(); rn=Math.min(rn,rw*rh); dRect(rw,rh,rn); var sq=rw===rh, P=(rw+rh)*2, V=rw*rh, nm=sq?'정사각형':'직사각형';
+  var per=sq?('정사각형의 둘레 = 한 변의 길이 × 4 = '+rw+' × 4 = '+P+'(cm)'):('직사각형의 둘레 = (가로 + 세로) × 2 = ('+rw+' + '+rh+') × 2 = '+P+'(cm)');
+  $('say').innerHTML=rn===0?(nm+'의 둘레는 <b class="r">'+P+'cm</b>예요. 넓이는 얼마일까요?<small style="font-size:15.5px;color:var(--ink)">'+per+'</small><small>한 변의 길이가 1cm인 정사각형의 넓이를 1㎠(1 제곱센티미터)라고 해요. ▶ 1㎠씩 세기를 눌러 보세요.</small>'):
+    (rn<V?('1㎠가 <b class="r">'+rn+'개</b>'):('1㎠가 한 줄에 '+rw+'개씩 '+rh+'줄이므로 '+rw+' × '+rh+' = '+V+'개예요. 넓이는 <b class="r">'+V+'㎠</b>예요.<small style="font-size:15.5px;color:var(--ink)">'+(sq?'정사각형의 넓이 = 한 변의 길이 × 한 변의 길이 = ':'직사각형의 넓이 = 가로 × 세로 = ')+rw+' × '+rh+' = '+V+'(㎠)</small><small>'+per+'</small>')); }
+function rectUI(){ $('ctl').innerHTML='<div class="dims">'+sl('rW','가로',1,14,rw)+sl('rH','세로',1,6,rh)+'</div><div class="row"><button class="btn primary" id="rGo">▶ 1㎠씩 세기</button><button class="btn" id="rAll">모두 채우기</button><button class="btn" id="rClr">지우기</button></div>';
+  slBind('rW',function(v){ rStop(); rw=v; rn=0; }); slBind('rH',function(v){ rStop(); rh=v; rn=0; });
+  $('rGo').onclick=function(){ rStop(); if(rn>=rw*rh) rn=0; rT=setInterval(function(){ rn++; if(rn>=rw*rh) rStop(); draw(); },Math.max(40,3200/(rw*rh))); };
+  $('rAll').onclick=function(){ rStop(); rn=rw*rh; draw(); }; $('rClr').onclick=function(){ rStop(); rn=0; draw(); }; }
+
+/* ───────── 2. 평행사변형 ───────── */
+var pb=6, ph=3, ps=2, pt=0;
+function paraDraw(){ grid(); dPara(pb,ph,ps,pt); var V=pb*ph, b=$('pGo'); if(b&&!anT) b.textContent=pt>0.5?'◀ 되돌리기':'▶ 잘라서 옮기기';
+  $('say').innerHTML=pt<0.99?('평행사변형의 넓이는 어떻게 구할까요?<small>평행한 두 변을 <b>밑변</b>, 두 밑변 사이의 거리를 <b>높이</b>라고 해요. 주황색 삼각형을 잘라서 반대쪽으로 옮겨 보세요.</small>'):
+    ('삼각형을 잘라 옮기면 가로 '+pb+'cm, 세로 '+ph+'cm인 직사각형이 돼요. 넓이는 <b class="r">'+V+'㎠</b>예요.<small style="font-size:15.5px;color:var(--ink)">평행사변형의 넓이 = 밑변의 길이 × 높이 = '+pb+' × '+ph+' = '+V+'(㎠)</small><small>기울기를 바꿔도 밑변의 길이와 높이가 같으면 넓이는 같아요.</small>'); }
+function paraUI(){ $('ctl').innerHTML='<div class="dims">'+sl('pB','밑변',2,8,pb)+sl('pH','높이',1,6,ph)+sl('pS','기울기',0,4,ps)+'</div><div class="row"><button class="btn primary" id="pGo">▶ 잘라서 옮기기</button></div>';
+  slBind('pB',function(v){ anStop(); pb=v; }); slBind('pH',function(v){ anStop(); ph=v; }); slBind('pS',function(v){ anStop(); ps=v; }); $('pS').nextElementSibling.textContent='';
+  $('pS').addEventListener('input',function(){ this.nextElementSibling.textContent=''; });
+  $('pGo').onclick=function(){ anim(function(){ return pt; },function(v){ pt=v; },pt>0.5?0:1); }; }
+
+/* ───────── 3. 삼각형 ───────── */
+var tb=6, th=4, tp=2, tt=0;
+function triDraw(){ grid(); tp=Math.min(tp,tb); dTri(tb,th,tp,tt); var V=tb*th/2, b=$('tGo'); if(b&&!anT) b.textContent=tt>0.5?'◀ 되돌리기':'▶ 똑같은 삼각형 붙이기';
+  $('say').innerHTML=tt<0.99?('삼각형의 넓이는 어떻게 구할까요?<small>삼각형의 한 변을 <b>밑변</b>, 밑변과 마주 보는 꼭짓점에서 밑변에 수직으로 그은 선분의 길이를 <b>높이</b>라고 해요. 똑같은 삼각형을 하나 더 붙여 보세요.</small>'):
+    ('합동인 삼각형 2개를 붙이면 평행사변형이 돼요. 삼각형의 넓이는 그 반인 <b class="r">'+fmt(V)+'㎠</b>예요.<small style="font-size:15.5px;color:var(--ink)">삼각형의 넓이 = 밑변의 길이 × 높이 ÷ 2 = '+tb+' × '+th+' ÷ 2 = '+fmt(V)+'(㎠)</small><small>꼭짓점을 옆으로 옮겨도 밑변의 길이와 높이가 같으면 넓이는 같아요.</small>'); }
+function triUI(){ $('ctl').innerHTML='<div class="dims">'+sl('tB','밑변',2,7,tb)+sl('tH','높이',1,6,th)+sl('tP','꼭짓점',0,7,tp)+'</div><div class="row"><button class="btn primary" id="tGo">▶ 똑같은 삼각형 붙이기</button></div>';
+  slBind('tB',function(v){ anStop(); tb=v; }); slBind('tH',function(v){ anStop(); th=v; }); slBind('tP',function(v){ anStop(); tp=v; }); $('tP').nextElementSibling.textContent='';
+  $('tP').addEventListener('input',function(){ this.nextElementSibling.textContent=''; });
+  $('tGo').onclick=function(){ anim(function(){ return tt; },function(v){ tt=v; },tt>0.5?0:1); }; }
+
+/* ───────── 4. 사다리꼴 ───────── */
+var za=3, zb=6, zh=3, zt=0;
+function trapDraw(){ grid(); dTrap(za,zb,zh,zt); var V=(za+zb)*zh/2, b=$('zGo'); if(b&&!anT) b.textContent=zt>0.5?'◀ 되돌리기':'▶ 똑같은 사다리꼴 붙이기';
+  $('say').innerHTML=zt<0.99?('사다리꼴의 넓이는 어떻게 구할까요?<small>평행한 두 변을 <b>밑변</b>이라 하고, 위치에 따라 <b>윗변</b>, <b>아랫변</b>이라고 해요. 두 밑변 사이의 거리가 <b>높이</b>예요. 똑같은 사다리꼴을 하나 더 붙여 보세요.</small>'):
+    ('합동인 사다리꼴 2개를 붙이면 밑변이 ('+za+' + '+zb+')cm, 높이가 '+zh+'cm인 평행사변형이 돼요. 사다리꼴의 넓이는 그 반인 <b class="r">'+fmt(V)+'㎠</b>예요.<small style="font-size:15.5px;color:var(--ink)">사다리꼴의 넓이 = (윗변의 길이 + 아랫변의 길이) × 높이 ÷ 2 = ('+za+' + '+zb+') × '+zh+' ÷ 2 = '+fmt(V)+'(㎠)</small>'); }
+function trapUI(){ $('ctl').innerHTML='<div class="dims">'+sl('zA','윗변',1,5,za)+sl('zB','아랫변',2,7,zb)+sl('zH','높이',1,6,zh)+'</div><div class="row"><button class="btn primary" id="zGo">▶ 똑같은 사다리꼴 붙이기</button></div>';
+  slBind('zA',function(v){ anStop(); za=v; }); slBind('zB',function(v){ anStop(); zb=v; }); slBind('zH',function(v){ anStop(); zh=v; });
+  $('zGo').onclick=function(){ anim(function(){ return zt; },function(v){ zt=v; },zt>0.5?0:1); }; }
+
+/* ───────── 5. 마름모 ───────── */
+var m1=8, m2=4, mt=0;
+function rhomDraw(){ grid(); dRhom(m1,m2,mt); var V=m1*m2/2, b=$('mGo'); if(b&&!anT) b.textContent=mt>0.5?'◀ 되돌리기':'▶ 직사각형으로 둘러싸기';
+  $('say').innerHTML=mt<0.99?('마름모의 넓이는 어떻게 구할까요?<small>마름모의 두 대각선은 서로 수직으로 만나고 서로를 똑같이 둘로 나누어요. 마름모를 직사각형으로 둘러싸 보세요.</small>'):
+    ('둘러싼 직사각형은 가로 '+m1+'cm, 세로 '+m2+'cm예요. 주황색 삼각형 4개를 모으면 마름모와 넓이가 같으므로, 마름모의 넓이는 직사각형의 반인 <b class="r">'+fmt(V)+'㎠</b>예요.<small style="font-size:15.5px;color:var(--ink)">마름모의 넓이 = 한 대각선의 길이 × 다른 대각선의 길이 ÷ 2 = '+m1+' × '+m2+' ÷ 2 = '+fmt(V)+'(㎠)</small>'); }
+function rhomUI(){ $('ctl').innerHTML='<div class="dims">'+sl('mA','가로 대각선',2,12,m1,2)+sl('mB','세로 대각선',2,6,m2,2)+'</div><div class="row"><button class="btn primary" id="mGo">▶ 직사각형으로 둘러싸기</button></div>';
+  slBind('mA',function(v){ anStop(); m1=v; }); slBind('mB',function(v){ anStop(); m2=v; });
+  $('mGo').onclick=function(){ anim(function(){ return mt; },function(v){ mt=v; },mt>0.5?0:1,900); }; }
+
+/* ───────── 6. 문제 풀기 ───────── */
+var qz=null, qzScore=[0,0];
+function qzNew(){ var t=['rect','rectP','para','tri','trap','rhom'][rnd(6)], q={t:t,done:false,tries:0};
+  if(t==='rect'||t==='rectP'){ q.w=2+rnd(10); q.h=2+rnd(5); q.ans=t==='rect'?q.w*q.h:(q.w+q.h)*2; q.ask=t==='rect'?'넓이':'둘레'; q.unit=t==='rect'?'㎠':'cm'; q.nm=q.w===q.h?'정사각형':'직사각형';
+    q.why=t==='rect'?('가로 × 세로 = '+q.w+' × '+q.h+' = '+q.ans+'(㎠)'):('(가로 + 세로) × 2 = ('+q.w+' + '+q.h+') × 2 = '+q.ans+'(cm)'); }
+  else if(t==='para'){ q.b=3+rnd(6); q.h=2+rnd(5); q.s=1+rnd(3); q.ans=q.b*q.h; q.nm='평행사변형'; q.why='밑변의 길이 × 높이 = '+q.b+' × '+q.h+' = '+q.ans+'(㎠)'; }
+  else if(t==='tri'){ q.b=3+rnd(5); q.h=2+rnd(5); q.p=rnd(q.b+1); q.ans=q.b*q.h/2; q.nm='삼각형'; q.why='밑변의 길이 × 높이 ÷ 2 = '+q.b+' × '+q.h+' ÷ 2 = '+fmt(q.ans)+'(㎠)'; }
+  else if(t==='trap'){ q.a=1+rnd(4); q.b=q.a+1+rnd(3); q.h=2+rnd(5); q.ans=(q.a+q.b)*q.h/2; q.nm='사다리꼴'; q.why='(윗변 + 아랫변) × 높이 ÷ 2 = ('+q.a+' + '+q.b+') × '+q.h+' ÷ 2 = '+fmt(q.ans)+'(㎠)'; }
+  else { q.d1=2*(2+rnd(5)); q.d2=2*(1+rnd(3)); q.ans=q.d1*q.d2/2; q.nm='마름모'; q.why='한 대각선 × 다른 대각선 ÷ 2 = '+q.d1+' × '+q.d2+' ÷ 2 = '+fmt(q.ans)+'(㎠)'; }
+  if(!q.ask){ q.ask='넓이'; q.unit='㎠'; } qz=q; }
+function quizDraw(){ if(!qz) qzNew(); var q=qz;
+  if(q.t==='rect'||q.t==='rectP') dRect(q.w,q.h,0); else if(q.t==='para') dPara(q.b,q.h,q.s,0); else if(q.t==='tri') dTri(q.b,q.h,q.p,0); else if(q.t==='trap') dTrap(q.a,q.b,q.h,0); else dRhom(q.d1,q.d2,0);
+  $('say').innerHTML=q.done?('<b class="r">정답이에요!</b> '+q.nm+'의 '+q.ask+'는 '+fmt(q.ans)+q.unit+'예요.<small style="font-size:15.5px;color:var(--ink)">'+q.why+'</small>'):
+    (q.nm+'의 <b class="r">'+q.ask+'</b>'+(q.ask==='둘레'?'는 몇 cm일까요?':'는 몇 ㎠일까요?')+(q.tries>=2?'<small style="font-size:15.5px;color:var(--ink)">도움말: '+q.why.split(' = ')[0]+'</small>':'<small>모눈이 없으니 길이를 보고 계산해 보세요.</small>')); }
+function quizUI(msg,cls){ if(!qz) qzNew(); $('ctl').innerHTML='<div class="row" style="margin-top:8px;font-size:17px"><span>'+qz.ask+' = <input type="number" id="qIn" inputmode="decimal" step="0.5"> '+qz.unit+'</span>'+(qz.done?'':'<button class="btn primary" id="qGo">확인하기</button>')+'<button class="btn'+(qz.done?' primary':'')+'" id="qNext">'+(qz.done?'다음 문제 ▶':'건너뛰기')+'</button><span class="score">맞힌 문제 '+qzScore[0]+' / '+qzScore[1]+'</span></div><p class="msg '+(cls||'')+'" id="qMsg">'+(msg||'')+'</p>';
+  if(qz.done){ $('qIn').value=fmt(qz.ans); $('qIn').className='ok'; $('qIn').disabled=true; }
+  else { $('qGo').onclick=function(){ var el=$('qIn'), m=$('qMsg'); if(el.value===''){ m.className='msg bad'; m.textContent='칸에 수를 써 주세요.'; return; }
+      if(Math.abs(+el.value-qz.ans)<1e-6){ if(qz.tries===0) qzScore[0]++; qzScore[1]++; qz.done=true; quizUI(); draw(); }
+      else { qz.tries++; el.className='bad'; m.className='msg bad'; m.textContent='다시 계산해 보세요.'; draw(); } };
+    $('qIn').onkeydown=function(e){ if(e.key==='Enter') $('qGo').click(); }; }
+  $('qNext').onclick=function(){ if(!qz.done) qzScore[1]++; qzNew(); quizUI(); draw(); }; }
+
+function ui(){ $('top').innerHTML=''; ({rect:rectUI,para:paraUI,tri:triUI,trap:trapUI,rhom:rhomUI,quiz:quizUI})[tab](); }
+function draw(){ tone(); lay(); g.clearRect(0,0,W,H); ({rect:rectDraw,para:paraDraw,tri:triDraw,trap:trapDraw,rhom:rhomDraw,quiz:quizDraw})[tab](); }
+function setTab(t){ anStop(); rStop(); tab=t; $('hint').style.visibility=t==='quiz'?'hidden':'visible'; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+
+document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+var drag=null, moved=0;
+cv.addEventListener('pointerdown',function(e){ drag=[e.clientX,e.clientY]; moved=0; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
+cv.addEventListener('pointermove',function(e){ if(!drag) return; var dx=e.clientX-drag[0], dy=e.clientY-drag[1]; moved+=Math.abs(dx)+Math.abs(dy); drag=[e.clientX,e.clientY];
+  if(D3&&!(window.noDrag&&noDrag())){ yaw+=dx*0.011; pit=Math.max(-0.5,Math.min(1.5,pit+dy*0.009)); draw(); } });
+cv.addEventListener('pointerup',function(e){ if(drag&&moved<10&&window.onTap){ var r=cv.getBoundingClientRect(); onTap(e.clientX-r.left,e.clientY-r.top); } drag=null; });
+cv.addEventListener('pointercancel',function(){ drag=null; });
+window.addEventListener('resize',fit); try{ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw); }catch(_){}
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+setTab(TAB0); fit();
+</script></body></html>
