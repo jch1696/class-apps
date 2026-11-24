@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>비와 비율</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 다른 수업 앱(쌓기나무·원주와 원의 넓이)과 같은 색·글꼴 */
+:root{--bg:#EDF1F3;--surface:#FFFFFF;--surface2:#EDF1F3;--ink:#1D2B36;--muted:#5C6B77;--line:#C9D3DA;--accent:#2F6FDB;--accent-ink:#fff;--c1:#D9482B;--sel:#DCEAFF;--sel-ink:#1B4FB0;
+ --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4vw,36px)}
+header p{margin:0;color:var(--muted);font-size:15px}
+h1,button,label,output,select{font-family:var(--display);font-weight:400}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stage{max-width:760px;width:100%;margin:0 auto}
+button{font:inherit;font-family:var(--display);cursor:pointer}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs button{font-size:17px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.btn,.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:16px}
+.tabs button:hover,.btn:hover,.chip:hover{border-color:var(--ink)}
+.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+canvas{display:block;width:100%;border-radius:12px;background:var(--surface2);touch-action:none;cursor:grab}
+.hint{font-size:14px;color:var(--muted);margin:6px 0}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.row label{font-size:15px;min-width:64px}
+.row input[type=range]{flex:1;min-width:140px;height:28px;accent-color:var(--accent)}
+.row output{font-size:17px;min-width:56px;text-align:right}
+.say{background:var(--bg);border-left:6px solid var(--accent);border-radius:8px;padding:9px 12px;margin:10px 0 0;font-size:16px;font-weight:700;min-height:46px}
+.say small{display:block;font-weight:400;color:var(--muted);margin-top:2px;font-size:14.5px}
+.say b.r{color:var(--c1)}
+select{font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:15.5px}
+th{background:var(--surface2);font-family:var(--display);font-weight:400}
+td.st{text-align:left;font-weight:700}
+.ck{min-width:46px;min-height:36px;padding:4px 8px;font-size:19px;line-height:1}
+td.res{width:44px;font-size:18px}
+.vt td{height:92px;font-family:var(--display);font-size:17px;width:33.3%}
+.vt td.no{color:var(--muted);font-size:26px}
+.vt svg{display:block;margin:0 auto 2px;width:54px;height:46px;color:var(--accent)}
+input[type=number]{font:inherit;width:74px;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);margin-left:4px}
+input.ok{border-color:#1E8E5A;background:rgba(30,142,90,.12)}input.bad{border-color:var(--c1);background:rgba(217,72,43,.12)}
+.msg{font-weight:700;min-height:24px;margin:6px 0 0}.msg.ok{color:#1E8E5A}.msg.bad{color:var(--c1)}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+.found{background:var(--surface2);border:2px solid #1E8E5A;border-radius:10px;padding:10px 13px;margin:10px 0 0;font-size:16px;font-weight:700;line-height:1.8}
+.found small{display:block;color:#1E8E5A;font-size:13px}.found i{font-style:normal;color:var(--c1)}
+.dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 16px}
+.dims .row label{min-width:40px}
+.score{margin-left:auto;font-family:var(--display)}
+input.wide{width:130px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 3px;font-family:var(--display);font-weight:400}
+.fr i{font-style:normal;border-bottom:2px solid currentColor;padding:0 4px}.fr span{padding:0 4px}
+.fin{display:inline-flex;flex-direction:column;vertical-align:middle;gap:3px;align-items:center}.fin input{margin:0;width:64px;text-align:center}.fin hr{width:100%;border:0;border-top:2.5px solid var(--ink);margin:0}
+.dims .row label{min-width:40px;white-space:nowrap}
+.say small .fr,.say .fr{font-size:.95em}
+canvas{cursor:default}
+</style></head><body>
+<div class="app">
+  <header><h1>비와 비율</h1><p>두 양을 나눗셈으로 비교하고, 비와 비율, 백분율을 알아봐요</p></header>
+  <div class="card"><div class="tabs" id="tabs" role="tablist">
+    <button data-t="cmp" role="tab" aria-selected="true">① 두 수 비교하기</button>
+    <button data-t="ratio" role="tab" aria-selected="false">② 비</button>
+    <button data-t="rate" role="tab" aria-selected="false">③ 비율</button>
+    <button data-t="pct" role="tab" aria-selected="false">④ 백분율</button>
+    <button data-t="life" role="tab" aria-selected="false">⑤ 생활 속 비율</button>
+    <button data-t="quiz" role="tab" aria-selected="false">⑥ 문제 풀기</button>
+  </div></div>
+  <section class="card"><div class="stage">
+    <div id="top"></div>
+    <canvas id="cv"></canvas>
+    <p class="hint" id="hint"></p>
+    <div id="ctl"></div>
+    <div class="say" id="say"></div>
+  </div></section>
+</div>
+<script>
+var $=function(id){ return document.getElementById(id); };
+var cv=$('cv'), g=cv.getContext('2d'), W=640, H=440, S=100, yaw=-0.5, pit=0.36, tab='';
+var BLUE=[125,180,245], GREEN=[120,210,165], ORANGE=[251,146,60], GRAY=[185,196,206], PINK=[236,150,190], YEL=[240,200,95];
+var INK='#1D2B36', HOT='#D9482B', ACC='#2F6FDB', HALO='#EDF1F3', MUTED='#5C6B77', LINE='#C9D3DA';
+function tone(){ var c=getComputedStyle(document.documentElement), v=function(n,d){ return (c.getPropertyValue(n)||'').trim()||d; }; INK=v('--ink',INK); HOT=v('--c1',HOT); ACC=v('--accent',ACC); HALO=v('--surface2',HALO); MUTED=v('--muted',MUTED); LINE=v('--line',LINE); }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function rgba(c,a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+(a==null?1:a)+')'; }
+function fit(){ var w=cv.clientWidth||640, d=window.devicePixelRatio||1; W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
+var D3=false, TAB0="cmp";
+/* 수와 연산 앱 공통: 분수 표시, 막대 그리기, 입력 */
+function gcd(a,b){ return b?gcd(b,a%b):Math.abs(a); }
+function lcm(a,b){ return a/gcd(a,b)*b; }
+function F(n,d){ return '<span class="fr"><i>'+n+'</i><span>'+d+'</span></span>'; }
+function MXH(w,n,d){ return (w?w:'')+(n?F(n,d):(w?'':'0')); }
+/* n/d 를 기약분수(대분수) html 로 */
+function MX(n,d){ var k=gcd(n,d)||1; n/=k; d/=k; if(d===1) return ''+n; var w=Math.floor(n/d); return (w?w:'')+F(n-w*d,d); }
+function rect(x,y,w,h,fill,stroke,lw,dash){ if(fill){ g.fillStyle=fill; g.fillRect(x,y,w,h); } if(stroke){ g.strokeStyle=stroke; g.lineWidth=lw||2; g.setLineDash(dash||[]); g.strokeRect(x,y,w,h); g.setLineDash([]); } }
+function line(x1,y1,x2,y2,col,lw,dash){ g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.strokeStyle=col||INK; g.lineWidth=lw||1.5; g.setLineDash(dash||[]); g.stroke(); g.setLineDash([]); }
+function txt(t,x,y,col,sz,al){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; g.textAlign=al||'center'; g.textBaseline='middle'; g.lineWidth=5; g.lineJoin='round'; g.strokeStyle=HALO; g.strokeText(t,x,y); g.fillStyle=col||INK; g.fillText(t,x,y); }
+function tw(t,sz){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; return g.measureText(t).width; }
+/* 캔버스 분수: 가운데 (x,y), 너비를 돌려줌 */
+function cfr(n,d,x,y,col,sz){ sz=sz||18; var w=Math.max(tw(''+n,sz),tw(''+d,sz))+6; txt(''+n,x,y-sz*0.62,col,sz); txt(''+d,x,y+sz*0.66,col,sz); line(x-w/2,y,x+w/2,y,col||INK,2); return w; }
+/* 식 그리기: 토큰 = '÷' 같은 글자 또는 {w,n,d} */
+function cexpr(tk,cx,y,sz,col){ sz=sz||30; var ws=tk.map(function(t){ if(typeof t==='string') return tw(t,sz)+sz*0.5; var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; return (t.w?tw(''+t.w,sz)+4:0)+(t.n!=null?w:0)+sz*0.25; }), tot=ws.reduce(function(a,b){ return a+b; },0), x=cx-tot/2;
+  tk.forEach(function(t,i){ if(typeof t==='string') txt(t,x+ws[i]/2,y,col,sz); else { var xx=x+sz*0.12; if(t.w){ var a=tw(''+t.w,sz); txt(''+t.w,xx+a/2,y,col,sz); xx+=a+4; } if(t.n!=null){ var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; cfr(t.n,t.d,xx+w/2,y,col,sz*0.8); } } x+=ws[i]; }); }
+/* 단위 막대: parts 등분, fills=[[개수,색]...] 를 왼쪽부터 칠함 */
+function bar(x,y,w,h,parts,fills,thin){ var cw=w/parts, k=0; (fills||[]).forEach(function(f){ for(var i=0;i<f[0];i++){ rect(x+(k%parts)*cw,y,cw,h,f[1]); k++; } });
+  for(var i=1;i<parts;i++) line(x+i*cw,y,x+i*cw,y+h,INK,thin?0.8:1.5); rect(x,y,w,h,null,INK,2.4); }
+function sld(id,lab,min,max,val){ return '<div class="row"><label>'+lab+'</label><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" value="'+val+'"><output>'+val+'</output></div>'; }
+function sldBind(id,fn){ $(id).oninput=function(){ this.nextElementSibling.textContent=this.value; fn(+this.value); ui(); draw(); var e=$(id); if(e) e.focus(); }; }
+function frIn(p,whole){ return (whole?'<input type="number" id="'+p+'w" inputmode="numeric" style="width:58px;margin:0 4px 0 0" aria-label="자연수">':'')+'<span class="fin"><input type="number" id="'+p+'n" inputmode="numeric" aria-label="분자"><hr><input type="number" id="'+p+'d" inputmode="numeric" aria-label="분모"></span>'; }
+/* 입력한 분수 값 {n,d} (가분수로). 비어 있으면 null */
+function frVal(p){ var w=$(p+'w')?$(p+'w').value:'', n=$(p+'n').value, d=$(p+'d').value; if(n===''&&d===''&&w==='') return null; if(n===''&&d==='') return {n:+w,d:1}; if(d===''){ d='1'; } if(+d===0) return null; return {n:(+w||0)*(+d)+(+n||0),d:+d}; }
+function frShow(p,n,d){ var k=gcd(n,d)||1; n/=k; d/=k; var w=Math.floor(n/d), r=n-w*d; if($(p+'w')){ $(p+'w').value=w||''; if(r){ $(p+'n').value=r; $(p+'d').value=d; } } else { $(p+'n').value=n; $(p+'d').value=d; } [p+'w',p+'n',p+'d'].forEach(function(i){ if($(i)){ $(i).disabled=true; if($(i).value!=='') $(i).className='ok'; } }); }
+/* 숫자 뒤 조사: P(수,'이','가') → 받침 있으면 앞의 것 */
+function P(n,a,b){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '013678'.indexOf(d)>=0?a:b; }
+function J(n,a,b){ return n+P(n,a,b); }
+function Pr(n){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '036'.indexOf(d)>=0?'으로':'로'; }
+var anT=null;
+function anStop(){ if(anT){ cancelAnimationFrame(anT); anT=null; } }
+function anim(get,set,to,dur,done){ anStop(); var from=get(), t0=performance.now(); (function step(now){ var k=Math.min(1,(now-t0)/(dur||1500)), e=k*k*(3-2*k); set(from+(to-from)*e); if(k<1){ anT=requestAnimationFrame(step); draw(); } else { anT=null; if(done) done(); draw(); } })(t0); }
+function pick(a){ return a[rnd(a.length)]; }
+function shuf(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=rnd(i+1), t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function BWd(){ return Math.min(W-48,620); }
+var PC=[BLUE,ORANGE,GREEN,PINK,YEL,GRAY,[170,150,235],[120,205,215]];
+function scoreH(s){ return '<span class="score">맞힌 문제 '+s[0]+' / '+s[1]+'</span>'; }
+function chipsH(arr,cur,attr,st){ return '<div class="chips"'+(st?' style="'+st+'"':'')+'>'+arr.map(function(k){ return '<button class="chip" aria-pressed="'+(k[0]===cur)+'" data-'+attr+'="'+k[0]+'">'+k[1]+'</button>'; }).join('')+'</div>'; }
+function ri(a,b){ return a+rnd(b-a+1); }
+function beads(x,y,n,col,r,perRow){ perRow=perRow||10; for(var i=0;i<n;i++){ g.beginPath(); g.arc(x+(i%perRow)*(r*2+5)+r,y+Math.floor(i/perRow)*(r*2+5)+r,r,0,7); g.fillStyle=col; g.fill(); g.strokeStyle=INK; g.lineWidth=1.5; g.stroke(); } }
+/* 공통 문제 엔진. gen() → {lines:[글 또는 토큰배열], ask:html, kind:'mc'|'num'|'pair', opts, ans, unit, why} */
+function QZ(gen){ var o={q:null,score:[0,0]};
+  o.next=function(){ o.q=gen(); o.q.done=false; o.q.tries=0; o.q.right=false; };
+  o.draw=function(){ if(!o.q) o.next(); var q=o.q, n=q.lines.length, sz=Math.min(40,W/14,(H-40)/(n*1.9)), y=H/2-(n-1)*sz*0.95;
+    q.lines.forEach(function(l,i){ if(typeof l==='string'){ var s=sz; while(tw(l,s)>W-30&&s>12) s-=1; txt(l,W/2,y+i*sz*1.9,INK,s); } else cexpr(l,W/2,y+i*sz*1.9,sz); });
+    $('say').innerHTML=q.done?((q.right?'<b class="r">정답이에요!</b> ':'아쉬워요. ')+'답: '+q.show+'<small style="font-size:15.5px;color:var(--ink)">'+q.why+'</small>'):(q.ask+(q.tries>=2&&q.hint?'<small style="font-size:15.5px;color:var(--ink)">도움말: '+q.hint+'</small>':'')); };
+  o.ui=function(msg,cls){ if(!o.q) o.next(); var q=o.q, h='';
+    if(q.kind==='mc') h=q.opts.map(function(s,i){ return '<button class="btn'+(q.done?(s===q.ans?' primary':''):' primary')+'" data-o="'+i+'"'+(q.done?' disabled':'')+' style="font-size:17px">'+s+'</button>'; }).join('');
+    else h='<span style="font-size:17px">답 = '+(q.kind==='pair'?'<input type="number" id="qA" inputmode="decimal" step="any"> : <input type="number" id="qB" inputmode="decimal" step="any">':'<input type="number" class="wide" id="qA" inputmode="decimal" step="any">')+' '+(q.unit||'')+'</span>'+(q.done?'':'<button class="btn primary" id="qGo">확인하기</button>');
+    $('ctl').innerHTML='<div class="row" style="margin-top:8px">'+h+'<button class="btn'+(q.done?' primary':'')+'" id="qNext">'+(q.done?'다음 문제 ▶':'건너뛰기')+'</button>'+scoreH(o.score)+'</div><p class="msg '+(cls||'')+'" id="qMsg">'+(msg||'')+'</p>';
+    if(q.kind==='mc'){ if(!q.done) $('ctl').querySelectorAll('[data-o]').forEach(function(b){ b.onclick=function(){ q.done=true; q.right=q.opts[+b.dataset.o]===q.ans; o.score[1]++; if(q.right) o.score[0]++; o.ui(); draw(); }; }); }
+    else if(q.done){ $('qA').value=q.kind==='pair'?q.ans[0]:q.ans; $('qA').className=(q.kind==='pair'?'':'wide ')+'ok'; $('qA').disabled=true; if($('qB')){ $('qB').value=q.ans[1]; $('qB').className='ok'; $('qB').disabled=true; } }
+    else { $('qGo').onclick=function(){ var m=$('qMsg'), a=$('qA').value, b=$('qB')?$('qB').value:'0'; if(a===''||b===''){ m.className='msg bad'; m.textContent='칸에 수를 써 주세요.'; return; }
+        var ok=q.kind==='pair'?(Math.abs(+a-q.ans[0])<1e-9&&Math.abs(+b-q.ans[1])<1e-9):Math.abs(+a-q.ans)<1e-9;
+        if(ok){ if(q.tries===0) o.score[0]++; o.score[1]++; q.done=true; q.right=true; o.ui(); draw(); } else { q.tries++; m.className='msg bad'; m.textContent='다시 생각해 보세요.'; draw(); } };
+      $('qA').onkeydown=function(e){ if(e.key==='Enter'&&!$('qB')) $('qGo').click(); }; }
+    $('qNext').onclick=function(){ if(!o.q.done) o.score[1]++; o.next(); o.ui(); draw(); }; };
+  return o; }
+function DD(x){ return (Math.round(x*1000)/1000)+''; }
+
+/* 비와 비율 (6학년 1학기) */
+var CB=function(a){ return rgba(BLUE,a==null?0.9:a); }, CO=function(a){ return rgba(ORANGE,a==null?0.9:a); };
+function decS(a,b){ var v=a/b, s=DD(v); return (Math.abs(v*1000-Math.round(v*1000))<1e-9)?s:'약 '+v.toFixed(2); }
+
+/* ───────── 1. 두 수 비교하기 ───────── */
+var ca=6, cb=2, cn=3;
+function cmDraw(){ var gw=Math.min(150,(W-30)/cn), x0=(W-gw*cn)/2, r=Math.min(9,(gw-30)/8), i;
+  for(i=0;i<cn;i++){ var x=x0+i*gw+8; rect(x,30,gw-16,H-70,rgba(GRAY,0.18),LINE,1.5); txt((i+1)+'모둠',x+(gw-16)/2,18,MUTED,14); beads(x+10,44,ca,CB(),r,4); beads(x+10,44+Math.ceil(ca/4)*(r*2+5)+14,cb,CO(),r,4); }
+  txt('● 모둠원 '+ca+'명',W/2-70,H-20,ACC,15); txt('● 태블릿 '+cb+'대',W/2+70,H-20,HOT,15);
+  var div=ca%cb===0;
+  $('say').innerHTML='<b>뺄셈</b>으로 비교하면 모둠원이 태블릿보다 '+(ca-cb)+', '+((ca-cb)*2)+', '+((ca-cb)*3)+'…만큼 많아서 모둠 수에 따라 달라져요. <b>나눗셈</b>으로 비교하면 모둠원 수는 항상 태블릿 수의 <b class="r">'+(div?ca/cb:F(ca,cb))+'배</b>예요.<small style="font-size:15.5px;color:var(--ink)">두 수를 나눗셈으로 비교하면 모둠 수가 바뀌어도 관계가 변하지 않아요. 이렇게 나눗셈으로 비교하기 위해 기호 : 을 써서 나타낸 것을 <b>비</b>라고 해요.</small>'; }
+function cmUI(){ var rows=[['모둠 수',function(i){ return i; }],['모둠원 수 (명)',function(i){ return ca*i; }],['태블릿 수 (대)',function(i){ return cb*i; }],['뺄셈: 모둠원 − 태블릿',function(i){ return (ca-cb)*i; }],['나눗셈: 모둠원 ÷ 태블릿',function(){ return ca%cb===0?ca/cb:F(ca,cb); }]], h='<table><tbody>';
+  rows.forEach(function(r,k){ h+='<tr><th style="text-align:left">'+r[0]+'</th>'; for(var i=1;i<=cn;i++) h+='<td'+(k>=3?' style="font-weight:700;color:'+(k===3?'var(--muted)':'var(--c1)')+'"':'')+'>'+r[1](i)+'</td>'; h+='</tr>'; });
+  $('ctl').innerHTML='<div class="dims">'+sld('cA','한 모둠의 모둠원',2,8,ca)+sld('cB','한 모둠의 태블릿',1,4,cb)+sld('cN','모둠 수',1,5,cn)+'</div>'+h+'</tbody></table>';
+  sldBind('cA',function(v){ ca=v; }); sldBind('cB',function(v){ cb=v; }); sldBind('cN',function(v){ cn=v; }); }
+
+/* ───────── 2. 비 ───────── */
+var ra=3, rb=2, rdir=0;
+function rtDraw(){ var r=Math.min(15,(W-80)/22), a=rdir?rb:ra, b=rdir?ra:rb, x0=(W-10*(r*2+5))/2, sz=Math.min(64,W/8), y=H*0.62;
+  beads(x0,26,ra,CB(),r,10); beads(x0,26+r*2+16,rb,CO(),r,10); txt('파랑 '+ra+'개',x0-10,26+r,ACC,15,'right'); txt('주황 '+rb+'개',x0-10,26+r*3+16,HOT,15,'right');
+  var wa=tw(''+a,sz), wc=tw(' : ',sz), wb=tw(''+b,sz), xs=W/2-(wa+wc+wb)/2;
+  txt(''+a,xs+wa/2,y,rdir?HOT:ACC,sz); txt(':',xs+wa+wc/2,y-4,INK,sz); txt(''+b,xs+wa+wc+wb/2,y,rdir?ACC:HOT,sz);
+  txt('비교하는 양',xs+wa/2-30,y+sz*0.85,MUTED,15); txt('기준량',xs+wa+wc+wb/2+22,y+sz*0.85,MUTED,15);
+  var A=rdir?'주황 구슬':'파랑 구슬', B=rdir?'파랑 구슬':'주황 구슬';
+  $('say').innerHTML=B+' 수에 대한 '+A+' 수의 비는 <b class="r">'+a+' : '+b+'</b>예요.<small style="font-size:15.5px;color:var(--ink)">읽는 방법은 네 가지예요. 「'+a+' 대 '+b+'」, 「'+J(a,'과','와')+' '+b+'의 비」, 「'+a+'의 '+b+'에 대한 비」, 「'+b+'에 대한 '+a+'의 비」<br>기호 : 의 오른쪽에 있는 '+J(b,'이','가')+' <b>기준량</b>, 왼쪽에 있는 '+J(a,'이','가')+' <b>비교하는 양</b>이에요. '+a+' : '+J(b,'과','와')+' '+b+' : '+J(a,'은','는')+' 서로 다른 비예요.</small>'; }
+function rtUI(){ $('top').innerHTML=chipsH([[0,'주황에 대한 파랑의 비'],[1,'파랑에 대한 주황의 비']],rdir,'k');
+  $('ctl').innerHTML='<div class="dims">'+sld('rA','파랑 구슬',1,10,ra)+sld('rB','주황 구슬',1,10,rb)+'</div>';
+  $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ rdir=+b.dataset.k; rtUI(); draw(); }; }); sldBind('rA',function(v){ ra=v; }); sldBind('rB',function(v){ rb=v; }); }
+
+/* ───────── 3. 비율 ───────── */
+var qa=3, qb=4;
+function rlDraw(){ var BW=BWd()-60, x0=(W-BW)/2+30, m=Math.max(qa,qb), u=BW/m, hh=48, y1=64, y2=y1+hh+44, i;
+  rect(x0,y1,qb*u,hh,CO(0.8),INK,2.4); for(i=1;i<qb;i++) line(x0+i*u,y1,x0+i*u,y1+hh,INK,1); txt('기준량 '+qb,x0-8,y1+hh/2,HOT,15,'right');
+  rect(x0,y2,qa*u,hh,CB(0.8),INK,2.4); for(i=1;i<qa;i++) line(x0+i*u,y2,x0+i*u,y2+hh,INK,1); txt('비교하는 양 '+qa,x0-8,y2+hh/2,ACC,15,'right');
+  line(x0+qb*u,y1-10,x0+qb*u,y2+hh+10,HOT,2,[6,5]); txt('1',x0+qb*u,y1-20,HOT,15);
+  cexpr([qa+' : '+qb,'→',{n:qa,d:qb},'=',decS(qa,qb)],W/2,y2+hh+62,Math.min(32,W/16));
+  var v=qa/qb;
+  $('say').innerHTML='기준량에 대한 비교하는 양의 크기를 <b class="r">비율</b>이라고 해요. '+qa+' : '+qb+'의 비율은 '+F(qa,qb)+' = '+decS(qa,qb)+P(decS(qa,qb),'이에요','예요')+'.<small style="font-size:15.5px;color:var(--ink)">(비율) = (비교하는 양) ÷ (기준량) = '+F('비교하는 양','기준량')+'<br>'+(v>1?'비율이 1보다 크면 비교하는 양이 기준량보다 커요.':(v<1?'비율이 1보다 작으면 비교하는 양이 기준량보다 작아요.':'비율이 1이면 비교하는 양과 기준량이 같아요.'))+'</small>'; }
+function rlUI(){ $('ctl').innerHTML='<div class="dims">'+sld('qA','비교하는 양',1,12,qa)+sld('qB','기준량',1,12,qb)+'</div>'; sldBind('qA',function(v){ qa=v; }); sldBind('qB',function(v){ qb=v; }); }
+
+/* ───────── 4. 백분율 ───────── */
+var pn=25;
+function pcDraw(){ var SQ=Math.min(H-40,W-200,300), x0=(W-SQ)/2-50, y0=20, c=SQ/10, i;
+  for(i=0;i<pn;i++) rect(x0+Math.floor(i/10)*c,y0+(i%10)*c,c,c,CB(0.85));
+  for(i=1;i<10;i++){ line(x0+i*c,y0,x0+i*c,y0+SQ,INK,0.7); line(x0,y0+i*c,x0+SQ,y0+i*c,INK,0.7); } rect(x0,y0,SQ,SQ,null,INK,2.4);
+  var xr=x0+SQ+70, k=gcd(pn,100)||1; cfr(pn,100,xr,y0+40,INK,26); if(k>1&&pn>0&&pn<100) cexpr(['=',{n:pn/k,d:100/k}],xr+62,y0+40,26); txt('= '+DD(pn/100),xr,y0+120,INK,30); txt('= '+pn+'%',xr,y0+185,HOT,38);
+  $('say').innerHTML='100칸 가운데 '+pn+'칸을 색칠했어요. 비율은 '+F(pn,100)+' = '+DD(pn/100)+'이고, 백분율로는 <b class="r">'+pn+'%</b>예요.<small style="font-size:15.5px;color:var(--ink)">기준량을 100으로 할 때의 비율을 <b>백분율</b>이라고 해요. 기호 %를 쓰고 「퍼센트」라고 읽어요. 비율에 100을 곱하면 백분율이 돼요: '+DD(pn/100)+' × 100 = '+pn+'(%)</small>'; }
+function pcUI(){ $('ctl').innerHTML='<div class="row"><label>색칠한 칸</label><input type="range" id="pN" min="0" max="100" value="'+pn+'"><output>'+pn+'칸</output></div>'+'<div class="chips">'+[[50,'1/2'],[25,'1/4'],[75,'3/4'],[20,'1/5'],[60,'3/5'],[35,'7/20'],[10,'0.1'],[5,'0.05']].map(function(k){ return '<button class="chip" data-n="'+k[0]+'">'+k[1]+' = ? %</button>'; }).join('')+'</div>';
+  $('pN').oninput=function(){ pn=+this.value; this.nextElementSibling.textContent=pn+'칸'; draw(); };
+  $('ctl').querySelectorAll('[data-n]').forEach(function(b){ b.onclick=function(){ pn=+b.dataset.n; $('pN').value=pn; $('pN').nextElementSibling.textContent=pn+'칸'; draw(); }; }); }
+
+/* ───────── 5. 생활 속 비율 ───────── */
+var LF=[{k:'spd',nm:'빠르기',who:['가 자동차','나 자동차'],x:['간 거리','km',60,480,20],y:['걸린 시간','시간',1,6,1],res:'걸린 시간에 대한 간 거리의 비율',unit:'',win:'더 빨라요',v:[[240,3],[300,4]],note:'걸린 시간에 대한 간 거리의 비율이 클수록 빨라요. 1시간 동안 간 거리와 같아요.'},
+  {k:'pop',nm:'인구가 밀집한 정도',who:['가 마을','나 마을'],x:['인구','명',1000,20000,500],y:['넓이','㎢',2,20,1],res:'넓이에 대한 인구의 비율',unit:'',win:'인구가 더 밀집해 있어요',v:[[9000,6],[12000,10]],note:'넓이에 대한 인구의 비율이 클수록 사람이 더 빽빽하게 살아요. 1㎢에 사는 사람 수와 같아요.'},
+  {k:'salt',nm:'소금물의 진하기',who:['가 컵','나 컵'],x:['소금 양','g',5,60,5],y:['소금물 양','g',100,500,50],res:'소금물 양에 대한 소금 양의 비율',unit:'%',win:'더 진해요',v:[[30,200],[40,400]],note:'소금물 양에 대한 소금 양의 비율이 클수록 진해요. 백분율로 나타내면 비교하기 쉬워요.'},
+  {k:'sale',nm:'할인율',who:['가 가게','나 가게'],x:['할인 금액','원',500,5000,500],y:['원래 가격','원',5000,20000,1000],res:'원래 가격에 대한 할인 금액의 비율',unit:'%',win:'할인율이 더 높아요',v:[[2000,10000],[3000,20000]],note:'할인 금액이 커도 원래 가격이 비싸면 할인율은 낮을 수 있어요. 기준량이 다를 때는 비율로 비교해요.'}], lf=0;
+function lfVal(o,i){ var v=o.v[i][0]/o.v[i][1]; return o.unit==='%'?v*100:v; }
+function lfStr(o,i){ var v=lfVal(o,i), s=(Math.abs(v*100-Math.round(v*100))<1e-9)?DD(v):'약 '+v.toFixed(1); return s+o.unit; }
+function lfDraw(){ var o=LF[lf], BW=BWd()-110, x0=(W-BW)/2+50, hh=54, m=Math.max(lfVal(o,0),lfVal(o,1))||1, i;
+  for(i=0;i<2;i++){ var y=60+i*(hh+74), w=BW*lfVal(o,i)/m; txt(o.who[i],x0-10,y+hh/2,INK,16,'right'); rect(x0,y,w,hh,i?CO(0.85):CB(0.85),INK,2.2); txt(lfStr(o,i),x0+w+8,y+hh/2,i?HOT:ACC,20,'left');
+    txt(o.x[0]+' '+o.v[i][0]+o.x[1]+' ÷ '+o.y[0]+' '+o.v[i][1]+o.y[1],x0,y-16,MUTED,14,'left'); }
+  var a=lfVal(o,0), b=lfVal(o,1), E=function(i){ return o.v[i][0]+' ÷ '+o.v[i][1]+(o.unit==='%'?' × 100':'')+' = '+lfStr(o,i); };
+  $('say').innerHTML=(Math.abs(a-b)<1e-9?'두 곳의 비율이 같아요.':('<b class="r">'+o.who[a>b?0:1]+'</b> 쪽이 '+o.win+'.'))+'<small style="font-size:15.5px;color:var(--ink)">'+o.res+'로 비교해요.　'+o.who[0]+': '+E(0)+'　　'+o.who[1]+': '+E(1)+'<br>'+o.note+'</small>'; }
+function lfUI(){ var o=LF[lf]; $('top').innerHTML=chipsH(LF.map(function(x,i){ return [i,x.nm]; }),lf,'i');
+  var S=function(id,lab,a,val){ return '<div class="row"><label>'+lab+'</label><input type="range" id="'+id+'" min="'+a[2]+'" max="'+a[3]+'" step="'+a[4]+'" value="'+val+'"><output>'+val+a[1]+'</output></div>'; };
+  $('ctl').innerHTML='<div class="dims">'+S('l0','가: '+o.x[0],o.x,o.v[0][0])+S('l1','가: '+o.y[0],o.y,o.v[0][1])+S('l2','나: '+o.x[0],o.x,o.v[1][0])+S('l3','나: '+o.y[0],o.y,o.v[1][1])+'</div>';
+  $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ lf=+b.dataset.i; lfUI(); draw(); }; });
+  [0,1,2,3].forEach(function(k){ $('l'+k).oninput=function(){ o.v[k>>1][k&1]=+this.value; this.nextElementSibling.textContent=this.value+(k&1?o.y[1]:o.x[1]); draw(); }; }); }
+
+/* ───────── 6. 문제 풀기 ───────── */
+var quiz=QZ(function(){ var t=rnd(5), a, b, q={};
+  if(t===0){ do{ a=ri(2,9); b=ri(2,9); }while(a===b); var f=pick([[a+' 대 '+b,0],[J(a,'과','와')+' '+b+'의 비',0],[a+'의 '+b+'에 대한 비',0],[b+'에 대한 '+a+'의 비',0]]);
+    q={lines:['「'+f[0]+'」'],ask:'비로 바르게 나타낸 것을 고르세요.',kind:'mc',opts:shuf([a+' : '+b,b+' : '+a]),ans:a+' : '+b,show:a+' : '+b,why:'「~에 대한」이 붙은 수가 기준량이고, 기준량은 기호 : 의 오른쪽에 써요.'}; }
+  else if(t===1){ b=pick([2,4,5,8,10,20,25]); do{ a=ri(1,b+6); }while(a===b); q={lines:[a+' : '+b],ask:'비율을 <b>소수</b>로 나타내 보세요.',kind:'num',ans:a/b,unit:'',show:DD(a/b),why:'(비교하는 양) ÷ (기준량) = '+a+' ÷ '+b+' = '+DD(a/b),hint:'비교하는 양을 기준량으로 나누어요.'}; }
+  else if(t===2){ b=pick([2,4,5,10,20,25,50]); a=ri(1,b-1); q={lines:[[{n:a,d:b}]],ask:'이 비율을 <b>백분율</b>로 나타내 보세요.',kind:'num',ans:a/b*100,unit:'%',show:DD(a/b*100)+'%',why:F(a,b)+' × 100 = '+DD(a/b*100)+'(%)',hint:'비율에 100을 곱해요.'}; }
+  else if(t===3){ b=pick([20,25,40,50,200]); a=ri(1,b/5)*pick([1,2,3]); if(a>=b) a=b/5; var s=pick([['전체 학생 '+b+'명 가운데 안경을 쓴 학생은 '+a+'명','전체 학생 수에 대한 안경을 쓴 학생 수의 비율'],['공을 '+b+'번 던져 '+a+'번 넣었어요','던진 횟수에 대한 넣은 횟수의 비율'],['씨앗 '+b+'개를 심었더니 '+a+'개에서 싹이 났어요','심은 씨앗 수에 대한 싹이 난 씨앗 수의 비율']]);
+    q={lines:[s[0]],ask:s[1]+'은 몇 %일까요?',kind:'num',ans:a/b*100,unit:'%',show:DD(a/b*100)+'%',why:F(a,b)+' × 100 = '+DD(a/b*100)+'(%)',hint:'기준량은 '+b+', 비교하는 양은 '+J(a,'이에요','예요')+'.'}; }
+  else { do{ a=ri(2,12); b=ri(2,12); }while(a===b); var askB=rnd(2); q={lines:[a+' : '+b],ask:'이 비에서 <b>'+(askB?'기준량':'비교하는 양')+'</b>은 어느 것일까요?',kind:'mc',opts:[''+a,''+b],ans:''+(askB?b:a),show:''+(askB?b:a),why:'기호 : 의 오른쪽이 기준량, 왼쪽이 비교하는 양이에요.'}; }
+  return q; });
+
+var UIS={cmp:cmUI,ratio:rtUI,rate:rlUI,pct:pcUI,life:lfUI,quiz:quiz.ui}, DRS={cmp:cmDraw,ratio:rtDraw,rate:rlDraw,pct:pcDraw,life:lfDraw,quiz:quiz.draw};
+function ui(){ if(tab!=='ratio'&&tab!=='life') $('top').innerHTML=''; UIS[tab](); }
+function draw(){ tone(); g.clearRect(0,0,W,H); DRS[tab](); }
+function setTab(t){ anStop(); tab=t; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+
+document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+var drag=null, moved=0;
+cv.addEventListener('pointerdown',function(e){ drag=[e.clientX,e.clientY]; moved=0; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
+cv.addEventListener('pointermove',function(e){ if(!drag) return; var dx=e.clientX-drag[0], dy=e.clientY-drag[1]; moved+=Math.abs(dx)+Math.abs(dy); drag=[e.clientX,e.clientY];
+  if(D3&&!(window.noDrag&&noDrag())){ yaw+=dx*0.011; pit=Math.max(-0.5,Math.min(1.5,pit+dy*0.009)); draw(); } });
+cv.addEventListener('pointerup',function(e){ if(drag&&moved<10&&window.onTap){ var r=cv.getBoundingClientRect(); onTap(e.clientX-r.left,e.clientY-r.top); } drag=null; });
+cv.addEventListener('pointercancel',function(){ drag=null; });
+window.addEventListener('resize',fit); try{ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw); }catch(_){}
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+setTab(TAB0); fit();
+</script></body></html>
