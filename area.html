@@ -184,20 +184,30 @@ function rhomUI(){ $('ctl').innerHTML='<div class="dims">'+sl('mA','가로 대�
 
 /* ───────── 6. 문제 풀기 ───────── */
 var qz=null, qzScore=[0,0];
-function qzNew(){ var t=['rect','rectP','para','tri','trap','rhom'][rnd(6)], q={t:t,done:false,tries:0};
+function qzNew(){ var t=['rect','rectP','para','tri','trap','rhom','unit','unit'][rnd(8)], q={t:t,done:false,tries:0};
   if(t==='rect'||t==='rectP'){ q.w=2+rnd(10); q.h=2+rnd(5); q.ans=t==='rect'?q.w*q.h:(q.w+q.h)*2; q.ask=t==='rect'?'넓이':'둘레'; q.unit=t==='rect'?'㎠':'cm'; q.nm=q.w===q.h?'정사각형':'직사각형';
     q.why=t==='rect'?('가로 × 세로 = '+q.w+' × '+q.h+' = '+q.ans+'(㎠)'):('(가로 + 세로) × 2 = ('+q.w+' + '+q.h+') × 2 = '+q.ans+'(cm)'); }
   else if(t==='para'){ q.b=3+rnd(6); q.h=2+rnd(5); q.s=1+rnd(3); q.ans=q.b*q.h; q.nm='평행사변형'; q.why='밑변의 길이 × 높이 = '+q.b+' × '+q.h+' = '+q.ans+'(㎠)'; }
   else if(t==='tri'){ q.b=3+rnd(5); q.h=2+rnd(5); q.p=rnd(q.b+1); q.ans=q.b*q.h/2; q.nm='삼각형'; q.why='밑변의 길이 × 높이 ÷ 2 = '+q.b+' × '+q.h+' ÷ 2 = '+fmt(q.ans)+'(㎠)'; }
   else if(t==='trap'){ q.a=1+rnd(4); q.b=q.a+1+rnd(3); q.h=2+rnd(5); q.ans=(q.a+q.b)*q.h/2; q.nm='사다리꼴'; q.why='(윗변 + 아랫변) × 높이 ÷ 2 = ('+q.a+' + '+q.b+') × '+q.h+' ÷ 2 = '+fmt(q.ans)+'(㎠)'; }
+  else if(t==='unit'){ var ua=2+rnd(8), us=rnd(5), ub=2+rnd(5); q.ask='□'; q.nm='넓이 단위'; q.hint='1㎡ = 10000㎠, 1㎢ = 1000000㎡';
+    if(us===0){ q.L=ua+'㎡ = □㎠'; q.ans=ua*10000; q.unit='㎠'; q.why='1㎡ = 10000㎠이므로 0을 4개 붙이면 '+ua+'㎡ = '+q.ans+'㎠'; }
+    else if(us===1){ q.L=ua*10000+'㎠ = □㎡'; q.ans=ua; q.unit='㎡'; q.why='10000㎠ = 1㎡이므로 0을 4개 떼면 '+ua*10000+'㎠ = '+ua+'㎡'; }
+    else if(us===2){ q.L=ua+'㎢ = □㎡'; q.ans=ua*1000000; q.unit='㎡'; q.why='1㎢ = 1000000㎡이므로 0을 6개 붙이면 '+ua+'㎢ = '+q.ans+'㎡'; }
+    else if(us===3){ q.L=ua*1000000+'㎡ = □㎢'; q.ans=ua; q.unit='㎢'; q.why='1000000㎡ = 1㎢이므로 0을 6개 떼면 '+ua*1000000+'㎡ = '+ua+'㎢'; }
+    else { q.L='가로 '+ua*100+'cm, 세로 '+ub*100+'cm'; q.L2='이 직사각형의 넓이는 몇 ㎡일까요?'; q.ask='넓이'; q.ans=ua*ub; q.unit='㎡'; q.hint='먼저 cm를 m로 바꾸어요. 100cm = 1m'; q.why=ua*100+'cm = '+ua+'m, '+ub*100+'cm = '+ub+'m이므로 '+ua+' × '+ub+' = '+q.ans+'(㎡)'; } }
   else { q.d1=2*(2+rnd(5)); q.d2=2*(1+rnd(3)); q.ans=q.d1*q.d2/2; q.nm='마름모'; q.why='한 대각선 × 다른 대각선 ÷ 2 = '+q.d1+' × '+q.d2+' ÷ 2 = '+fmt(q.ans)+'(㎠)'; }
   if(!q.ask){ q.ask='넓이'; q.unit='㎠'; } qz=q; }
 function quizDraw(){ if(!qz) qzNew(); var q=qz;
+  if(q.t==='unit'){ var us=Math.min(36,W/11), ut=q.done?q.L.replace('□',''+q.ans):q.L, uf=function(){ g.font=us+'px Jua,"Malgun Gothic",sans-serif'; }; uf(); while(g.measureText(ut).width>W-30&&us>14){ us--; uf(); }
+    utxt(ut,W/2,H*0.4,INK,us); if(q.L2) utxt(q.done?'넓이 = '+q.ans+'㎡':q.L2,W/2,H*0.4+us*1.8,q.done?HOT:MUTED,Math.max(15,us*0.8));
+    $('say').innerHTML=q.done?('<b class="r">정답이에요!</b> 답: '+q.ans+q.unit+'<small style="font-size:15.5px;color:var(--ink)">'+q.why+'</small>'):
+      ((q.L2?'넓이를 ㎡ 단위로 구해 보세요.':'□ 안에 알맞은 수를 써 보세요.')+(q.tries>=2?'<small style="font-size:15.5px;color:var(--ink)">도움말: '+q.hint+'</small>':'<small>넓이 단위 사이의 관계를 떠올려 보세요.</small>')); return; }
   if(q.t==='rect'||q.t==='rectP') dRect(q.w,q.h,0); else if(q.t==='para') dPara(q.b,q.h,q.s,0); else if(q.t==='tri') dTri(q.b,q.h,q.p,0); else if(q.t==='trap') dTrap(q.a,q.b,q.h,0); else dRhom(q.d1,q.d2,0);
   $('say').innerHTML=q.done?('<b class="r">정답이에요!</b> '+q.nm+'의 '+q.ask+'는 '+fmt(q.ans)+q.unit+'예요.<small style="font-size:15.5px;color:var(--ink)">'+q.why+'</small>'):
     (q.nm+'의 <b class="r">'+q.ask+'</b>'+(q.ask==='둘레'?'는 몇 cm일까요?':'는 몇 ㎠일까요?')+(q.tries>=2?'<small style="font-size:15.5px;color:var(--ink)">도움말: '+q.why.split(' = ')[0]+'</small>':'<small>모눈이 없으니 길이를 보고 계산해 보세요.</small>')); }
 function quizUI(msg,cls){ if(!qz) qzNew(); $('ctl').innerHTML='<div class="row" style="margin-top:8px;font-size:17px"><span>'+qz.ask+' = <input type="number" id="qIn" inputmode="decimal" step="0.5"> '+qz.unit+'</span>'+(qz.done?'':'<button class="btn primary" id="qGo">확인하기</button>')+'<button class="btn'+(qz.done?' primary':'')+'" id="qNext">'+(qz.done?'다음 문제 ▶':'건너뛰기')+'</button><span class="score">맞힌 문제 '+qzScore[0]+' / '+qzScore[1]+'</span></div><p class="msg '+(cls||'')+'" id="qMsg">'+(msg||'')+'</p>';
-  if(qz.done){ $('qIn').value=fmt(qz.ans); $('qIn').className='ok'; $('qIn').disabled=true; }
+  if(qz.done){ $('qIn').value=qz.t==='unit'?qz.ans:fmt(qz.ans); $('qIn').className='ok'; $('qIn').disabled=true; }
   else { $('qGo').onclick=function(){ var el=$('qIn'), m=$('qMsg'); if(el.value===''){ m.className='msg bad'; m.textContent='칸에 수를 써 주세요.'; return; }
       if(Math.abs(+el.value-qz.ans)<1e-6){ if(qz.tries===0) qzScore[0]++; qzScore[1]++; qz.done=true; quizUI(); draw(); }
       else { qz.tries++; el.className='bad'; m.className='msg bad'; m.textContent='다시 계산해 보세요.'; draw(); } };
@@ -237,7 +247,7 @@ function unitUI(){ $('top').innerHTML='<div class="chips">'+[['m','1㎡와 1㎠'
 
 function ui(){ $('top').innerHTML=''; ({rect:rectUI,para:paraUI,tri:triUI,trap:trapUI,rhom:rhomUI,unit:unitUI,quiz:quizUI})[tab](); }
 function draw(){ tone(); lay(); g.clearRect(0,0,W,H); ({rect:rectDraw,para:paraDraw,tri:triDraw,trap:trapDraw,rhom:rhomDraw,unit:unitDraw,quiz:quizDraw})[tab](); }
-function setTab(t){ anStop(); rStop(); tab=t; $('hint').style.visibility=(t==='quiz'||t==='unit')?'hidden':'visible'; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+function setTab(t){ anStop(); rStop(); tab=t; $('hint').style.visibility=(t==='quiz'||t==='unit')?'hidden':'visible'; if(t==='quiz'&&qz&&qz.t==='unit'){ } document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
 
 document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
 var drag=null, moved=0;

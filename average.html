@@ -63,7 +63,7 @@ input.wide{width:130px}
 canvas{cursor:default}
 </style></head><body>
 <div class="app">
-  <header><h1>평균과 가능성</h1><p>자료를 고르게 하여 평균을 구하고, 일이 일어날 가능성을 알아봐요</p></header>
+  <header><h1>평균과 가능성</h1><p>자료를 고르게 하여 평균을 구하고, 일이 일어날 가능성을 알아보고 판단해요</p></header>
   <div class="card"><div class="tabs" id="tabs" role="tablist">
     <button data-t="level" role="tab" aria-selected="true">① 평균의 뜻</button>
     <button data-t="calc" role="tab" aria-selected="false">② 평균 구하기</button>
@@ -71,6 +71,7 @@ canvas{cursor:default}
     <button data-t="word" role="tab" aria-selected="false">④ 가능성을 말로</button>
     <button data-t="num" role="tab" aria-selected="false">⑤ 가능성을 수로</button>
     <button data-t="exp" role="tab" aria-selected="false">⑥ 실험하기</button>
+    <button data-t="judge" role="tab" aria-selected="false">⑦ 가능성으로 판단하기</button>
   </div></div>
   <section class="card"><div class="stage">
     <div id="top"></div>
@@ -245,7 +246,34 @@ function xpUI(){ $('top').innerHTML=chipsH([[0,'빨강 없음'],[1,'빨강 1/4']
   $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ xp=+b.dataset.p; xr=0; xn=0; xpUI(); draw(); }; });
   $('ctl').querySelectorAll('[data-k]').forEach(function(b){ b.onclick=function(){ xpSpin(+b.dataset.k); }; }); $('xClr').onclick=function(){ xr=0; xn=0; draw(); }; }
 
-var UIS={level:lvUI,calc:clUI,use:function(){ $('top').innerHTML=''; quiz.ui(); },word:function(){ $('top').innerHTML=''; wq.ui(); },num:nmUI,exp:xpUI}, DRS={level:lvDraw,calc:clDraw,use:quiz.draw,word:wq.draw,num:nmDraw,exp:xpDraw};
+/* ───────── 7. 가능성으로 판단하기 ───────── */
+var FO=['공정하다','가에게 유리하다','나에게 유리하다'];
+var FG=[['주사위를 던져 짝수가 나오면 가가 이기고,','홀수가 나오면 나가 이겨요.',0,'짝수는 2, 4, 6으로 3가지, 홀수는 1, 3, 5로 3가지예요. 두 사람이 이길 가능성이 똑같이 반반이에요.'],
+  ['주사위를 던져 1, 2가 나오면 가가 이기고,','3, 4, 5, 6이 나오면 나가 이겨요.',2,'가가 이기는 눈은 2가지, 나가 이기는 눈은 4가지예요. 나가 이길 가능성이 더 높아요.'],
+  ['주사위를 던져 6의 약수가 나오면 가가 이기고,','그렇지 않으면 나가 이겨요.',1,'6의 약수는 1, 2, 3, 6으로 4가지이고 나머지는 4, 5로 2가지예요. 가가 이길 가능성이 더 높아요.'],
+  ['동전을 던져 그림 면이 나오면 가가 이기고,','숫자 면이 나오면 나가 이겨요.',0,'그림 면과 숫자 면이 나올 가능성은 똑같이 반반이에요.'],
+  ['빨간 구슬 3개, 파란 구슬 1개가 든 주머니에서 1개를 꺼내','빨간색이면 가, 파란색이면 나가 이겨요.',1,'구슬 4개 가운데 빨간 구슬이 3개예요. 빨간색이 나올 가능성이 더 높으므로 가에게 유리해요.'],
+  ['빨간색이 전체의 1/4인 회전판을 돌려','빨간색이면 가, 파란색이면 나가 이겨요.',2,'파란색이 전체의 3/4이에요. 파란색에 멈출 가능성이 더 높으므로 나에게 유리해요.'],
+  ['1부터 10까지 쓴 카드에서 한 장을 뽑아','5 이하이면 가, 6 이상이면 나가 이겨요.',0,'5 이하는 1, 2, 3, 4, 5로 5장, 6 이상은 6, 7, 8, 9, 10으로 5장이에요. 가능성이 같아요.'],
+  ['1부터 10까지 쓴 카드에서 한 장을 뽑아','3의 배수이면 가, 아니면 나가 이겨요.',2,'3의 배수는 3, 6, 9로 3장뿐이고 나머지는 7장이에요. 나가 이길 가능성이 더 높아요.']];
+var JG=[['내일 비가 올 가능성이 90%라고 해요.','소풍 준비를 어떻게 하면 좋을까요?',['우산을 챙긴다','우산은 필요 없다'],0,'비가 올 가능성이 매우 높아요. 가능성이 높은 일에 대비하는 것이 알맞은 판단이에요.'],
+  ['제비 100개 가운데 당첨 제비는 2개예요.','제비 1개를 뽑을 때 알맞은 예상은 무엇일까요?',['당첨될 것이다','당첨되기 어렵다'],1,'당첨될 가능성은 100개 가운데 2개로 매우 낮아요. 당첨을 기대하고 결정하면 실망하기 쉬워요.'],
+  ['지난 30일 동안 버스가 27일은 제시간에 왔어요.','내일 버스는 어떨 것이라고 예상할 수 있나요?',['제시간에 올 것 같다','늦게 올 것 같다'],0,'30일 가운데 27일은 제시간에 왔어요. 자료를 보면 내일도 제시간에 올 가능성이 높아요. 다만 확실한 것은 아니에요.'],
+  ['동전을 4번 던졌더니 모두 그림 면이 나왔어요.','다섯 번째에는 어떤 면이 나올까요?',['그림 면이 확실하다','숫자 면이 확실하다','알 수 없다, 반반이다'],2,'앞에서 나온 결과는 다음 결과에 영향을 주지 않아요. 다섯 번째에도 그림 면과 숫자 면이 나올 가능성은 반반이에요.'],
+  ['주사위를 600번 던졌더니 1의 눈이 98번 나왔어요.','6000번 던지면 1의 눈은 몇 번쯤 나올까요?',['약 100번','약 1000번','약 3000번'],1,'1의 눈은 6번에 1번꼴로 나와요. 600번 가운데 약 100번 나왔으니 6000번 던지면 약 1000번 나올 것으로 예상할 수 있어요.'],
+  ['과녁 맞히기에서 가는 20번 중 15번,','나는 20번 중 9번 맞혔어요. 대표로 누구를 뽑을까요?',['가','나'],0,'같은 20번 가운데 가가 더 많이 맞혔어요. 다음에도 가가 맞힐 가능성이 더 높다고 예상할 수 있어요.'],
+  ['급식에 과일이 나온 날은 지난 20일 가운데 19일이에요.','내일 급식에 과일이 나올 가능성은 어떨까요?',['~아닐 것 같다','반반이다','~일 것 같다'],2,'20일 가운데 19일이나 과일이 나왔어요. 내일도 나올 가능성이 높지만, 확실하다고 할 수는 없어요.']], jI=-1, fI=-1;
+var jq=QZ(function(){ var t=rnd(5), i;
+  if(t===0){ var w1=ri(2,8), n2=pick([20,50]), w2; do{ w2=(w1+pick([-2,-1,1,2]))*n2/10; }while(w2<n2/10||w2>n2*0.9); var a=w1/10>w2/n2?'가 상자':'나 상자';
+    return {lines:['가 상자: 제비 10개 가운데 당첨 '+w1+'개','나 상자: 제비 '+n2+'개 가운데 당첨 '+w2+'개'],ask:'제비 1개를 뽑는다면 어느 상자에서 뽑는 것이 유리할까요?',kind:'mc',opts:['가 상자','나 상자'],ans:a,show:a,why:'당첨될 가능성은 가 상자가 '+F(w1,10)+', 나 상자가 '+F(w2,n2)+' = '+F(w2*10/n2,10)+'이에요. 당첨 제비의 수가 아니라 전체 가운데 당첨 제비가 차지하는 정도로 비교해요.'}; }
+  if(t===1){ var k=pick([1,2,3]), r=k*25+ri(-5,5), o=['빨강이 전체의 1/4','빨강이 전체의 절반','빨강이 전체의 3/4'];
+    return {lines:['회전판을 100번 돌렸더니','빨강 '+r+'번, 파랑 '+(100-r)+'번이 나왔어요.'],ask:'어떤 회전판을 돌렸을 가능성이 가장 높을까요?',kind:'mc',opts:o,ans:o[k-1],show:o[k-1],why:'빨강이 100번 가운데 '+r+'번으로 약 '+(k*25)+'%예요. 여러 번 실험한 결과는 실제 가능성에 가까워지므로, '+o[k-1]+'인 회전판이라고 예상할 수 있어요.'}; }
+  if(t===2){ do{ i=rnd(FG.length); }while(i===fI); fI=i; var f=FG[i]; return {lines:[f[0],f[1]],ask:'이 놀이 규칙은 <b>공정</b>할까요?<small>두 사람이 이길 가능성이 같아야 공정한 놀이예요.</small>',kind:'mc',opts:FO,ans:FO[f[2]],show:FO[f[2]],why:f[3]}; }
+  if(t===3){ var d=pick([[3,0],[4,0],[10,1],[16,2],[17,2]]), c=pick([['자유투를 20번 던져 ','번 넣었어요.','다음 자유투가 들어갈'],['화살을 20번 쏘아 ','번 과녁에 맞혔어요.','다음 화살이 과녁에 맞을'],['뽑기를 20번 해서 ','번 당첨되었어요.','다음 뽑기에서 당첨될']]), o2=['~아닐 것 같다','반반이다','~일 것 같다'];
+    return {lines:[c[0]+d[0]+c[1]],ask:c[2]+' 가능성을 알맞게 표현한 말을 고르세요.',kind:'mc',opts:o2,ans:o2[d[1]],show:o2[d[1]],why:'20번 가운데 '+d[0]+'번이면 '+(d[1]===1?'절반이에요.':(d[1]===0?'절반보다 훨씬 적어요.':'절반보다 훨씬 많아요.'))+' 지금까지의 자료를 보고 다음에 일어날 가능성을 예상할 수 있어요.'}; }
+  do{ i=rnd(JG.length); }while(i===jI); jI=i; var s=JG[i]; return {lines:[s[0],s[1]],ask:'가능성을 생각하여 알맞은 판단을 골라 보세요.',kind:'mc',opts:s[2],ans:s[2][s[3]],show:s[2][s[3]],why:s[4]}; });
+
+var UIS={judge:function(){ $('top').innerHTML=''; jq.ui(); },level:lvUI,calc:clUI,use:function(){ $('top').innerHTML=''; quiz.ui(); },word:function(){ $('top').innerHTML=''; wq.ui(); },num:nmUI,exp:xpUI}, DRS={judge:jq.draw,level:lvDraw,calc:clDraw,use:quiz.draw,word:wq.draw,num:nmDraw,exp:xpDraw};
 function ui(){ UIS[tab](); }
 function draw(){ tone(); g.clearRect(0,0,W,H); DRS[tab](); }
 function setTab(t){ anStop(); tab=t; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
