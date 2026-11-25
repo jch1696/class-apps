@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>자연수의 혼합 계산</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 다른 수업 앱(쌓기나무·원주와 원의 넓이)과 같은 색·글꼴 */
+:root{--bg:#EDF1F3;--surface:#FFFFFF;--surface2:#EDF1F3;--ink:#1D2B36;--muted:#5C6B77;--line:#C9D3DA;--accent:#2F6FDB;--accent-ink:#fff;--c1:#D9482B;--sel:#DCEAFF;--sel-ink:#1B4FB0;
+ --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4vw,36px)}
+header p{margin:0;color:var(--muted);font-size:15px}
+h1,button,label,output,select{font-family:var(--display);font-weight:400}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stage{max-width:760px;width:100%;margin:0 auto}
+button{font:inherit;font-family:var(--display);cursor:pointer}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs button{font-size:17px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.btn,.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:16px}
+.tabs button:hover,.btn:hover,.chip:hover{border-color:var(--ink)}
+.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+canvas{display:block;width:100%;border-radius:12px;background:var(--surface2);touch-action:none;cursor:grab}
+.hint{font-size:14px;color:var(--muted);margin:6px 0}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.row label{font-size:15px;min-width:64px}
+.row input[type=range]{flex:1;min-width:140px;height:28px;accent-color:var(--accent)}
+.row output{font-size:17px;min-width:56px;text-align:right}
+.say{background:var(--bg);border-left:6px solid var(--accent);border-radius:8px;padding:9px 12px;margin:10px 0 0;font-size:16px;font-weight:700;min-height:46px}
+.say small{display:block;font-weight:400;color:var(--muted);margin-top:2px;font-size:14.5px}
+.say b.r{color:var(--c1)}
+select{font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:15.5px}
+th{background:var(--surface2);font-family:var(--display);font-weight:400}
+td.st{text-align:left;font-weight:700}
+.ck{min-width:46px;min-height:36px;padding:4px 8px;font-size:19px;line-height:1}
+td.res{width:44px;font-size:18px}
+.vt td{height:92px;font-family:var(--display);font-size:17px;width:33.3%}
+.vt td.no{color:var(--muted);font-size:26px}
+.vt svg{display:block;margin:0 auto 2px;width:54px;height:46px;color:var(--accent)}
+input[type=number]{font:inherit;width:74px;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);margin-left:4px}
+input.ok{border-color:#1E8E5A;background:rgba(30,142,90,.12)}input.bad{border-color:var(--c1);background:rgba(217,72,43,.12)}
+.msg{font-weight:700;min-height:24px;margin:6px 0 0}.msg.ok{color:#1E8E5A}.msg.bad{color:var(--c1)}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+.found{background:var(--surface2);border:2px solid #1E8E5A;border-radius:10px;padding:10px 13px;margin:10px 0 0;font-size:16px;font-weight:700;line-height:1.8}
+.found small{display:block;color:#1E8E5A;font-size:13px}.found i{font-style:normal;color:var(--c1)}
+.dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 16px}
+.dims .row label{min-width:40px}
+.score{margin-left:auto;font-family:var(--display)}
+input.wide{width:130px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 3px;font-family:var(--display);font-weight:400}
+.fr i{font-style:normal;border-bottom:2px solid currentColor;padding:0 4px}.fr span{padding:0 4px}
+.fin{display:inline-flex;flex-direction:column;vertical-align:middle;gap:3px;align-items:center}.fin input{margin:0;width:64px;text-align:center}.fin hr{width:100%;border:0;border-top:2.5px solid var(--ink);margin:0}
+.dims .row label{min-width:40px;white-space:nowrap}
+.say small .fr,.say .fr{font-size:.95em}
+canvas{cursor:default}
+</style></head><body>
+<div class="app">
+  <header><h1>자연수의 혼합 계산</h1><p>덧셈, 뺄셈, 곱셈, 나눗셈과 ( )가 섞인 식의 계산 순서를 알아봐요</p></header>
+  <div class="card"><div class="tabs" id="tabs" role="tablist">
+    <button data-t="order" role="tab" aria-selected="true">① 계산 순서</button>
+    <button data-t="tap" role="tab" aria-selected="false">② 순서 맞히기</button>
+    <button data-t="paren" role="tab" aria-selected="false">③ ( )의 힘</button>
+    <button data-t="story" role="tab" aria-selected="false">④ 식 세우기</button>
+    <button data-t="quiz" role="tab" aria-selected="false">⑤ 문제 풀기</button>
+  </div></div>
+  <section class="card"><div class="stage">
+    <div id="top"></div>
+    <canvas id="cv"></canvas>
+    <p class="hint" id="hint"></p>
+    <div id="ctl"></div>
+    <div class="say" id="say"></div>
+  </div></section>
+</div>
+<script>
+var $=function(id){ return document.getElementById(id); };
+var cv=$('cv'), g=cv.getContext('2d'), W=640, H=440, S=100, yaw=-0.5, pit=0.36, tab='';
+var BLUE=[125,180,245], GREEN=[120,210,165], ORANGE=[251,146,60], GRAY=[185,196,206], PINK=[236,150,190], YEL=[240,200,95];
+var INK='#1D2B36', HOT='#D9482B', ACC='#2F6FDB', HALO='#EDF1F3', MUTED='#5C6B77', LINE='#C9D3DA';
+function tone(){ var c=getComputedStyle(document.documentElement), v=function(n,d){ return (c.getPropertyValue(n)||'').trim()||d; }; INK=v('--ink',INK); HOT=v('--c1',HOT); ACC=v('--accent',ACC); HALO=v('--surface2',HALO); MUTED=v('--muted',MUTED); LINE=v('--line',LINE); }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function rgba(c,a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+(a==null?1:a)+')'; }
+function fit(){ var w=cv.clientWidth||640, d=(window.devicePixelRatio||1)*(window.__zoom||1); W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
+var D3=false, TAB0="order";
+/* 수와 연산 앱 공통: 분수 표시, 막대 그리기, 입력 */
+function gcd(a,b){ return b?gcd(b,a%b):Math.abs(a); }
+function lcm(a,b){ return a/gcd(a,b)*b; }
+function F(n,d){ return '<span class="fr"><i>'+n+'</i><span>'+d+'</span></span>'; }
+function MXH(w,n,d){ return (w?w:'')+(n?F(n,d):(w?'':'0')); }
+/* n/d 를 기약분수(대분수) html 로 */
+function MX(n,d){ var k=gcd(n,d)||1; n/=k; d/=k; if(d===1) return ''+n; var w=Math.floor(n/d); return (w?w:'')+F(n-w*d,d); }
+function rect(x,y,w,h,fill,stroke,lw,dash){ if(fill){ g.fillStyle=fill; g.fillRect(x,y,w,h); } if(stroke){ g.strokeStyle=stroke; g.lineWidth=lw||2; g.setLineDash(dash||[]); g.strokeRect(x,y,w,h); g.setLineDash([]); } }
+function line(x1,y1,x2,y2,col,lw,dash){ g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.strokeStyle=col||INK; g.lineWidth=lw||1.5; g.setLineDash(dash||[]); g.stroke(); g.setLineDash([]); }
+function txt(t,x,y,col,sz,al){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; g.textAlign=al||'center'; g.textBaseline='middle'; g.lineWidth=5; g.lineJoin='round'; g.strokeStyle=HALO; g.strokeText(t,x,y); g.fillStyle=col||INK; g.fillText(t,x,y); }
+function tw(t,sz){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; return g.measureText(t).width; }
+/* 캔버스 분수: 가운데 (x,y), 너비를 돌려줌 */
+function cfr(n,d,x,y,col,sz){ sz=sz||18; var w=Math.max(tw(''+n,sz),tw(''+d,sz))+6; txt(''+n,x,y-sz*0.62,col,sz); txt(''+d,x,y+sz*0.66,col,sz); line(x-w/2,y,x+w/2,y,col||INK,2); return w; }
+/* 식 그리기: 토큰 = '÷' 같은 글자 또는 {w,n,d} */
+function cexpr(tk,cx,y,sz,col){ sz=sz||30; var ws=tk.map(function(t){ if(typeof t==='string') return tw(t,sz)+sz*0.5; var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; return (t.w?tw(''+t.w,sz)+4:0)+(t.n!=null?w:0)+sz*0.25; }), tot=ws.reduce(function(a,b){ return a+b; },0), x=cx-tot/2;
+  tk.forEach(function(t,i){ if(typeof t==='string') txt(t,x+ws[i]/2,y,col,sz); else { var xx=x+sz*0.12; if(t.w){ var a=tw(''+t.w,sz); txt(''+t.w,xx+a/2,y,col,sz); xx+=a+4; } if(t.n!=null){ var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; cfr(t.n,t.d,xx+w/2,y,col,sz*0.8); } } x+=ws[i]; }); }
+/* 단위 막대: parts 등분, fills=[[개수,색]...] 를 왼쪽부터 칠함 */
+function bar(x,y,w,h,parts,fills,thin){ var cw=w/parts, k=0; (fills||[]).forEach(function(f){ for(var i=0;i<f[0];i++){ rect(x+(k%parts)*cw,y,cw,h,f[1]); k++; } });
+  for(var i=1;i<parts;i++) line(x+i*cw,y,x+i*cw,y+h,INK,thin?0.8:1.5); rect(x,y,w,h,null,INK,2.4); }
+function sld(id,lab,min,max,val){ return '<div class="row"><label>'+lab+'</label><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" value="'+val+'"><output>'+val+'</output></div>'; }
+function sldBind(id,fn){ $(id).oninput=function(){ this.nextElementSibling.textContent=this.value; fn(+this.value); ui(); draw(); var e=$(id); if(e) e.focus(); }; }
+function frIn(p,whole){ return (whole?'<input type="number" id="'+p+'w" inputmode="numeric" style="width:58px;margin:0 4px 0 0" aria-label="자연수">':'')+'<span class="fin"><input type="number" id="'+p+'n" inputmode="numeric" aria-label="분자"><hr><input type="number" id="'+p+'d" inputmode="numeric" aria-label="분모"></span>'; }
+/* 입력한 분수 값 {n,d} (가분수로). 비어 있으면 null */
+function frVal(p){ var w=$(p+'w')?$(p+'w').value:'', n=$(p+'n').value, d=$(p+'d').value; if(n===''&&d===''&&w==='') return null; if(n===''&&d==='') return {n:+w,d:1}; if(d===''){ d='1'; } if(+d===0) return null; return {n:(+w||0)*(+d)+(+n||0),d:+d}; }
+function frShow(p,n,d){ var k=gcd(n,d)||1; n/=k; d/=k; var w=Math.floor(n/d), r=n-w*d; if($(p+'w')){ $(p+'w').value=w||''; if(r){ $(p+'n').value=r; $(p+'d').value=d; } } else { $(p+'n').value=n; $(p+'d').value=d; } [p+'w',p+'n',p+'d'].forEach(function(i){ if($(i)){ $(i).disabled=true; if($(i).value!=='') $(i).className='ok'; } }); }
+/* 숫자 뒤 조사: P(수,'이','가') → 받침 있으면 앞의 것 */
+function P(n,a,b){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '013678'.indexOf(d)>=0?a:b; }
+function J(n,a,b){ return n+P(n,a,b); }
+function Pr(n){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '036'.indexOf(d)>=0?'으로':'로'; }
+var anT=null;
+function anStop(){ if(anT){ cancelAnimationFrame(anT); anT=null; } }
+function anim(get,set,to,dur,done){ anStop(); var from=get(), t0=performance.now(); (function step(now){ var k=Math.min(1,(now-t0)/(dur||1500)), e=k*k*(3-2*k); set(from+(to-from)*e); if(k<1){ anT=requestAnimationFrame(step); draw(); } else { anT=null; if(done) done(); draw(); } })(t0); }
+function pick(a){ return a[rnd(a.length)]; }
+function shuf(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=rnd(i+1), t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function BWd(){ return Math.min(W-48,620); }
+var PC=[BLUE,ORANGE,GREEN,PINK,YEL,GRAY,[170,150,235],[120,205,215]];
+function scoreH(s){ return '<span class="score">맞힌 문제 '+s[0]+' / '+s[1]+'</span>'; }
+function chipsH(arr,cur,attr,st){ return '<div class="chips"'+(st?' style="'+st+'"':'')+'>'+arr.map(function(k){ return '<button class="chip" aria-pressed="'+(k[0]===cur)+'" data-'+attr+'="'+k[0]+'">'+k[1]+'</button>'; }).join('')+'</div>'; }
+function ri(a,b){ return a+rnd(b-a+1); }
+function beads(x,y,n,col,r,perRow){ perRow=perRow||10; for(var i=0;i<n;i++){ g.beginPath(); g.arc(x+(i%perRow)*(r*2+5)+r,y+Math.floor(i/perRow)*(r*2+5)+r,r,0,7); g.fillStyle=col; g.fill(); g.strokeStyle=INK; g.lineWidth=1.5; g.stroke(); } }
+/* 공통 문제 엔진. gen() → {lines:[글 또는 토큰배열], ask:html, kind:'mc'|'num'|'pair', opts, ans, unit, why} */
+function QZ(gen){ var o={q:null,score:[0,0]};
+  o.next=function(){ o.q=gen(); o.q.done=false; o.q.tries=0; o.q.right=false; };
+  o.draw=function(){ if(!o.q) o.next(); var q=o.q, n=q.lines.length, sz=Math.min(40,W/14,(H-40)/(n*1.9)), y=H/2-(n-1)*sz*0.95;
+    q.lines.forEach(function(l,i){ if(typeof l==='string'){ var s=sz; while(tw(l,s)>W-30&&s>12) s-=1; txt(l,W/2,y+i*sz*1.9,INK,s); } else cexpr(l,W/2,y+i*sz*1.9,sz); });
+    $('say').innerHTML=q.done?((q.right?'<b class="r">정답이에요!</b> ':'아쉬워요. ')+'답: '+q.show+'<small style="font-size:15.5px;color:var(--ink)">'+q.why+'</small>'):(q.ask+(q.tries>=2&&q.hint?'<small style="font-size:15.5px;color:var(--ink)">도움말: '+q.hint+'</small>':'')); };
+  o.ui=function(msg,cls){ if(!o.q) o.next(); var q=o.q, h='';
+    if(q.kind==='mc') h=q.opts.map(function(s,i){ return '<button class="btn'+(q.done?(s===q.ans?' primary':''):' primary')+'" data-o="'+i+'"'+(q.done?' disabled':'')+' style="font-size:17px">'+s+'</button>'; }).join('');
+    else h='<span style="font-size:17px">답 = '+(q.kind==='pair'?'<input type="number" id="qA" inputmode="decimal" step="any"> : <input type="number" id="qB" inputmode="decimal" step="any">':'<input type="number" class="wide" id="qA" inputmode="decimal" step="any">')+' '+(q.unit||'')+'</span>'+(q.done?'':'<button class="btn primary" id="qGo">확인하기</button>');
+    $('ctl').innerHTML='<div class="row" style="margin-top:8px">'+h+'<button class="btn'+(q.done?' primary':'')+'" id="qNext">'+(q.done?'다음 문제 ▶':'건너뛰기')+'</button>'+scoreH(o.score)+'</div><p class="msg '+(cls||'')+'" id="qMsg">'+(msg||'')+'</p>';
+    if(q.kind==='mc'){ if(!q.done) $('ctl').querySelectorAll('[data-o]').forEach(function(b){ b.onclick=function(){ q.done=true; q.right=q.opts[+b.dataset.o]===q.ans; o.score[1]++; if(q.right) o.score[0]++; o.ui(); draw(); }; }); }
+    else if(q.done){ $('qA').value=q.kind==='pair'?q.ans[0]:q.ans; $('qA').className=(q.kind==='pair'?'':'wide ')+'ok'; $('qA').disabled=true; if($('qB')){ $('qB').value=q.ans[1]; $('qB').className='ok'; $('qB').disabled=true; } }
+    else { $('qGo').onclick=function(){ var m=$('qMsg'), a=$('qA').value, b=$('qB')?$('qB').value:'0'; if(a===''||b===''){ m.className='msg bad'; m.textContent='칸에 수를 써 주세요.'; return; }
+        var ok=q.kind==='pair'?(Math.abs(+a-q.ans[0])<1e-9&&Math.abs(+b-q.ans[1])<1e-9):Math.abs(+a-q.ans)<1e-9;
+        if(ok){ if(q.tries===0) o.score[0]++; o.score[1]++; q.done=true; q.right=true; o.ui(); draw(); } else { q.tries++; m.className='msg bad'; m.textContent='다시 생각해 보세요.'; draw(); } };
+      $('qA').onkeydown=function(e){ if(e.key==='Enter'&&!$('qB')) $('qGo').click(); }; }
+    $('qNext').onclick=function(){ if(!o.q.done) o.score[1]++; o.next(); o.ui(); draw(); }; };
+  return o; }
+function DD(x){ return (Math.round(x*1000)/1000)+''; }
+/* 캔버스 표: rows=[[이름, 값들...]], hl=칸 색(선택). 아래쪽 y를 돌려줌 */
+function ctable(rows,y0,hl,rh){ var n=rows[0].length-1, lw=Math.min(150,W*0.3), cw=Math.min(74,(W-30-lw)/n), x0=(W-lw-cw*n)/2; rh=rh||40;
+  rows.forEach(function(r,i){ rect(x0,y0+i*rh,lw,rh,rgba(GRAY,0.3),LINE,1.2); txt(r[0],x0+lw/2,y0+i*rh+rh/2,INK,15); for(var j=0;j<n;j++){ rect(x0+lw+j*cw,y0+i*rh,cw,rh,hl&&hl[i]&&hl[i][j]?hl[i][j]:null,LINE,1.2); txt(''+r[j+1],x0+lw+j*cw+cw/2,y0+i*rh+rh/2,INK,Math.min(18,cw/3.2+6)); } });
+  return y0+rows.length*rh; }
+var GC=[BLUE,ORANGE,GREEN,PINK,YEL,[170,150,235],GRAY];
+/* 띠그래프: it=[{nm,p}] (p=백분율), lab=이름 표시 */
+function drawBand(it,x,y,w,h,lab,upto){ var acc=0, i; for(i=0;i<=20;i++){ line(x+w*i/20,y-(i%2?5:9),x+w*i/20,y,INK,1); if(i%2===0) txt(''+(i*5),x+w*i/20,y-18,MUTED,12); } txt('(%)',x+w+16,y-18,MUTED,12);
+  it.forEach(function(o,k){ if(upto!=null&&k>=upto) return; var sw=w*o.p/100; rect(x+w*acc/100,y,sw,h,rgba(GC[k%GC.length],0.9),INK,1.5); if(lab&&sw>26){ txt(o.nm,x+w*acc/100+sw/2,y+h/2-(sw>44?9:0),INK,Math.min(15,sw/3.2+5)); if(sw>44) txt('('+DD(o.p)+'%)',x+w*acc/100+sw/2,y+h/2+10,INK,12); } acc+=o.p; });
+  rect(x,y,w,h,null,INK,2.4); }
+/* 원그래프: 위쪽에서 시계 방향 */
+function drawPie(it,cx,cy,r,lab,upto){ var acc=0, i, A=function(p){ return -Math.PI/2+Math.PI*2*p/100; };
+  it.forEach(function(o,k){ if(upto!=null&&k>=upto) return; g.beginPath(); g.moveTo(cx,cy); g.arc(cx,cy,r,A(acc),A(acc+o.p)); g.closePath(); g.fillStyle=rgba(GC[k%GC.length],0.9); g.fill(); g.strokeStyle=INK; g.lineWidth=1.5; g.stroke();
+    if(lab&&o.p>=5){ var m=A(acc+o.p/2), rr=r*(o.p>=15?0.62:0.78); txt(o.nm,cx+rr*Math.cos(m),cy+rr*Math.sin(m)-(o.p>=10?8:0),INK,o.p>=15?15:12); if(o.p>=10) txt('('+DD(o.p)+'%)',cx+rr*Math.cos(m),cy+rr*Math.sin(m)+9,INK,12); } acc+=o.p; });
+  g.beginPath(); g.arc(cx,cy,r,0,7); g.strokeStyle=INK; g.lineWidth=2.4; g.stroke();
+  for(i=0;i<20;i++){ var a=A(i*5); line(cx+r*Math.cos(a),cy+r*Math.sin(a),cx+(r+(i%5?5:9))*Math.cos(a),cy+(r+(i%5?5:9))*Math.sin(a),INK,1.2); if(i%5===0) txt(''+(i*5),cx+(r+22)*Math.cos(a),cy+(r+22)*Math.sin(a),MUTED,12); } }
+/* 낱말 뒤 조사 (받침 있으면 앞의 것) */
+function KP(w,a,b){ var c=(''+w).charCodeAt((''+w).length-1); if(c>=0xAC00&&c<=0xD7A3) return (c-0xAC00)%28?a:b; return P(w,a,b); }
+
+/* 자연수의 혼합 계산 (5학년 1학기). 식은 토큰 배열로 다룬다: 수, '+', '−', '×', '÷', '(', ')' */
+var SM='<small style="font-size:15.5px;color:var(--ink)">';
+var CN=['①','②','③','④','⑤','⑥'], ON={'+':'덧셈','−':'뺄셈','×':'곱셈','÷':'나눗셈'};
+function isOp(t){ return t==='+'||t==='−'||t==='×'||t==='÷'; }
+function mxStr(tk){ return tk.join(' ').replace(/\( /g,'(').replace(/ \)/g,')'); }
+function parse(s){ return s.replace(/\(/g,'( ').replace(/\)/g,' )').split(' ').map(function(t){ return /^\d+$/.test(t)?+t:t; }); }
+/* 다음에 계산할 곳 찾기 */
+function mxStep(tk){ var lo=0, hi=tk.length-1, par=false, o=tk.lastIndexOf('('), i, k=-1, as=false, md=false;
+  if(o>=0){ lo=o+1; hi=tk.indexOf(')',o)-1; par=true; }
+  for(i=lo;i<=hi;i++){ if(tk[i]==='×'||tk[i]==='÷'){ md=true; if(k<0) k=i; } if(tk[i]==='+'||tk[i]==='−') as=true; }
+  if(k<0) for(i=lo;i<=hi;i++) if(tk[i]==='+'||tk[i]==='−'){ k=i; break; }
+  if(k<0) return null;
+  var a=tk[k-1], b=tk[k+1], op=tk[k], r=op==='+'?a+b:(op==='−'?a-b:(op==='×'?a*b:a/b)), n=tk.slice(0,k-1).concat([r],tk.slice(k+2)), whole=par&&hi-lo===2;
+  if(whole) n.splice(o,3,r);
+  var m=(op==='×'||op==='÷'), cnt=0; for(i=lo;i<=hi;i++) if(isOp(tk[i])) cnt++;
+  var why=(par?'( ) 안을 가장 먼저 계산해요. ':'')+(cnt<=1?'':(m&&as?'곱셈과 나눗셈을 덧셈과 뺄셈보다 먼저 계산해요.':(m?'곱셈과 나눗셈은 앞에서부터 차례로 계산해요.':'덧셈과 뺄셈은 앞에서부터 차례로 계산해요.'))); if(!why) why='마지막으로 남은 계산을 해요.';
+  return {tk:tk,k:k,a:a,b:b,op:op,r:r,after:n,from:whole?o:k-1,to:whole?hi+1:k+1,par:par,why:why,ok:r>=0&&r===Math.floor(r)&&r<=999&&!(op==='÷'&&b===0)}; }
+function mxRun(tk){ var st=[], cur=tk, s; while((s=mxStep(cur))){ if(!s.ok) return null; st.push(s); cur=s.after; } return {tk:tk,steps:st,res:cur[0]}; }
+/* 괄호와 순서를 무시하고 앞에서부터 계산한 값 */
+function naive(tk){ var f=tk.filter(function(t){ return t!=='('&&t!==')'; }), v=f[0], i; for(i=1;i<f.length;i+=2){ var b=f[i+1], op=f[i]; v=op==='+'?v+b:(op==='−'?v-b:(op==='×'?v*b:v/b)); } return v; }
+var TP={as:['a + b − c','a − b + c','a − (b + c)','a − (b − c)'],
+  md:['a × b ÷ c','a ÷ b × c','a ÷ (b × c)'],
+  mix:['a + b × c','a − b × c','a + b ÷ c','a − b ÷ c + d','a × b − c ÷ d','a + b × c − d','a + b ÷ c × d','a − b + c × d'],
+  par:['(a + b) × c','a × (b − c) + d','a ÷ (b + c) × d','a + (b − c) × d','a − (b + c) ÷ d','(a − b) ÷ c + d × e']};
+function mxGen(kind){ var t=pick(TP[kind]), n, r, tk; for(n=0;n<30000;n++){ tk=parse(t.replace(/[a-e]/g,function(){ return Math.random()<0.3?ri(10,48):ri(2,12); })); r=mxRun(tk); if(!r||r.res<1) continue;
+    if(t.indexOf('(')>=0){ var np=mxRunBig(tk.filter(function(x){ return x!=='('&&x!==')'; })); if(np&&np.res===r.res) continue; } else if(kind==='mix'&&naive(tk)===r.res) continue; var nums=tk.filter(function(x){ return typeof x==='number'; }); if(nums.some(function(x,i){ return nums.indexOf(x)!==i; })) continue; return r; }
+  return mxRun(parse('2 + 3 × 4')); }
+function tkW(tk,sz){ return tk.reduce(function(s,t){ return s+(typeof t==='number'?tw(''+t,sz)+sz*0.4:(isOp(t)?sz*1.05:sz*0.42)); },0); }
+/* 토큰 그리기. hl={from,to,col,badge} 밑줄, circ=연산 기호에 동그라미. 각 토큰의 가운데 x 배열을 돌려줌 */
+function drawTk(tk,cx,y,sz,hl,circ){ var x=cx-tkW(tk,sz)/2, pos=[], x1=0, x2=0;
+  tk.forEach(function(t,i){ var w=typeof t==='number'?tw(''+t,sz)+sz*0.4:(isOp(t)?sz*1.05:sz*0.42), on=hl&&i>=hl.from&&i<=hl.to; if(hl&&i===hl.from) x1=x; if(hl&&i===hl.to) x2=x+w;
+    if(circ&&isOp(t)){ g.beginPath(); g.arc(x+w/2,y,sz*0.5,0,7); g.fillStyle=rgba(BLUE,0.35); g.fill(); g.strokeStyle=ACC; g.lineWidth=2; g.stroke(); }
+    txt(''+t,x+w/2,y,on?hl.col:INK,sz); pos.push(x+w/2); x+=w; });
+  if(hl){ line(x1+3,y+sz*0.72,x2-3,y+sz*0.72,hl.col,3); if(hl.badge) txt(hl.badge,(x1+x2)/2,y+sz*1.12,hl.col,sz*0.5); }
+  return pos; }
+/* 계산 과정 그리기: upto 단계까지 */
+function drawSteps(R,upto,yT,yB){ var n=R.steps.length+1, rh=Math.min(64,(yB-yT)/n), sz=Math.min(34,rh*0.5), j; while(tkW(R.tk,sz)>W-70&&sz>12) sz--;
+  for(j=0;j<=upto;j++){ var tk=j?R.steps[j-1].after:R.tk, y=yT+rh*j+rh*0.4, s=R.steps[j], hl=s?{from:s.from,to:s.to,col:j===upto?HOT:ACC,badge:CN[j]}:null;
+    if(j) txt('=',W/2-tkW(tk,sz)/2-sz*0.7,y,MUTED,sz); if(!s){ txt(''+tk[0],W/2,y,HOT,sz*1.15); } else drawTk(tk,W/2,y,sz,hl); } }
+
+/* ───────── 1. 계산 순서 ───────── */
+var odK='mix', od=null, odS=0;
+function odDraw(){ if(!od){ od=mxGen(odK); odS=0; } var n=od.steps.length, s=odS?od.steps[odS-1]:null, nx=od.steps[odS];
+  drawSteps(od,odS,14,H-8);
+  $('say').innerHTML=!s?('<b>'+mxStr(od.tk)+'</b>'+SM+'어느 부분부터 계산해야 할까요? 밑줄 친 '+CN[0]+'부터 계산해요. '+nx.why+' [다음 ▶]을 눌러 보세요.</small>'):
+    (s.why+' <b class="r">'+s.a+' '+s.op+' '+s.b+' = '+s.r+'</b>'+SM+(odS<n?'다음은 밑줄 친 '+CN[odS]+'예요. '+nx.why:'계산이 끝났어요. <b class="r">'+mxStr(od.tk)+' = '+od.res+'</b>')+'</small>'); }
+function odUI(){ if(!od){ od=mxGen(odK); odS=0; } $('top').innerHTML=chipsH([['as','덧셈과 뺄셈'],['md','곱셈과 나눗셈'],['mix','네 가지가 섞인 식'],['par','( )가 있는 식']],odK,'k');
+  $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ odK=b.dataset.k; od=null; ui(); draw(); }; });
+  $('ctl').innerHTML='<div class="row" style="margin-top:8px"><button class="btn" id="odP">◀ 이전</button><button class="btn primary" id="odN">다음 ▶</button><button class="btn" id="odNew">다른 식</button><span class="score">'+odS+' / '+od.steps.length+'단계</span></div>';
+  $('odP').onclick=function(){ odS=Math.max(0,odS-1); ui(); draw(); }; $('odN').onclick=function(){ odS=Math.min(od.steps.length,odS+1); ui(); draw(); }; $('odNew').onclick=function(){ od=null; ui(); draw(); }; }
+
+/* ───────── 2. 순서 맞히기 ───────── */
+var tp=null, tpScore=[0,0], tpPos=[], tpMsg='', tpCls='';
+function tpNew(){ var R=mxGen(pick(['mix','par','mix','par','as','md'])); tp={R:R,i:0,miss:0}; tpMsg=''; tpCls=''; }
+function tpCur(){ return tp.i?tp.R.steps[tp.i-1].after:tp.R.tk; }
+function tpDraw(){ if(!tp) tpNew(); var R=tp.R, n=R.steps.length, done=tp.i>=n, rh=Math.min(40,(H*0.42)/Math.max(1,n)), ssz=Math.min(22,rh*0.55), j, cur=tpCur();
+  for(j=0;j<tp.i;j++){ var t0=j?R.steps[j-1].after:R.tk; if(j) txt('=',W/2-tkW(t0,ssz)/2-ssz*0.7,16+rh*j+rh/2,MUTED,ssz); drawTk(t0,W/2,16+rh*j+rh/2,ssz,{from:R.steps[j].from,to:R.steps[j].to,col:ACC}); }
+  var y=Math.min(H-56,16+rh*tp.i+Math.max(60,(H-16-rh*tp.i)/2)), sz=Math.min(44,W/10); while(tkW(cur,sz)>W-60&&sz>14) sz--;
+  tpPos=[]; if(done){ if(tp.i) txt('=',W/2-tw(''+R.res,sz)/2-sz*0.7,y,MUTED,sz); txt(''+R.res,W/2,y,HOT,sz*1.1); }
+  else { if(tp.i) txt('=',W/2-tkW(cur,sz)/2-sz*0.6,y,MUTED,sz); var pos=drawTk(cur,W/2,y,sz,null,true); cur.forEach(function(t,k){ if(isOp(t)) tpPos.push({x:pos[k],y:y,k:k}); }); }
+  $('say').innerHTML=done?('<b class="r">'+mxStr(R.tk)+' = '+R.res+'</b>'+SM+(tp.miss?'틀린 횟수: '+tp.miss+'번. 계산 순서를 다시 떠올려 보세요.':'한 번도 틀리지 않고 순서를 모두 맞혔어요!')+' ( ) 안 → 곱셈과 나눗셈 → 덧셈과 뺄셈 순서로, 같은 종류끼리는 앞에서부터 계산해요.</small>'):
+    ('<b>가장 먼저 계산해야 하는 곳</b>을 골라 보세요.<small>식에서 동그라미 친 기호를 누르거나 아래 단추를 누르면 돼요.</small>'); }
+function tpPick(k){ if(!tp||tp.i>=tp.R.steps.length) return; var s=tp.R.steps[tp.i];
+  if(s.k===k){ tp.i++; tpMsg='맞아요! '+s.a+' '+s.op+' '+s.b+' = '+s.r; tpCls='ok'; if(tp.i>=tp.R.steps.length){ tpScore[1]++; if(!tp.miss) tpScore[0]++; } }
+  else { tp.miss++; tpMsg='다시 생각해 보세요. '+(s.why||'앞에서부터 차례로 계산해요.'); tpCls='bad'; }
+  ui(); draw(); }
+function onTap(x,y){ if(tab!=='tap'||!tp) return; var best=null, bd=1e9; tpPos.forEach(function(p){ var d=Math.abs(p.x-x)+Math.abs(p.y-y)*0.6; if(d<bd){ bd=d; best=p; } }); if(best&&bd<44) tpPick(best.k); }
+function tpUI(){ if(!tp) tpNew(); var cur=tpCur(), done=tp.i>=tp.R.steps.length, side=function(t,l){ return (t==='('||t===')')?(l?'(…)':'(…)'):t; };
+  $('ctl').innerHTML='<div class="row" style="margin-top:8px">'+(done?'':cur.map(function(t,k){ return isOp(t)?'<button class="btn primary" data-k="'+k+'" style="font-size:17px">'+side(cur[k-1],1)+' '+t+' '+side(cur[k+1],0)+'</button>':''; }).join(''))+'<button class="btn'+(done?' primary':'')+'" id="tpNew">'+(done?'다음 문제 ▶':'다른 문제')+'</button>'+scoreH(tpScore)+'</div><p class="msg '+tpCls+'">'+tpMsg+'</p>';
+  $('ctl').querySelectorAll('[data-k]').forEach(function(b){ b.onclick=function(){ tpPick(+b.dataset.k); }; });
+  $('tpNew').onclick=function(){ if(!done) tpScore[1]++; tpNew(); ui(); draw(); }; }
+
+/* ───────── 3. 괄호의 힘 ───────── */
+var PRT=[['−','+'],['−','−'],['+','×'],['×','+'],['−','×'],['÷','×'],['×','−']], prK=0, prM=0, pr=null;
+function prTk(m){ var a=pr.a, b=pr.b, c=pr.c, o1=PRT[prK][0], o2=PRT[prK][1]; return m===1?['(',a,o1,b,')',o2,c]:(m===2?[a,o1,'(',b,o2,c,')']:[a,o1,b,o2,c]); }
+function prNew(){ var n, R; for(n=0;n<30000;n++){ pr={a:ri(4,40),b:ri(2,12),c:ri(2,9)}; if(pr.a===pr.b||pr.b===pr.c||pr.a===pr.c) continue; R=[0,1,2].map(function(m){ return mxRun(prTk(m)); }); if(R[0]&&R[1]&&R[2]&&R[0].res>0&&R[1].res>0&&R[2].res>0&&(R[1].res!==R[0].res||R[2].res!==R[0].res)){ pr.R=R; return; } } pr={a:20,b:8,c:2}; pr.R=[0,1,2].map(function(m){ return mxRun(prTk(m)); }); }
+function prDraw(){ if(!pr) prNew(); var R=pr.R[prM], yB=H-74, nm=['( ) 없음','앞을 묶음','뒤를 묶음'], bw=Math.min(190,(W-24)/3), x0=W/2-bw*1.5, m;
+  drawSteps(R,R.steps.length,10,yB);
+  for(m=0;m<3;m++){ rect(x0+m*bw+3,H-64,bw-6,56,m===prM?rgba(ORANGE,0.35):rgba(GRAY,0.18),m===prM?HOT:LINE,m===prM?2.5:1.2); txt(nm[m],x0+m*bw+bw/2,H-48,MUTED,Math.min(14,bw/9)); var s=mxStr(pr.R[m].tk)+' = '+pr.R[m].res, fs=Math.min(18,bw/8); while(tw(s,fs)>bw-14&&fs>9) fs--; txt(s,x0+m*bw+bw/2,H-24,m===prM?HOT:INK,fs); }
+  var same=R.res===pr.R[0].res;
+  $('say').innerHTML='<b class="r">'+mxStr(R.tk)+' = '+R.res+'</b>'+SM+(prM===0?'( )가 없으면 '+(R.steps[0].why||'앞에서부터 차례로 계산해요.')+' 아래에서 ( )의 자리를 바꿔 보세요.':
+    ('( ) 안을 가장 먼저 계산해요. '+(same?'이 식은 ( )가 없어도 같은 순서로 계산하므로 결과가 '+pr.R[0].res+Pr(pr.R[0].res)+' 같아요.':'계산 순서가 바뀌어서 결과가 '+pr.R[0].res+'에서 <b>'+R.res+'</b>'+Pr(R.res)+' 달라졌어요. 같은 수와 기호라도 ( )에 따라 값이 달라질 수 있어요.')))+'</small>'; }
+function prUI(){ if(!pr) prNew(); $('top').innerHTML=chipsH(PRT.map(function(p,i){ return [''+i,'□ '+p[0]+' □ '+p[1]+' □']; }),''+prK,'k'); $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ prK=+b.dataset.k; prM=0; prNew(); ui(); draw(); }; });
+  $('ctl').innerHTML=chipsH([['0','( ) 없음'],['1','앞의 두 수 묶기'],['2','뒤의 두 수 묶기']],''+prM,'m','margin-top:8px')+'<div class="row"><button class="btn" id="prNew">다른 수</button></div>';
+  $('ctl').querySelectorAll('[data-m]').forEach(function(b){ b.onclick=function(){ prM=+b.dataset.m; ui(); draw(); }; }); $('prNew').onclick=function(){ prNew(); ui(); draw(); }; }
+
+/* ───────── 4. 식 세우기 ───────── */
+var ST=[
+  function(a,b,c){ return {l:['사탕 '+a+'개 중에서 '+b+'개를 먹고','다시 '+c+'개를 받았어요.','사탕은 몇 개일까요?'],e:'a − b + c',w:['a − (b + c)','a + b − c'],u:'개',y:'먹은 만큼 빼고 받은 만큼 더해요.'}; },
+  function(a,b,c){ return {l:['공책 '+a+'권을 남학생 '+b+'명과 여학생 '+c+'명에게','한 권씩 나누어 주었어요.','남은 공책은 몇 권일까요?'],e:'a − (b + c)',w:['a − b + c','a + b − c'],u:'권',y:'나누어 준 학생 수를 먼저 더해야 하므로 ( )로 묶어요.'}; },
+  function(a,b,c){ return {l:['구슬이 낱개로 '+a+'개 있고,','한 봉지에 '+b+'개씩 든 봉지가 '+c+'봉지 있어요.','구슬은 모두 몇 개일까요?'],e:'a + b × c',w:['(a + b) × c','a × b + c'],u:'개',y:'봉지에 든 구슬 수를 곱셈으로 먼저 구해서 더해요.'}; },
+  function(a,b,c){ a=ri(3,10)*1000; b=ri(2,9)*100; return {l:[a+'원을 내고','한 개에 '+b+'원인 지우개 '+c+'개를 샀어요.','거스름돈은 얼마일까요?'],e:a+' − '+b+' × '+c,w:['('+a+' − '+b+') × '+c,a+' − '+b+' + '+c],u:'원',y:'지우개 값을 곱셈으로 먼저 구해서 낸 돈에서 빼요.',raw:true}; },
+  function(a,b,c){ return {l:['연필 '+a+'자루와 색연필 '+b+'자루를 합쳐서','학생 '+c+'명이 똑같이 나누어 가지려고 해요.','한 명이 몇 자루씩 가질까요?'],e:'(a + b) ÷ c',w:['a + b ÷ c','a ÷ c + b'],u:'자루',y:'먼저 합쳐야 하므로 덧셈을 ( )로 묶어요.'}; },
+  function(a,b,c){ a=ri(3,10)*100; c=ri(10,40)*100; return {l:['한 명이 '+a+'원씩 '+b+'명이 돈을 모아','한 개에 '+c+'원인 공을 한 개 샀어요.','남은 돈은 얼마일까요?'],e:a+' × '+b+' − '+c,w:[a+' × '+b+' + '+c,a+' + '+b+' − '+c],u:'원',y:'모은 돈을 곱셈으로 먼저 구해서 공의 값을 빼요.',raw:true}; }];
+function stQ(){ var n, f, a, b, c, o, sub, R, opts; for(n=0;n<20000;n++){ f=pick(ST); a=ri(12,48); b=ri(2,12); c=ri(2,9); if(a===b||b===c||a===c) continue; o=f(a,b,c); sub=function(s){ return o.raw?s:s.replace('a',a).replace('b',b).replace('c',c); };
+    R=mxRunBig(parse(sub(o.e))); if(!R||R.res<1) continue; opts=[sub(o.e)].concat(o.w.map(sub));
+    return {lines:o.l,ask:'이 문제에 알맞은 식을 골라 보세요.',kind:'mc',opts:shuf(opts),ans:sub(o.e),show:sub(o.e)+' = '+R.res+'('+o.u+')',why:o.y+' '+R.steps.map(function(s){ return s.a+' '+s.op+' '+s.b+' = '+s.r; }).join(', ')}; }
+  return null; }
+/* 돈처럼 큰 수가 나오는 식용: 범위 제한 없이 계산 */
+function mxRunBig(tk){ var st=[], cur=tk, s; while((s=mxStep(cur))){ if(!(s.r>=0&&s.r===Math.floor(s.r))) return null; st.push(s); cur=s.after; } return {tk:tk,steps:st,res:cur[0]}; }
+var sq=QZ(stQ);
+
+/* ───────── 5. 문제 풀기 ───────── */
+var mq=QZ(function(){ if(rnd(5)===0) return stQ(); var R=mxGen(pick(['as','md','mix','mix','par','par']));
+  return {lines:[mxStr(R.tk)+' = ?'],ask:'계산 순서에 맞게 계산해 보세요.',kind:'num',ans:R.res,show:''+R.res,why:R.steps.map(function(s,i){ return CN[i]+' '+s.a+' '+s.op+' '+s.b+' = '+s.r; }).join(', '),hint:R.steps[0].why||'앞에서부터 차례로 계산해요.'}; });
+
+var UIS={order:odUI,tap:tpUI,paren:prUI,story:function(){ sq.ui(); },quiz:function(){ mq.ui(); }}, DRS={order:odDraw,tap:tpDraw,paren:prDraw,story:function(){ sq.draw(); },quiz:function(){ mq.draw(); }};
+function ui(){ $('top').innerHTML=''; UIS[tab](); }
+function draw(){ tone(); g.clearRect(0,0,W,H); DRS[tab](); }
+function setTab(t){ anStop(); tab=t; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+
+document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+var drag=null, moved=0;
+cv.addEventListener('pointerdown',function(e){ drag=[e.clientX,e.clientY]; moved=0; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
+cv.addEventListener('pointermove',function(e){ if(!drag) return; var dx=e.clientX-drag[0], dy=e.clientY-drag[1]; moved+=Math.abs(dx)+Math.abs(dy); drag=[e.clientX,e.clientY];
+  if(D3&&!(window.noDrag&&noDrag())){ yaw+=dx*0.011; pit=Math.max(-0.5,Math.min(1.5,pit+dy*0.009)); draw(); } });
+cv.addEventListener('pointerup',function(e){ if(drag&&moved<10&&window.onTap){ var r=cv.getBoundingClientRect(), k=(r.width/(cv.clientWidth||r.width))||1; onTap((e.clientX-r.left)/k,(e.clientY-r.top)/k); } drag=null; });
+cv.addEventListener('pointercancel',function(){ drag=null; });
+window.addEventListener('resize',fit); try{ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw); }catch(_){}
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+setTab(TAB0); fit();
+</script>
+<script src="zoom.js"></script></body></html>
