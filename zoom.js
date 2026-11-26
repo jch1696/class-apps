@@ -103,6 +103,8 @@
       var step=+inp.step||1, span=((+inp.max)-(+inp.min))/step;
       row.className+=' stp'+(span<=12?' few':'');
       row.insertBefore(mk(-1,inp),inp); row.appendChild(mk(1,inp)); } }
+  /* 값이 바뀌면 − / + 단추의 흐림 상태를 다시 맞춘다 */
+  document.addEventListener('input',function(e){ var t=e.target; if(!t||t.type!=='range'||!t.parentNode||t.parentNode.className.indexOf('stp')<0) return; var bs=t.parentNode.querySelectorAll('.stp-b'), v=+t.value; if(bs.length===2){ bs[0].disabled=t.min!==''&&v<=+t.min; bs[1].disabled=t.max!==''&&v>=+t.max; } },true);
   var ob2=new MutationObserver(function(){ ob2.disconnect(); try{ enh(); }catch(e){} ob2.observe(document.body,{childList:true,subtree:true}); });
   /* 탭 번호 ①②… 는 굵은 글꼴에서 뭉개져 보여서 동그란 숫자 배지로 바꾼다 */
   function tabNo(){ var bs=document.querySelectorAll('.tabs button'), i; for(i=0;i<bs.length;i++){ var b=bs[i], t=b.textContent, c=t.charCodeAt(0); if(b.querySelector('.tn')||c<0x2460||c>0x2473) continue;

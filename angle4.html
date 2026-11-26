@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>각도</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 다른 수업 앱(쌓기나무·원주와 원의 넓이)과 같은 색·글꼴 */
+:root{--bg:#EDF1F3;--surface:#FFFFFF;--surface2:#EDF1F3;--ink:#1D2B36;--muted:#5C6B77;--line:#C9D3DA;--accent:#2F6FDB;--accent-ink:#fff;--c1:#D9482B;--sel:#DCEAFF;--sel-ink:#1B4FB0;
+ --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B21;--surface:#1D262E;--surface2:#232E37;--ink:#E8EEF2;--muted:#9AA8B3;--line:#34424D;--accent:#6FA3F5;--accent-ink:#10182a;--c1:#F0775C;--sel:#1F3A63;--sel-ink:#CFE1FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:1100px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4vw,36px)}
+header p{margin:0;color:var(--muted);font-size:15px}
+h1,button,label,output,select{font-family:var(--display);font-weight:400}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stage{max-width:760px;width:100%;margin:0 auto}
+button{font:inherit;font-family:var(--display);cursor:pointer}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs button{font-size:17px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.btn,.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 13px;font-size:16px}
+.tabs button:hover,.btn:hover,.chip:hover{border-color:var(--ink)}
+.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+canvas{display:block;width:100%;border-radius:12px;background:var(--surface2);touch-action:none;cursor:grab}
+.hint{font-size:14px;color:var(--muted);margin:6px 0}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.row label{font-size:15px;min-width:64px}
+.row input[type=range]{flex:1;min-width:140px;height:28px;accent-color:var(--accent)}
+.row output{font-size:17px;min-width:56px;text-align:right}
+.say{background:var(--bg);border-left:6px solid var(--accent);border-radius:8px;padding:9px 12px;margin:10px 0 0;font-size:16px;font-weight:700;min-height:46px}
+.say small{display:block;font-weight:400;color:var(--muted);margin-top:2px;font-size:14.5px}
+.say b.r{color:var(--c1)}
+select{font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:15.5px}
+th{background:var(--surface2);font-family:var(--display);font-weight:400}
+td.st{text-align:left;font-weight:700}
+.ck{min-width:46px;min-height:36px;padding:4px 8px;font-size:19px;line-height:1}
+td.res{width:44px;font-size:18px}
+.vt td{height:92px;font-family:var(--display);font-size:17px;width:33.3%}
+.vt td.no{color:var(--muted);font-size:26px}
+.vt svg{display:block;margin:0 auto 2px;width:54px;height:46px;color:var(--accent)}
+input[type=number]{font:inherit;width:74px;padding:7px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);margin-left:4px}
+input.ok{border-color:#1E8E5A;background:rgba(30,142,90,.12)}input.bad{border-color:var(--c1);background:rgba(217,72,43,.12)}
+.msg{font-weight:700;min-height:24px;margin:6px 0 0}.msg.ok{color:#1E8E5A}.msg.bad{color:var(--c1)}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+.found{background:var(--surface2);border:2px solid #1E8E5A;border-radius:10px;padding:10px 13px;margin:10px 0 0;font-size:16px;font-weight:700;line-height:1.8}
+.found small{display:block;color:#1E8E5A;font-size:13px}.found i{font-style:normal;color:var(--c1)}
+.dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 16px}
+.dims .row label{min-width:40px}
+.score{margin-left:auto;font-family:var(--display)}
+input.wide{width:130px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 3px;font-family:var(--display);font-weight:400}
+.fr i{font-style:normal;border-bottom:2px solid currentColor;padding:0 4px}.fr span{padding:0 4px}
+.fin{display:inline-flex;flex-direction:column;vertical-align:middle;gap:3px;align-items:center}.fin input{margin:0;width:64px;text-align:center}.fin hr{width:100%;border:0;border-top:2.5px solid var(--ink);margin:0}
+.dims .row label{min-width:40px;white-space:nowrap}
+.say small .fr,.say .fr{font-size:.95em}
+.dims .row{flex-wrap:nowrap}.dims .row input[type=range]{flex:1 1 0;min-width:0;width:auto}.dims .row output{min-width:30px;text-align:right}
+canvas{cursor:default}
+</style></head><body>
+<div class="app">
+  <header><h1>각도</h1><p>각도기로 각을 재고, 삼각형과 사각형의 각의 합을 알아봐요</p></header>
+  <div class="card"><div class="tabs" id="tabs" role="tablist">
+    <button data-t="meas" role="tab" aria-selected="true">① 각도 재기</button>
+    <button data-t="est" role="tab" aria-selected="false">② 어림하기</button>
+    <button data-t="sum" role="tab" aria-selected="false">③ 합과 차</button>
+    <button data-t="tri" role="tab" aria-selected="false">④ 삼각형의 세 각</button>
+    <button data-t="quad" role="tab" aria-selected="false">⑤ 사각형의 네 각</button>
+    <button data-t="quiz" role="tab" aria-selected="false">⑥ 문제 풀기</button>
+  </div></div>
+  <section class="card"><div class="stage">
+    <div id="top"></div>
+    <canvas id="cv"></canvas>
+    <p class="hint" id="hint"></p>
+    <div id="ctl"></div>
+    <div class="say" id="say"></div>
+  </div></section>
+</div>
+<script>
+var $=function(id){ return document.getElementById(id); };
+var cv=$('cv'), g=cv.getContext('2d'), W=640, H=440, S=100, yaw=-0.5, pit=0.36, tab='';
+var BLUE=[125,180,245], GREEN=[120,210,165], ORANGE=[251,146,60], GRAY=[185,196,206], PINK=[236,150,190], YEL=[240,200,95];
+var INK='#1D2B36', HOT='#D9482B', ACC='#2F6FDB', HALO='#EDF1F3', MUTED='#5C6B77', LINE='#C9D3DA';
+function tone(){ var c=getComputedStyle(document.documentElement), v=function(n,d){ return (c.getPropertyValue(n)||'').trim()||d; }; INK=v('--ink',INK); HOT=v('--c1',HOT); ACC=v('--accent',ACC); HALO=v('--surface2',HALO); MUTED=v('--muted',MUTED); LINE=v('--line',LINE); }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function rgba(c,a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+(a==null?1:a)+')'; }
+function fit(){ var w=cv.clientWidth||640, d=(window.devicePixelRatio||1)*(window.__zoom||1); W=w; H=Math.round(Math.min(460,Math.max(300,w*0.72))); cv.style.height=H+'px'; cv.width=Math.round(W*d); cv.height=Math.round(H*d); g.setTransform(d,0,0,d,0,0); draw(); }
+var D3=false, TAB0="meas";
+/* 수와 연산 앱 공통: 분수 표시, 막대 그리기, 입력 */
+function gcd(a,b){ return b?gcd(b,a%b):Math.abs(a); }
+function lcm(a,b){ return a/gcd(a,b)*b; }
+function F(n,d){ return '<span class="fr"><i>'+n+'</i><span>'+d+'</span></span>'; }
+function MXH(w,n,d){ return (w?w:'')+(n?F(n,d):(w?'':'0')); }
+/* n/d 를 기약분수(대분수) html 로 */
+function MX(n,d){ var k=gcd(n,d)||1; n/=k; d/=k; if(d===1) return ''+n; var w=Math.floor(n/d); return (w?w:'')+F(n-w*d,d); }
+function rect(x,y,w,h,fill,stroke,lw,dash){ if(fill){ g.fillStyle=fill; g.fillRect(x,y,w,h); } if(stroke){ g.strokeStyle=stroke; g.lineWidth=lw||2; g.setLineDash(dash||[]); g.strokeRect(x,y,w,h); g.setLineDash([]); } }
+function line(x1,y1,x2,y2,col,lw,dash){ g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.strokeStyle=col||INK; g.lineWidth=lw||1.5; g.setLineDash(dash||[]); g.stroke(); g.setLineDash([]); }
+function txt(t,x,y,col,sz,al){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; g.textAlign=al||'center'; g.textBaseline='middle'; g.lineWidth=5; g.lineJoin='round'; g.strokeStyle=HALO; g.strokeText(t,x,y); g.fillStyle=col||INK; g.fillText(t,x,y); }
+function tw(t,sz){ g.font=(sz||17)+'px Jua,"Malgun Gothic",sans-serif'; return g.measureText(t).width; }
+/* 캔버스 분수: 가운데 (x,y), 너비를 돌려줌 */
+function cfr(n,d,x,y,col,sz){ sz=sz||18; var w=Math.max(tw(''+n,sz),tw(''+d,sz))+6; txt(''+n,x,y-sz*0.62,col,sz); txt(''+d,x,y+sz*0.66,col,sz); line(x-w/2,y,x+w/2,y,col||INK,2); return w; }
+/* 식 그리기: 토큰 = '÷' 같은 글자 또는 {w,n,d} */
+function cexpr(tk,cx,y,sz,col){ sz=sz||30; var ws=tk.map(function(t){ if(typeof t==='string') return tw(t,sz)+sz*0.5; var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; return (t.w?tw(''+t.w,sz)+4:0)+(t.n!=null?w:0)+sz*0.25; }), tot=ws.reduce(function(a,b){ return a+b; },0), x=cx-tot/2;
+  tk.forEach(function(t,i){ if(typeof t==='string') txt(t,x+ws[i]/2,y,col,sz); else { var xx=x+sz*0.12; if(t.w){ var a=tw(''+t.w,sz); txt(''+t.w,xx+a/2,y,col,sz); xx+=a+4; } if(t.n!=null){ var w=Math.max(tw(''+t.n,sz*0.8),tw(''+t.d,sz*0.8))+8; cfr(t.n,t.d,xx+w/2,y,col,sz*0.8); } } x+=ws[i]; }); }
+/* 단위 막대: parts 등분, fills=[[개수,색]...] 를 왼쪽부터 칠함 */
+function bar(x,y,w,h,parts,fills,thin){ var cw=w/parts, k=0; (fills||[]).forEach(function(f){ for(var i=0;i<f[0];i++){ rect(x+(k%parts)*cw,y,cw,h,f[1]); k++; } });
+  for(var i=1;i<parts;i++) line(x+i*cw,y,x+i*cw,y+h,INK,thin?0.8:1.5); rect(x,y,w,h,null,INK,2.4); }
+function sld(id,lab,min,max,val){ return '<div class="row"><label>'+lab+'</label><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" value="'+val+'"><output>'+val+'</output></div>'; }
+function sldBind(id,fn){ $(id).oninput=function(){ this.nextElementSibling.textContent=this.value; fn(+this.value); ui(); draw(); var e=$(id); if(e) e.focus(); }; }
+function frIn(p,whole){ return (whole?'<input type="number" id="'+p+'w" inputmode="numeric" style="width:58px;margin:0 4px 0 0" aria-label="자연수">':'')+'<span class="fin"><input type="number" id="'+p+'n" inputmode="numeric" aria-label="분자"><hr><input type="number" id="'+p+'d" inputmode="numeric" aria-label="분모"></span>'; }
+/* 입력한 분수 값 {n,d} (가분수로). 비어 있으면 null */
+function frVal(p){ var w=$(p+'w')?$(p+'w').value:'', n=$(p+'n').value, d=$(p+'d').value; if(n===''&&d===''&&w==='') return null; if(n===''&&d==='') return {n:+w,d:1}; if(d===''){ d='1'; } if(+d===0) return null; return {n:(+w||0)*(+d)+(+n||0),d:+d}; }
+function frShow(p,n,d){ var k=gcd(n,d)||1; n/=k; d/=k; var w=Math.floor(n/d), r=n-w*d; if($(p+'w')){ $(p+'w').value=w||''; if(r){ $(p+'n').value=r; $(p+'d').value=d; } } else { $(p+'n').value=n; $(p+'d').value=d; } [p+'w',p+'n',p+'d'].forEach(function(i){ if($(i)){ $(i).disabled=true; if($(i).value!=='') $(i).className='ok'; } }); }
+/* 숫자 뒤 조사: P(수,'이','가') → 받침 있으면 앞의 것 */
+function P(n,a,b){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '013678'.indexOf(d)>=0?a:b; }
+function J(n,a,b){ return n+P(n,a,b); }
+function Pr(n){ var s=(''+n).replace(/[^0-9]/g,''), d=s[s.length-1]; return '036'.indexOf(d)>=0?'으로':'로'; }
+var anT=null;
+function anStop(){ if(anT){ cancelAnimationFrame(anT); anT=null; } }
+function anim(get,set,to,dur,done){ anStop(); var from=get(), t0=performance.now(); (function step(now){ var k=Math.min(1,(now-t0)/(dur||1500)), e=k*k*(3-2*k); set(from+(to-from)*e); if(k<1){ anT=requestAnimationFrame(step); draw(); } else { anT=null; if(done) done(); draw(); } })(t0); }
+function pick(a){ return a[rnd(a.length)]; }
+function shuf(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=rnd(i+1), t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function BWd(){ return Math.min(W-48,620); }
+var PC=[BLUE,ORANGE,GREEN,PINK,YEL,GRAY,[170,150,235],[120,205,215]];
+function scoreH(s){ return '<span class="score">맞힌 문제 '+s[0]+' / '+s[1]+'</span>'; }
+function chipsH(arr,cur,attr,st){ return '<div class="chips"'+(st?' style="'+st+'"':'')+'>'+arr.map(function(k){ return '<button class="chip" aria-pressed="'+(k[0]===cur)+'" data-'+attr+'="'+k[0]+'">'+k[1]+'</button>'; }).join('')+'</div>'; }
+function ri(a,b){ return a+rnd(b-a+1); }
+function beads(x,y,n,col,r,perRow){ perRow=perRow||10; for(var i=0;i<n;i++){ g.beginPath(); g.arc(x+(i%perRow)*(r*2+5)+r,y+Math.floor(i/perRow)*(r*2+5)+r,r,0,7); g.fillStyle=col; g.fill(); g.strokeStyle=INK; g.lineWidth=1.5; g.stroke(); } }
+/* 공통 문제 엔진. gen() → {lines:[글 또는 토큰배열], ask:html, kind:'mc'|'num'|'pair', opts, ans, unit, why} */
+function QZ(gen){ var o={q:null,score:[0,0]};
+  o.next=function(){ o.q=gen(); o.q.done=false; o.q.tries=0; o.q.right=false; };
+  o.draw=function(){ if(!o.q) o.next(); var q=o.q, n=q.lines.length, sz=Math.min(40,W/14,(H-40)/(n*1.9)), y=H/2-(n-1)*sz*0.95;
+    q.lines.forEach(function(l,i){ if(typeof l==='string'){ var s=sz; while(tw(l,s)>W-30&&s>12) s-=1; txt(l,W/2,y+i*sz*1.9,INK,s); } else cexpr(l,W/2,y+i*sz*1.9,sz); });
+    $('say').innerHTML=q.done?((q.right?'<b class="r">정답이에요!</b> ':'아쉬워요. ')+'답: '+q.show+'<small style="font-size:15.5px;color:var(--ink)">'+q.why+'</small>'):(q.ask+(q.tries>=2&&q.hint?'<small style="font-size:15.5px;color:var(--ink)">도움말: '+q.hint+'</small>':'')); };
+  o.ui=function(msg,cls){ if(!o.q) o.next(); var q=o.q, h='';
+    if(q.kind==='mc') h=q.opts.map(function(s,i){ return '<button class="btn'+(q.done?(s===q.ans?' primary':''):' primary')+'" data-o="'+i+'"'+(q.done?' disabled':'')+' style="font-size:17px">'+s+'</button>'; }).join('');
+    else h='<span style="font-size:17px">답 = '+(q.kind==='pair'?'<input type="number" id="qA" inputmode="decimal" step="any"> : <input type="number" id="qB" inputmode="decimal" step="any">':'<input type="number" class="wide" id="qA" inputmode="decimal" step="any">')+' '+(q.unit||'')+'</span>'+(q.done?'':'<button class="btn primary" id="qGo">확인하기</button>');
+    $('ctl').innerHTML='<div class="row" style="margin-top:8px">'+h+'<button class="btn'+(q.done?' primary':'')+'" id="qNext">'+(q.done?'다음 문제 ▶':'건너뛰기')+'</button>'+scoreH(o.score)+'</div><p class="msg '+(cls||'')+'" id="qMsg">'+(msg||'')+'</p>';
+    if(q.kind==='mc'){ if(!q.done) $('ctl').querySelectorAll('[data-o]').forEach(function(b){ b.onclick=function(){ q.done=true; q.right=q.opts[+b.dataset.o]===q.ans; o.score[1]++; if(q.right) o.score[0]++; o.ui(); draw(); }; }); }
+    else if(q.done){ $('qA').value=q.kind==='pair'?q.ans[0]:q.ans; $('qA').className=(q.kind==='pair'?'':'wide ')+'ok'; $('qA').disabled=true; if($('qB')){ $('qB').value=q.ans[1]; $('qB').className='ok'; $('qB').disabled=true; } }
+    else { $('qGo').onclick=function(){ var m=$('qMsg'), a=$('qA').value, b=$('qB')?$('qB').value:'0'; if(a===''||b===''){ m.className='msg bad'; m.textContent='칸에 수를 써 주세요.'; return; }
+        var ok=q.kind==='pair'?(Math.abs(+a-q.ans[0])<1e-9&&Math.abs(+b-q.ans[1])<1e-9):Math.abs(+a-q.ans)<1e-9;
+        if(ok){ if(q.tries===0) o.score[0]++; o.score[1]++; q.done=true; q.right=true; o.ui(); draw(); } else { q.tries++; m.className='msg bad'; m.textContent='다시 생각해 보세요.'; draw(); } };
+      $('qA').onkeydown=function(e){ if(e.key==='Enter'&&!$('qB')) $('qGo').click(); }; }
+    $('qNext').onclick=function(){ if(!o.q.done) o.score[1]++; o.next(); o.ui(); draw(); }; };
+  return o; }
+function DD(x){ return (Math.round(x*1000)/1000)+''; }
+/* 캔버스 표: rows=[[이름, 값들...]], hl=칸 색(선택). 아래쪽 y를 돌려줌 */
+function ctable(rows,y0,hl,rh){ var n=rows[0].length-1, lw=Math.min(150,W*0.3), cw=Math.min(74,(W-30-lw)/n), x0=(W-lw-cw*n)/2; rh=rh||40;
+  rows.forEach(function(r,i){ rect(x0,y0+i*rh,lw,rh,rgba(GRAY,0.3),LINE,1.2); txt(r[0],x0+lw/2,y0+i*rh+rh/2,INK,15); for(var j=0;j<n;j++){ rect(x0+lw+j*cw,y0+i*rh,cw,rh,hl&&hl[i]&&hl[i][j]?hl[i][j]:null,LINE,1.2); txt(''+r[j+1],x0+lw+j*cw+cw/2,y0+i*rh+rh/2,INK,Math.min(18,cw/3.2+6)); } });
+  return y0+rows.length*rh; }
+var GC=[BLUE,ORANGE,GREEN,PINK,YEL,[170,150,235],GRAY];
+/* 띠그래프: it=[{nm,p}] (p=백분율), lab=이름 표시 */
+function drawBand(it,x,y,w,h,lab,upto){ var acc=0, i; for(i=0;i<=20;i++){ line(x+w*i/20,y-(i%2?5:9),x+w*i/20,y,INK,1); if(i%2===0) txt(''+(i*5),x+w*i/20,y-18,MUTED,12); } txt('(%)',x+w+16,y-18,MUTED,12);
+  it.forEach(function(o,k){ if(upto!=null&&k>=upto) return; var sw=w*o.p/100; rect(x+w*acc/100,y,sw,h,rgba(GC[k%GC.length],0.9),INK,1.5); if(lab&&sw>26){ txt(o.nm,x+w*acc/100+sw/2,y+h/2-(sw>44?9:0),INK,Math.min(15,sw/3.2+5)); if(sw>44) txt('('+DD(o.p)+'%)',x+w*acc/100+sw/2,y+h/2+10,INK,12); } acc+=o.p; });
+  rect(x,y,w,h,null,INK,2.4); }
+/* 원그래프: 위쪽에서 시계 방향 */
+function drawPie(it,cx,cy,r,lab,upto){ var acc=0, i, A=function(p){ return -Math.PI/2+Math.PI*2*p/100; };
+  it.forEach(function(o,k){ if(upto!=null&&k>=upto) return; g.beginPath(); g.moveTo(cx,cy); g.arc(cx,cy,r,A(acc),A(acc+o.p)); g.closePath(); g.fillStyle=rgba(GC[k%GC.length],0.9); g.fill(); g.strokeStyle=INK; g.lineWidth=1.5; g.stroke();
+    if(lab&&o.p>=5){ var m=A(acc+o.p/2), rr=r*(o.p>=15?0.62:0.78); txt(o.nm,cx+rr*Math.cos(m),cy+rr*Math.sin(m)-(o.p>=10?8:0),INK,o.p>=15?15:12); if(o.p>=10) txt('('+DD(o.p)+'%)',cx+rr*Math.cos(m),cy+rr*Math.sin(m)+9,INK,12); } acc+=o.p; });
+  g.beginPath(); g.arc(cx,cy,r,0,7); g.strokeStyle=INK; g.lineWidth=2.4; g.stroke();
+  for(i=0;i<20;i++){ var a=A(i*5); line(cx+r*Math.cos(a),cy+r*Math.sin(a),cx+(r+(i%5?5:9))*Math.cos(a),cy+(r+(i%5?5:9))*Math.sin(a),INK,1.2); if(i%5===0) txt(''+(i*5),cx+(r+22)*Math.cos(a),cy+(r+22)*Math.sin(a),MUTED,12); } }
+/* 낱말 뒤 조사 (받침 있으면 앞의 것) */
+function KP(w,a,b){ var c=(''+w).charCodeAt((''+w).length-1); if(c>=0xAC00&&c<=0xD7A3) return (c-0xAC00)%28?a:b; return P(w,a,b); }
+
+/* 각도 (4학년 1학기). 각도는 수학 방향(오른쪽 0°, 반시계)으로 다루고 그릴 때만 y를 뒤집는다. */
+var DEG=Math.PI/180, SM='<small style="font-size:15.5px;color:var(--ink)">';
+var WC=[BLUE,ORANGE,GREEN,PINK];
+function sl(id,lab,min,max,val,step){ return '<div class="row"><label>'+lab+'</label><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" step="'+(step||1)+'" value="'+val+'"><output>'+val+'°</output></div>'; }
+function sb(id,fn){ var e=$(id); e.oninput=function(){ fn(+this.value); this.nextElementSibling.textContent=this.value+'°'; draw(); }; e.onchange=function(){ ui(); draw(); var x=$(id); if(x) x.focus(); }; }
+function ray(cx,cy,r,a,col,lw){ line(cx,cy,cx+r*Math.cos(a*DEG),cy-r*Math.sin(a*DEG),col||INK,lw||3.5); }
+function wedge(cx,cy,r,a0,a1,fill,stroke){ g.beginPath(); g.moveTo(cx,cy); g.arc(cx,cy,r,-a0*DEG,-a1*DEG,true); g.closePath(); if(fill){ g.fillStyle=fill; g.fill(); } if(stroke){ g.strokeStyle=stroke; g.lineWidth=2; g.stroke(); } }
+function dot(x,y,col){ g.beginPath(); g.arc(x,y,5,0,7); g.fillStyle=col||INK; g.fill(); }
+function aType(a){ return a>0&&a<90?'예각':(a===90?'직각':(a>90&&a<180?'둔각':'')); }
+function protr(cx,cy,R){ var i, st=R>=180?10:30; g.beginPath(); g.arc(cx,cy,R,Math.PI,0); g.closePath(); g.fillStyle=rgba(YEL,0.3); g.fill(); g.strokeStyle=INK; g.lineWidth=2; g.stroke();
+  for(i=0;i<=180;i+=(R>=200?1:5)){ var L=i%10===0?14:(i%5===0?9:5), c=Math.cos(i*DEG), s=Math.sin(i*DEG); line(cx+(R-L)*c,cy-(R-L)*s,cx+R*c,cy-R*s,INK,i%10===0?1.6:0.8); }
+  for(i=0;i<=180;i+=st) txt(''+i,cx+(R-28)*Math.cos(i*DEG),cy-(R-28)*Math.sin(i*DEG)+(i===0||i===180?-9:0),INK,13);
+  line(cx,cy,cx,cy-R+16,MUTED,1,[4,4]); }
+function base(){ var R=Math.max(90,Math.min(W/2-24,H-96)); return {cx:W/2,cy:H-44,R:R}; }
+
+/* ───────── 1. 각도 재기 ───────── */
+var ang=70, adrag=false;
+function msDraw(){ var b=base(), ty=aType(ang), col=ty==='예각'?BLUE:(ty==='직각'?GREEN:ORANGE);
+  protr(b.cx,b.cy,b.R); wedge(b.cx,b.cy,Math.min(60,b.R*0.34),0,ang,rgba(col,0.75),INK);
+  if(ang===90) rect(b.cx,b.cy-16,16,16,null,INK,2);
+  ray(b.cx,b.cy,b.R+14,0,INK,4); ray(b.cx,b.cy,b.R+14,ang,HOT,4.5); dot(b.cx,b.cy); dot(b.cx+(b.R+14)*Math.cos(ang*DEG),b.cy-(b.R+14)*Math.sin(ang*DEG),HOT);
+  txt(ang+'°',Math.min(70,W*0.16),28,HOT,Math.min(40,W/11)); if(ty) txt(ty,Math.min(70,W*0.16),28+Math.min(40,W/11),INK,Math.min(22,W/20));
+  $('say').innerHTML='<b class="r">'+ang+'°</b> '+(ty||(ang===0?'두 변이 겹쳐 있어요.':'두 변이 일직선이에요.'))+SM+'<b>예각</b>: 0°보다 크고 직각보다 작은 각<br><b>직각</b>: 90°<br><b>둔각</b>: 직각보다 크고 180°보다 작은 각</small>'; }
+function msUI(){ $('ctl').innerHTML=sl('aN','각도',0,180,ang)+'<div class="chips">'+[30,45,60,90,120,150].map(function(v){ return '<button class="chip" data-v="'+v+'">'+v+'°</button>'; }).join('')+'</div>'; sb('aN',function(v){ ang=v; });
+  $('ctl').querySelectorAll('[data-v]').forEach(function(x){ x.onclick=function(){ ang=+x.dataset.v; ui(); draw(); }; }); }
+function aSet(e){ var r=cv.getBoundingClientRect(), k=(r.width/(cv.clientWidth||r.width))||1, b=base(), x=(e.clientX-r.left)/k, y=(e.clientY-r.top)/k, a=Math.atan2(b.cy-y,x-b.cx)/DEG;
+  if(a<0) a=a<-90?180:0; ang=Math.round(a); var s=$('aN'); if(s){ s.value=ang; s.nextElementSibling.textContent=ang+'°'; } draw(); }
+cv.addEventListener('pointerdown',function(e){ if(tab==='meas'){ adrag=true; aSet(e); } });
+cv.addEventListener('pointermove',function(e){ if(adrag&&tab==='meas') aSet(e); });
+cv.addEventListener('pointerup',function(){ if(adrag){ adrag=false; if(tab==='meas'){ ui(); draw(); } } });
+cv.addEventListener('pointercancel',function(){ adrag=false; });
+
+/* ───────── 2. 어림하기 ───────── */
+var eT=65, eG=90, eDone=false;
+function esNew(){ var o=eT; do{ eT=ri(3,33)*5; }while(eT===o); eG=90; eDone=false; }
+function esDraw(){ var b=base();
+  if(eDone) protr(b.cx,b.cy,b.R);
+  wedge(b.cx,b.cy,Math.min(60,b.R*0.34),0,eT,rgba(BLUE,0.75),INK);
+  if(eDone&&eG!==eT) ray(b.cx,b.cy,b.R,eG,MUTED,2.5);
+  ray(b.cx,b.cy,b.R+14,0,INK,4); ray(b.cx,b.cy,b.R+14,eT,HOT,4.5); dot(b.cx,b.cy);
+  var d=Math.abs(eT-eG), x=Math.min(84,W*0.2);
+  if(eDone){ txt('실제 '+eT+'°',x,26,HOT,Math.min(26,W/16)); txt('어림 '+eG+'°',x,26+Math.min(30,W/14),MUTED,Math.min(20,W/20)); }
+  else txt('?',b.cx+Math.min(90,b.R*0.5)*Math.cos(eT/2*DEG),b.cy-Math.min(90,b.R*0.5)*Math.sin(eT/2*DEG),HOT,34);
+  $('say').innerHTML=eDone?('<b class="r">'+eT+'°</b> '+(d===0?'딱 맞혔어요!':(d<=10?'잘 어림했어요! 차이 '+d+'°':'차이 '+d+'°'))+SM+'각도기의 중심을 꼭짓점에, 밑금을 한 변에 맞추고 다른 변이 가리키는 눈금을 읽어요.</small>'):('몇 도일까요?'+SM+'직각(90°)보다 큰지 작은지 먼저 보세요.</small>'); }
+function esUI(){ $('ctl').innerHTML=(eDone?'':sl('eN','내 어림',5,175,eG,5))+'<div class="row" style="justify-content:center">'+(eDone?'<button class="btn primary" id="eNx" style="font-size:18px">다른 각 ▶</button>':'<button class="btn primary" id="eGo" style="font-size:18px">📐 각도기로 확인</button>')+'</div>';
+  if(eDone) $('eNx').onclick=function(){ esNew(); ui(); draw(); }; else { sb('eN',function(v){ eG=v; }); $('eGo').onclick=function(){ eDone=true; ui(); draw(); }; } }
+
+/* ───────── 3. 각도의 합과 차 ───────── */
+var sop=0, sa=40, sbv=65, da=120, db=45;
+function smDraw(){ var cx=W/2, cy=H-40, R=Math.max(90,Math.min(W/2-30,H-118)), sz=Math.min(38,W/13), m=R*0.62;
+  if(!sop){ wedge(cx,cy,R*0.8,0,sa,rgba(BLUE,0.8),INK); wedge(cx,cy,R*0.8,sa,sa+sbv,rgba(ORANGE,0.8),INK); ray(cx,cy,R,0); ray(cx,cy,R,sa); ray(cx,cy,R,sa+sbv);
+    txt(sa+'°',cx+m*Math.cos(sa/2*DEG),cy-m*Math.sin(sa/2*DEG),INK,17); txt(sbv+'°',cx+m*Math.cos((sa+sbv/2)*DEG),cy-m*Math.sin((sa+sbv/2)*DEG),INK,17);
+    txt(sa+'° + '+sbv+'° = '+(sa+sbv)+'°',W/2,H*0.1,INK,sz);
+    $('say').innerHTML=sa+'° + '+sbv+'° = <b class="r">'+(sa+sbv)+'°</b>'+SM+'두 각을 이어 붙였어요. 각도의 합은 자연수의 덧셈처럼 계산해요.</small>'; }
+  else { wedge(cx,cy,R*0.8,db,da,rgba(GREEN,0.85),INK); wedge(cx,cy,R*0.8,0,db,rgba(ORANGE,0.35),INK); ray(cx,cy,R,0); ray(cx,cy,R,db,MUTED,2.5); ray(cx,cy,R,da);
+    txt((da-db)+'°',cx+m*Math.cos((db+(da-db)/2)*DEG),cy-m*Math.sin((db+(da-db)/2)*DEG),INK,18); txt(db+'°',cx+m*Math.cos(db/2*DEG),cy-m*Math.sin(db/2*DEG),MUTED,15);
+    txt(da+'° − '+db+'° = '+(da-db)+'°',W/2,H*0.1,INK,sz);
+    $('say').innerHTML=da+'° − '+db+'° = <b class="r">'+(da-db)+'°</b>'+SM+'큰 각에서 작은 각을 겹쳐 덜어 냈어요. 각도의 차는 자연수의 뺄셈처럼 계산해요.</small>'; } }
+function smUI(){ $('top').innerHTML=chipsH([[0,'+ 합'],[1,'− 차']],sop,'k'); if(db>da-5) db=da-5;
+  $('ctl').innerHTML='<div class="dims">'+(sop?sl('dA','큰 각',20,175,da,5)+sl('dB','작은 각',5,da-5,db,5):sl('sA','파랑',10,90,sa,5)+sl('sB','주황',10,90,sbv,5))+'</div>';
+  $('top').querySelectorAll('.chip').forEach(function(b){ b.onclick=function(){ sop=+b.dataset.k; ui(); draw(); }; });
+  if(sop){ sb('dA',function(v){ da=v; if(db>da-5) db=da-5; }); sb('dB',function(v){ db=v; }); } else { sb('sA',function(v){ sa=v; }); sb('sB',function(v){ sbv=v; }); } }
+
+/* ───────── 각 모으기 공통 ───────── */
+/* P=화면 좌표 꼭짓점(수학 방향으로 반시계 순서) → [시작 방향, 각 크기] */
+function vang(P){ var n=P.length, o=[], i; for(i=0;i<n;i++){ var a=P[i], b=P[(i+1)%n], c=P[(i+n-1)%n], s=Math.atan2(-(b[1]-a[1]),b[0]-a[0])/DEG, e=Math.atan2(-(c[1]-a[1]),c[0]-a[0])/DEG; o.push([s,((e-s)%360+360)%360]); } return o; }
+function poly(P,fill){ g.beginPath(); P.forEach(function(p,i){ if(i) g.lineTo(p[0],p[1]); else g.moveTo(p[0],p[1]); }); g.closePath(); if(fill){ g.fillStyle=fill; g.fill(); } g.strokeStyle=INK; g.lineWidth=3; g.lineJoin='round'; g.stroke(); }
+function gather(P,degs,order,G,t,r){ var va=vang(P), cum=0;
+  order.forEach(function(i){ var s=va[i][0], w=va[i][1], rot=((cum-s)%360+540)%360-180, cs=s+rot*t, x=P[i][0]+(G[0]-P[i][0])*t, y=P[i][1]+(G[1]-P[i][1])*t, m=(cs+w/2)*DEG;
+    wedge(x,y,r,cs,cs+w,rgba(WC[i%4],0.9),INK); txt(degs[i]+'°',x+(r+17)*Math.cos(m),y-(r+17)*Math.sin(m),INK,15); cum+=w; }); }
+
+/* ───────── 4. 삼각형의 세 각 ───────── */
+var tA=60, tB=70, tt=0;
+function trDraw(){ var C=180-tA-tB, c=Math.sin(tB*DEG)/Math.sin(C*DEG), ax=c*Math.cos(tA*DEG), ay=c*Math.sin(tA*DEG), x0=Math.min(0,ax), x1=Math.max(1,ax), r=Math.min(42,H*0.1),
+    s=Math.min((W-90)/(x1-x0),H*0.5/ay), oy=H*0.66, ox=(W-(x1-x0)*s)/2-x0*s, P=[[ox,oy],[ox+s,oy],[ox+ax*s,oy-ay*s]], G=[W/2,H-16];
+  poly(P,rgba(GRAY,0.18)); if(tt>0.02) line(G[0]-r-40,G[1],G[0]+r+40,G[1],INK,3);
+  gather(P,[tA,tB,C],[0,2,1],G,tt,r);
+  txt(tt>0.98?tA+'° + '+tB+'° + '+C+'° = 180°':'세 각을 모으면?',W/2,H*0.075,tt>0.98?HOT:MUTED,Math.min(tt>0.98?28:20,W/17));
+  $('say').innerHTML=tt>0.98?'삼각형의 세 각의 크기의 합 = <b class="r">180°</b>'+SM+'세 각을 한 점에 모으면 직선이 돼요. 어떤 삼각형이든 180°예요.</small>':'세 각을 한 점에 모아 보세요.'; }
+function trUI(){ if(tB>160-tA) tB=160-tA;
+  $('ctl').innerHTML='<div class="dims">'+sl('tA','파랑 각',20,120,tA,5)+sl('tB','주황 각',20,160-tA,tB,5)+'</div><div class="row" style="justify-content:center"><button class="btn primary" id="tGo" style="font-size:18px">'+(tt>0.5?'↩ 되돌리기':'✂ 세 각 모으기')+'</button></div>';
+  sb('tA',function(v){ tA=v; if(tB>160-tA) tB=160-tA; }); sb('tB',function(v){ tB=v; });
+  $('tGo').onclick=function(){ var to=tt>0.5?0:1; anim(function(){ return tt; },function(v){ tt=v; },to,1600,function(){ ui(); }); }; }
+
+/* ───────── 5. 사각형의 네 각 ───────── */
+var QP=null, QD=null, qt=0, qsplit=false;
+function qdNew(){ var ok=false, i, P, D;
+  while(!ok){ P=[]; for(i=0;i<4;i++){ var th=(45+90*i+ri(-22,22))*DEG, rr=0.62+rnd(39)/100; P.push([rr*Math.cos(th),-rr*Math.sin(th)]); }
+    var va=vang(P); ok=va.every(function(v){ return v[1]>40&&v[1]<150; }); if(ok){ D=va.map(function(v){ return Math.round(v[1]); }); D[3]=360-D[0]-D[1]-D[2]; } }
+  QP=P; QD=D; }
+function qdDraw(){ if(!QP) qdNew(); var s=Math.min(W*0.27,H*0.37), cx=W*0.36, cy=H*0.53, r=Math.min(46,W*0.08), P=QP.map(function(p){ return [cx+p[0]*s,cy+p[1]*s]; }), G=[W*0.81,cy];
+  poly(P,rgba(GRAY,0.18));
+  if(qsplit){ line(P[0][0],P[0][1],P[2][0],P[2][1],HOT,2.5,[7,6]); [[0,1,2],[0,2,3]].forEach(function(t,k){ txt('삼각형 '+(k+1),(P[t[0]][0]+P[t[1]][0]+P[t[2]][0])/3,(P[t[0]][1]+P[t[1]][1]+P[t[2]][1])/3,MUTED,14); }); }
+  gather(P,QD,[0,1,2,3],G,qt,r);
+  txt(qsplit?'180° × 2 = 360°':(qt>0.98?QD.join('° + ')+'° = 360°':'네 각을 모으면?'),W/2,H*0.075,(qsplit||qt>0.98)?HOT:MUTED,Math.min((qsplit||qt>0.98)?26:20,W/19));
+  $('say').innerHTML=(qt>0.98||qsplit)?'사각형의 네 각의 크기의 합 = <b class="r">360°</b>'+SM+'네 각을 한 점에 모으면 한 바퀴가 돼요. 삼각형 2개로 나누면 180° × 2 = 360°예요.</small>':'네 각을 한 점에 모아 보세요.'; }
+function qdUI(){ $('ctl').innerHTML='<div class="row" style="justify-content:center;flex-wrap:wrap;gap:10px"><button class="btn primary" id="qGo2" style="font-size:18px">'+(qt>0.5?'↩ 되돌리기':'✂ 네 각 모으기')+'</button><button class="btn" id="qSp" aria-pressed="'+qsplit+'" style="font-size:18px">📐 삼각형 2개로</button><button class="btn" id="qNw" style="font-size:18px">다른 사각형 ▶</button></div>';
+  $('qGo2').onclick=function(){ var to=qt>0.5?0:1; anim(function(){ return qt; },function(v){ qt=v; },to,1800,function(){ ui(); }); };
+  $('qSp').onclick=function(){ qsplit=!qsplit; ui(); draw(); }; $('qNw').onclick=function(){ anStop(); qdNew(); qt=0; qsplit=false; ui(); draw(); }; }
+
+/* ───────── 6. 문제 풀기 ───────── */
+var quiz=QZ(function(){ var t=rnd(5), a, b, c, q;
+  if(t===0){ a=pick([ri(2,17)*5,90,ri(19,35)*5]); var ty=aType(a); q={lines:[a+'°'],ask:'어떤 각일까요?',kind:'mc',opts:['예각','직각','둔각'],ans:ty,show:ty,why:'직각은 90°예요. '+a+'°는 '+(a<90?'90°보다 작아요.':(a>90?'90°보다 커요.':'꼭 90°예요.'))}; }
+  else if(t===1){ a=ri(4,18)*5; b=ri(4,18)*5; q={lines:[a+'° + '+b+'° = ?'],ask:'각도의 합은?',kind:'num',ans:a+b,show:(a+b)+'°',why:a+' + '+b+' = '+(a+b),hint:'자연수의 덧셈처럼 계산해요.'}; }
+  else if(t===2){ a=ri(12,34)*5; b=ri(3,a/5-3)*5; q={lines:[a+'° − '+b+'° = ?'],ask:'각도의 차는?',kind:'num',ans:a-b,show:(a-b)+'°',why:a+' − '+b+' = '+(a-b),hint:'자연수의 뺄셈처럼 계산해요.'}; }
+  else if(t===3){ a=ri(5,20)*5; b=ri(5,Math.min(20,(170-a)/5))*5; c=180-a-b; q={lines:['삼각형의 두 각','「'+a+'°, '+b+'°」'],ask:'나머지 한 각은?',kind:'num',ans:c,show:c+'°',why:'180° − '+a+'° − '+b+'° = '+c+'°',hint:'삼각형의 세 각의 합은 180°예요.'}; }
+  else { a=ri(12,22)*5; b=ri(12,22)*5; c=ri(12,22)*5; var d=360-a-b-c; q={lines:['사각형의 세 각','「'+a+'°, '+b+'°, '+c+'°」'],ask:'나머지 한 각은?',kind:'num',ans:d,show:d+'°',why:'360° − '+a+'° − '+b+'° − '+c+'° = '+d+'°',hint:'사각형의 네 각의 합은 360°예요.'}; }
+  q.unit=q.kind==='num'?'°':''; return q; });
+
+var UIS={meas:msUI,est:esUI,sum:smUI,tri:trUI,quad:qdUI,quiz:quiz.ui}, DRS={meas:msDraw,est:esDraw,sum:smDraw,tri:trDraw,quad:qdDraw,quiz:quiz.draw};
+function ui(){ if(tab!=='sum') $('top').innerHTML=''; UIS[tab](); }
+function draw(){ tone(); g.clearRect(0,0,W,H); DRS[tab](); }
+function setTab(t){ anStop(); tab=t; if(tt>0&&tt<1) tt=0; if(qt>0&&qt<1) qt=0; $('hint').textContent=t==='meas'?'👆 빨간 선을 끌어 보세요':''; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+
+document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+var drag=null, moved=0;
+cv.addEventListener('pointerdown',function(e){ drag=[e.clientX,e.clientY]; moved=0; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
+cv.addEventListener('pointermove',function(e){ if(!drag) return; var dx=e.clientX-drag[0], dy=e.clientY-drag[1]; moved+=Math.abs(dx)+Math.abs(dy); drag=[e.clientX,e.clientY];
+  if(D3&&!(window.noDrag&&noDrag())){ yaw+=dx*0.011; pit=Math.max(-0.5,Math.min(1.5,pit+dy*0.009)); draw(); } });
+cv.addEventListener('pointerup',function(e){ if(drag&&moved<10&&window.onTap){ var r=cv.getBoundingClientRect(), k=(r.width/(cv.clientWidth||r.width))||1; onTap((e.clientX-r.left)/k,(e.clientY-r.top)/k); } drag=null; });
+cv.addEventListener('pointercancel',function(){ drag=null; });
+window.addEventListener('resize',fit); try{ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw); }catch(_){}
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+setTab(TAB0); fit();
+</script>
+<script src="zoom.js"></script></body></html>
