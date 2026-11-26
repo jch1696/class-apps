@@ -1,16 +1,23 @@
-# 수업 앱 공통 틀로 html 만들기:  python mk.py volume|cuboid|area|symmetry
-import sys, io
-D='C:/Users/user/AppData/Local/Temp/claude/06707af0ab819e1e/60f8efce-7c32-4b36-b0c1-77c73ed93ff7/scratchpad/'
-src=open(D+'class-apps/prism.html',encoding='utf-8').read()
+# -*- coding: utf-8 -*-
+# 5·6학년 수학 앱 16개 만들기 (저장소 폴더에서):
+#   python _src/mk.py ratio area      -> 고른 앱만 다시 만듦
+#   python _src/mk.py all             -> 16개 모두
+#   python _src/mk.py all --out DIR   -> 저장소는 그대로 두고 DIR 에 만들어 비교
+# 경로는 이 파일 위치 기준: 소스는 _src/, 결과는 저장소 맨 위, 공통 스타일은 prism.html 에서 읽음.
+import sys, io, os
+SRC=os.path.dirname(os.path.abspath(__file__))+'/'
+ROOT=os.path.dirname(SRC.rstrip('/'))+'/'
+OUT=ROOT
+src=open(ROOT+'prism.html',encoding='utf-8').read()
 css=src[src.find('<style>')+7:src.find('</style>')]
 core3=src[src.find('function rot(p)'):src.find('/* 입체 모형')]
 def rd(n):
     if n=='box.js':
-        v=open(D+'mk/volume.js',encoding='utf-8').read(); v=v[v.find('var DIRS'):v.find('/* ───────── 1.')]
+        v=open(SRC+'volume.js',encoding='utf-8').read(); v=v[v.find('var DIRS'):v.find('/* ───────── 1.')]
         return v
     if n=='g2d.js':
-        v=open(D+'mk/area.js',encoding='utf-8').read(); return v[:v.find('/* 도형 그리기')]
-    return open(D+'mk/'+n,encoding='utf-8').read()
+        v=open(SRC+'area.js',encoding='utf-8').read(); return v[:v.find('/* 도형 그리기')]
+    return open(SRC+n,encoding='utf-8').read()
 APPS={
  'divisors':dict(title='약수와 배수',sub='구슬을 줄지어 놓고 수 배열표를 색칠하며 약수와 배수, 공약수와 공배수를 알아봐요',
    tabs=[('div','① 약수'),('mul','② 배수'),('gcd','③ 공약수와 최대공약수'),('lcm','④ 공배수와 최소공배수'),('quiz','⑤ 문제 풀기')],
@@ -120,7 +127,11 @@ def build(k):
 %s</script>
 <script src="zoom.js"></script></body></html>
 '''%(a['title'],css,XCSS,cur,a['title'],a['sub'],tabs,a['hint'],js)
-    open(D+'class-apps/'+k+'.html','w',encoding='utf-8',newline='\n').write(h)
-    open('G:/내 드라이브/코딩중/(6월) 스쿨플래너/apps/_'+k+'_preview.html','w',encoding='utf-8',newline='\n').write(h)
+    open(OUT+k+'.html','w',encoding='utf-8',newline='\n').write(h)
     print('ok',k,len(h))
-for k in sys.argv[1:]: build(k)
+args=sys.argv[1:]
+if '--out' in args:
+    i=args.index('--out'); OUT=args[i+1].rstrip('/\\')+'/'; os.makedirs(OUT,exist_ok=True); del args[i:i+2]
+if args==['all']: args=list(APPS)
+if not args: print('앱 이름을 주세요:',' '.join(APPS))
+for k in args: build(k)
