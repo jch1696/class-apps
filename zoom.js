@@ -112,3 +112,6 @@
   function go(){ try{ tabNo(); enh(); }catch(e){} ob2.observe(document.body,{childList:true,subtree:true}); try{ window.dispatchEvent(new Event('resize')); }catch(e){} }
   if(document.body) go(); else document.addEventListener('DOMContentLoaded',go);
 })();
+
+/* 📌 약속: 약속 카드 파일을 불러온다(카드가 있는 앱에만 단추가 생김) */
+(function(){ try{ if(/yaksok/.test(location.pathname)) return; var s=document.createElement('script'); s.src='yaksok.js'; document.head.appendChild(s); }catch(e){} })();

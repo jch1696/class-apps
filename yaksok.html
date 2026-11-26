@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>수학 약속 모음</title>
+<style>
+:root{--bg:#f3f1ea;--surface:#fff;--surface2:#E8F0FC;--ink:#1f2430;--muted:#4A5568;--line:#AEBBC8;--accent:#2F6FDB}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161b;--surface:#1d2129;--surface2:#222B3A;--ink:#F1F4F9;--muted:#B4BFCE;--line:#4A5668;--accent:#6FA3F5}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;font-weight:600}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+h1{font-size:28px;font-weight:800;margin:6px 0 4px}
+.back{display:inline-block;font-weight:800;color:var(--accent);text-decoration:none;font-size:16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 6px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+.bar button{font:inherit;font-weight:800;font-size:17px;cursor:pointer;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 18px}
+.bar button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar .quiz{margin-left:auto;border-color:#C99A00;background:#FFD84D;color:#3A2A00}
+.bar .quiz[aria-pressed="true"]{background:#3A2A00;border-color:#3A2A00;color:#FFD84D}
+h2.gr{font-size:22px;font-weight:800;margin:26px 0 6px;display:flex;align-items:center;gap:10px}
+h2.gr::after{content:"";flex:1;height:2px;background:var(--line)}
+h3.ap{font-size:18px;font-weight:800;margin:18px 0 10px;display:flex;align-items:center;gap:10px}
+h3.ap a{font-size:14px;color:var(--accent);text-decoration:none;font-weight:800}
+body.hide .yk-card:not(.open) .yk-term{color:transparent;background:repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 8px,var(--line) 8px,var(--line) 10px);border-radius:8px;user-select:none}
+body.hide .yk-card:not(.open) .yk-s b{color:transparent;background:var(--line);border-radius:4px}
+body.hide .yk-card:not(.open) .yk-pic text.yl{opacity:0}
+body.hide .yk-card{cursor:pointer}
+.tip{color:var(--muted);font-size:15px;margin:0}
+</style></head><body><main>
+<a class="back" href="index.html">← 수업 앱 모음</a>
+<h1>📌 수학 약속 모음</h1>
+<p class="tip" id="tip">낱말의 뜻을 그림과 함께 모았어요.</p>
+<div class="bar" id="bar"></div>
+<div id="list"></div>
+</main>
+<script src="yaksok.js"></script>
+<script>
+(function(){ var D=window.YAKSOK||[], g='all', hide=false; window.YAKSOK_CSS();
+  function bar(){ var gs=[['all','전체'],[3,'3학년'],[4,'4학년'],[5,'5학년'],[6,'6학년']];
+    document.getElementById('bar').innerHTML=gs.map(function(k){ return '<button data-g="'+k[0]+'" aria-pressed="'+(''+k[0]===''+g)+'">'+k[1]+'</button>'; }).join('')+'<button class="quiz" id="qz" aria-pressed="'+hide+'">'+(hide?'👀 낱말 보이기':'🙈 낱말 가리고 맞히기')+'</button>';
+    document.querySelectorAll('#bar [data-g]').forEach(function(b){ b.onclick=function(){ g=b.dataset.g; try{ localStorage.setItem('yaksokGrade',g); }catch(e){} bar(); list(); }; });
+    document.getElementById('qz').onclick=function(){ hide=!hide; document.body.className=hide?'hide':''; document.getElementById('tip').textContent=hide?'그림과 뜻을 보고 낱말을 맞혀 보세요. 카드를 누르면 낱말이 보여요.':'낱말의 뜻을 그림과 함께 모았어요.'; bar(); list(); }; }
+  function list(){ var h='', last=0; D.forEach(function(e){ if(g!=='all'&&''+e.g!==''+g) return; if(e.g!==last){ h+='<h2 class="gr">'+e.g+'학년</h2>'; last=e.g; }
+      h+='<h3 class="ap">'+e.title+'</h3><div class="yk-grid">'+e.cards.map(function(c){ return window.YAKSOK_CARD(c,e.app,'app'); }).join('')+'</div>'; });
+    document.getElementById('list').innerHTML=h;
+    document.querySelectorAll('.yk-card').forEach(function(c){ c.onclick=function(ev){ if(hide&&ev.target.className!=='yk-go') c.classList.toggle('open'); }; }); }
+  try{ var s=localStorage.getItem('yaksokGrade'); if(s) g=s; }catch(e){}
+  bar(); list(); })();
+</script>
+</body></html>
