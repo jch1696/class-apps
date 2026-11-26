@@ -45,8 +45,16 @@ section[data-s="soc"] h2.sec{font-family:"Gowun Batang","Nanum Myeongjo",serif;l
 section[data-s="soc"] .card{background:color-mix(in srgb,#E9D9AE 26%,var(--surface));border-color:color-mix(in srgb,#B5822A 38%,var(--line));border-radius:8px;box-shadow:3px 4px 0 rgba(70,55,25,.16)}
 section[data-s="soc"] .card h2{font-family:"Gowun Batang","Nanum Myeongjo",serif}
 section[data-s="soc"] .pic{background:color-mix(in srgb,#B5822A 14%,var(--surface))}
+/* 음악: 공연 무대 느낌 (theme-mus.css 와 같은 색). 그림 띠는 조명 받은 것처럼 밝게 둔다 */
+section[data-s="mus"] h2.sec{font-family:"Do Hyeon","Malgun Gothic",sans-serif;font-weight:400;font-size:25px}
+section[data-s="mus"] .card{background:#1A2044;border-color:#414B8C;border-top-color:#F2C14E;color:#F6F2E4;box-shadow:0 14px 30px -16px rgba(10,12,40,.75)}
+section[data-s="mus"] .card h2{font-family:"Do Hyeon","Malgun Gothic",sans-serif;font-weight:400;font-size:21px;color:#F6F2E4}
+section[data-s="mus"] .card .go{color:#F2C14E;filter:none}
+section[data-s="mus"] .card .tag{background:#F2C14E;color:#241A04}
+section[data-s="mus"] .card:hover,section[data-s="mus"] .card:focus-visible{outline-color:#F2C14E}
+section[data-s="mus"] .pic{--ink:#1f2430;--surface:#fff;--muted:#687083;background:#EEF0F8;border-bottom-color:#414B8C}
 </style>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&display=swap"></head><body><main>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Do+Hyeon&display=swap"></head><body><main>
 <h1>우리 반 수업 앱</h1><p class="sub">월항초등학교 6학년 1반 · 수업에서 쓰는 앱을 모아 둔 곳이에요.</p>
 <nav class="filter" id="filter" aria-label="과목 고르기"><button data-f="all" aria-pressed="true">전체</button><button data-f="math" aria-pressed="false" style="--c:#C08A2B">수학 28</button><button data-f="soc" aria-pressed="false" style="--c:#2A5E63">사회 1</button><button data-f="mus" aria-pressed="false" style="--c:#3d5a98">음악 4</button></nav>
 <section data-s="math" style="--c:#C08A2B"><h2 class="sec">수학</h2>

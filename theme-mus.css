@@ -1,0 +1,66 @@
+/* 음악 과목 공통 옷 — 「공연 무대」
+   쓰는 법: <html data-subject="mus"> + 글꼴(Do Hyeon, Noto Sans KR) 링크 + <link rel="stylesheet" href="theme-mus.css">
+   늘 어두운 무대(밝은 화면 설정이어도 어둡다). 제목·단추는 도현, 읽는 글은 Noto Sans KR. 금색 조명 + 자주색.
+   공통 파일 zoom.js 가 수학용 색·글꼴을 덮어쓰므로, 여기 규칙은 모두 html[data-subject="mus"] 로 시작해 그보다 우선한다.
+   건반(.w .b)처럼 앱 안에서 색을 직접 정한 것은 그대로 둔다. */
+html:root[data-subject="mus"]{
+  color-scheme:dark;
+  --display:"Do Hyeon","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --bg:#0E1226; --surface:#1A2044; --surface2:#252C5A; --ink:#F6F2E4; --muted:#B4BADB; --line:#414B8C;
+  --accent:#F2C14E; --accent-ink:#241A04; --sel:#F2C14E; --sel-ink:#241A04; --accent2:#D2488A; --accent2-ink:#FFFFFF;
+  --c1:#FF7A66; --c2:#F2C14E; --c3:#5CC3D4; --c4:#8FD070; --hi:#F2C14E; --on-hi:#2A1D03;
+  --ok:#4CC789; --bad:#FF8172; --half:#FF8A73; --tonic:#F2C14E; --in:#BFE6D0; --inb:#2FA36B;
+  --shadow:0 14px 34px -16px rgba(0,0,0,.8);
+}
+/* 무대 조명 */
+html[data-subject="mus"] body{
+  background:
+    radial-gradient(ellipse 60% 42% at 50% -6%, rgba(242,193,78,.24), transparent 72%),
+    radial-gradient(ellipse 34% 30% at 8% -4%, rgba(210,72,138,.22), transparent 72%),
+    radial-gradient(ellipse 34% 30% at 92% -4%, rgba(92,195,212,.16), transparent 72%),
+    var(--bg);
+  background-attachment:fixed; color:var(--ink); font-family:var(--body); font-weight:500;
+}
+html[data-subject="mus"] h1,html[data-subject="mus"] h2,html[data-subject="mus"] h3,html[data-subject="mus"] button,
+html[data-subject="mus"] .big,html[data-subject="mus"] .lab,html[data-subject="mus"] th,html[data-subject="mus"] label,html[data-subject="mus"] output{font-family:var(--display); font-weight:400}
+html[data-subject="mus"] header{border-bottom:0; padding-bottom:4px}
+html[data-subject="mus"] h1{font-size:clamp(28px,4.4vw,42px); letter-spacing:.01em; color:var(--ink); display:flex; align-items:center; gap:12px;
+  text-shadow:0 0 22px rgba(242,193,78,.45)}
+html[data-subject="mus"] h1::before{content:"♪"; flex:none; width:1.25em; height:1.25em; border-radius:50%; display:grid; place-items:center;
+  background:var(--accent2); color:#fff; font-family:system-ui,sans-serif; font-size:.72em; text-shadow:none; box-shadow:0 0 0 3px rgba(210,72,138,.3),0 0 20px rgba(210,72,138,.7)}
+html[data-subject="mus"] header p{color:var(--muted); font-size:15px}
+html[data-subject="mus"] h2{font-size:21px; color:var(--accent)}
+
+/* 탭: 조명이 켜진 단추 */
+html[data-subject="mus"] .tabs{background:none; border:0; padding:0; gap:8px}
+html[data-subject="mus"] .tabs button{font-size:18px; padding:9px 18px; color:var(--ink); background:var(--surface); border:1.5px solid var(--line); border-radius:999px; box-shadow:none}
+html[data-subject="mus"] .tabs button:hover,html[data-subject="mus"] .btn:hover,html[data-subject="mus"] .chip:hover{border-color:var(--accent)}
+html[data-subject="mus"] .tabs button[aria-selected="true"]{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(242,193,78,.28),0 8px 22px -6px rgba(242,193,78,.75)}
+
+/* 단추 */
+html[data-subject="mus"] .btn,html[data-subject="mus"] .chip{font-size:17px; color:var(--ink); background:var(--surface2); border:1.5px solid var(--line); border-radius:12px}
+html[data-subject="mus"] .chip{border-radius:999px}
+html[data-subject="mus"] .chip small{color:var(--muted)}
+html[data-subject="mus"] .chip[aria-pressed="true"],html[data-subject="mus"] .btn[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); box-shadow:0 0 0 3px rgba(242,193,78,.25)}
+html[data-subject="mus"] .btn.primary{background:var(--accent2); color:var(--accent2-ink); border-color:var(--accent2); box-shadow:0 6px 18px -6px rgba(210,72,138,.85)}
+html[data-subject="mus"] .btn:active,html[data-subject="mus"] .chip:active{transform:scale(.96)}
+html[data-subject="mus"] :focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+
+/* 카드: 무대 바닥 */
+html[data-subject="mus"] .card{background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 88%,#fff 0%),var(--surface)); border:1.5px solid var(--line); border-radius:18px; box-shadow:var(--shadow)}
+html[data-subject="mus"] section.card,html[data-subject="mus"] .card{border-top:3px solid var(--accent)}
+html[data-subject="mus"] .lab{font-size:16px; color:var(--accent)}
+html[data-subject="mus"] .note{color:var(--muted); font-size:14.5px}
+html[data-subject="mus"] .say{background:var(--surface2); border-left:6px solid var(--accent); color:var(--ink); font-family:var(--body); font-weight:700}
+html[data-subject="mus"] .say small{color:var(--ink)}
+html[data-subject="mus"] .info div,html[data-subject="mus"] .stats div{background:var(--surface2)}
+html[data-subject="mus"] input[type=range]{accent-color:var(--accent)}
+html[data-subject="mus"] input[type=number],html[data-subject="mus"] input[type=text],html[data-subject="mus"] select{background:var(--bg); color:var(--ink); border:1.5px solid var(--line)}
+html[data-subject="mus"] th{background:var(--surface2); color:var(--accent)}
+html[data-subject="mus"] .kbwrap{background:linear-gradient(180deg,#2B1E12,#17100A); border-color:#5A4025}
+@media (max-width:600px){
+  html[data-subject="mus"] .tabs button{font-size:15.5px; padding:8px 13px}
+  html[data-subject="mus"] .btn,html[data-subject="mus"] .chip{font-size:15.5px}
+}
