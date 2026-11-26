@@ -57,3 +57,56 @@
     ob.observe(say,{childList:true,subtree:true}); }
   fix();
 })();
+
+/* 또렷하게(lookBold): 앱 모음(index)과 같은 굵은 글꼴·진한 색으로 맞춘다. 모든 앱 공통.
+   - 화면 글꼴: Pretendard/맑은 고딕 굵게, 탭·단추·설명 상자를 크게 진하게.
+   - 그림(canvas) 글자: Jua 로 그리던 것을 같은 굵은 글꼴로 바꿔 그린다.
+   - 숫자 조절(stepper): 슬라이더 옆에 큰 − 숫자 ＋ 단추를 붙인다. 범위가 좁으면(12 이하) 슬라이더는 숨긴다. */
+(function(){
+  var FF='"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif';
+  try{ var st=document.createElement('style'); st.textContent=
+    ':root{--display:'+FF+';--body:'+FF+';--bg:#f3f1ea;--surface2:#E8F0FC;--ink:#1f2430;--muted:#4A5568;--line:#AEBBC8;--accent:#2F6FDB;--sel:#2F6FDB;--sel-ink:#fff}'+
+    '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161b;--surface2:#222B3A;--ink:#F1F4F9;--muted:#B4BFCE;--line:#4A5668;--accent:#6FA3F5;--sel:#6FA3F5;--sel-ink:#10182a}}'+
+    ':root[data-theme="dark"]{--bg:#14161b;--surface2:#222B3A;--ink:#F1F4F9;--muted:#B4BFCE;--line:#4A5668;--accent:#6FA3F5;--sel:#6FA3F5;--sel-ink:#10182a}'+
+    'body{font-weight:600}h1{font-weight:800;letter-spacing:-.01em}'+
+    'h1,h2,button,label,output,select,th{font-family:var(--display);font-weight:800}'+
+    '.tabs button{font-size:18px;font-weight:800;border-width:2px;padding:9px 16px}'+
+    '.btn,.chip{font-size:17px;font-weight:800;border-width:2px}'+
+    '.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel);box-shadow:0 3px 0 rgba(0,0,0,.18)}'+
+    '.card{border-width:1.5px;box-shadow:0 8px 22px -14px rgba(30,30,40,.3)}section.card{border-top:6px solid var(--accent)}'+
+    '.say{font-size:19px;font-weight:800;border-left-width:8px;background:var(--surface2);padding:12px 14px}.say small{font-size:16px;font-weight:600;color:var(--ink)}'+
+    '.hint{font-size:15px;font-weight:700;color:var(--muted)}'+
+    '.row label{font-size:17px;font-weight:800}.row output{font-size:19px;font-weight:800}'+
+    'th,td{font-size:17px;font-weight:700;border-width:1.5px}'+
+    '.row.stp{flex-wrap:wrap;gap:8px}.row.stp label{order:0}.stp-b{order:1;flex:0 0 auto;width:46px;height:46px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink,#fff);font-size:28px;font-weight:800;line-height:1;padding:0;box-shadow:0 3px 0 rgba(0,0,0,.22);touch-action:manipulation}'+
+    '.stp-b:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.22)}.stp-b:disabled{opacity:.3;box-shadow:none}'+
+    '.row.stp output{order:2;flex:0 0 auto;min-width:58px;text-align:center;font-size:26px;font-weight:800;background:var(--surface);border:2.5px solid var(--accent);border-radius:12px;padding:3px 10px;line-height:1.3}'+
+    '.stp-b.up{order:3}.row.stp input[type=range]{order:4;flex:1 1 120px;min-width:100px}.row.stp.few input[type=range]{display:none}'+
+    '.tabs button{display:inline-flex;align-items:center;gap:7px}.tn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink,#fff);font-size:14px;font-weight:800;flex:none}.tabs button[aria-selected="true"] .tn{background:var(--sel-ink);color:var(--sel)}'+
+    '.dims .row.stp{flex-wrap:nowrap}.dims .row.stp.few label{flex:0 1 auto;min-width:0!important;white-space:normal!important;line-height:1.15;font-size:16px}.dims .row.stp:not(.few){flex-wrap:wrap}.dims{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))!important;gap:4px 18px!important}';
+    document.head.appendChild(st); }catch(e){}
+
+  /* canvas 글자: Jua → 굵은 본문 글꼴 */
+  try{ var P=CanvasRenderingContext2D.prototype, d=Object.getOwnPropertyDescriptor(P,'font');
+    if(d&&d.set&&!P.__bold){ P.__bold=1; Object.defineProperty(P,'font',{configurable:true,enumerable:d.enumerable,get:function(){ return d.get.call(this); },
+      set:function(v){ try{ if(typeof v==='string'&&/Jua/.test(v)&&!/^\s*(bold|[5-9]00)/.test(v)) v='800 '+v.replace(/Jua\s*,?/,'Pretendard,"Apple SD Gothic Neo",'); }catch(e){} d.set.call(this,v); }}); } }catch(e){}
+
+  /* 숫자 조절 단추 */
+  function fire(inp){ inp.dispatchEvent(new Event('input',{bubbles:true})); inp.dispatchEvent(new Event('change',{bubbles:true})); }
+  function mk(sign,inp){ var b=document.createElement('button'); b.type='button'; b.className='stp-b'+(sign>0?' up':''); b.textContent=sign>0?'+':'−'; b.setAttribute('aria-label',sign>0?'늘리기':'줄이기');
+    var lim=sign>0?+inp.max:+inp.min, v=+inp.value; if(!isNaN(lim)&&inp.max!==''&&(sign>0?v>=lim:v<=lim)) b.disabled=true;
+    b.onclick=function(){ if(sign>0) inp.stepUp(); else inp.stepDown(); fire(inp); }; return b; }
+  function enh(){ var rs=document.querySelectorAll('.row input[type=range]'), i;
+    for(i=0;i<rs.length;i++){ var inp=rs[i], row=inp.parentNode, out=inp.nextElementSibling;
+      if(!row||row.className.indexOf('stp')>=0||!out||out.tagName!=='OUTPUT'||inp.disabled) continue;
+      if(row.querySelectorAll('input').length!==1) continue;
+      var step=+inp.step||1, span=((+inp.max)-(+inp.min))/step;
+      row.className+=' stp'+(span<=12?' few':'');
+      row.insertBefore(mk(-1,inp),inp); row.appendChild(mk(1,inp)); } }
+  var ob2=new MutationObserver(function(){ ob2.disconnect(); try{ enh(); }catch(e){} ob2.observe(document.body,{childList:true,subtree:true}); });
+  /* 탭 번호 ①②… 는 굵은 글꼴에서 뭉개져 보여서 동그란 숫자 배지로 바꾼다 */
+  function tabNo(){ var bs=document.querySelectorAll('.tabs button'), i; for(i=0;i<bs.length;i++){ var b=bs[i], t=b.textContent, c=t.charCodeAt(0); if(b.querySelector('.tn')||c<0x2460||c>0x2473) continue;
+    b.textContent=''; var n=document.createElement('span'); n.className='tn'; n.textContent=String(c-0x245F); b.appendChild(n); b.appendChild(document.createTextNode(t.slice(1).replace(/^ +/,''))); } }
+  function go(){ try{ tabNo(); enh(); }catch(e){} ob2.observe(document.body,{childList:true,subtree:true}); try{ window.dispatchEvent(new Event('resize')); }catch(e){} }
+  if(document.body) go(); else document.addEventListener('DOMContentLoaded',go);
+})();
