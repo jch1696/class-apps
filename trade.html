@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ko" data-subject="soc">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>나라와 나라가 주고받아요 (무역)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* 바탕 틀만 여기서 정하고, 색·글꼴·모양은 theme-soc.css(사회 과목 옷)가 입힌다 */
+:root{--paper:#EDE3CC;--surface:#FBF6E9;--surface2:#F2E8D2;--ink:#2A2318;--muted:#6A5C45;--line:#C9BA98;--accent:#1E6E69;--accent-ink:#FFFBEF;--accent2:#B5822A;--accent2-ink:#FFFBEF;--ocean:#BCD6DA;--land:#EFE4C6;--coast:#9A8D6C;--ok:#2E7D4F;--no:#C2372D;--shadow:3px 4px 0 rgba(70,55,25,.16)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+h1,h2,h3,p{margin:0}
+button{font:inherit;cursor:pointer}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,2.4vw,26px) 70px;display:flex;flex-direction:column;gap:14px}
+.topbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{white-space:nowrap}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.seg{display:flex;flex-wrap:wrap;padding:3px;gap:2px}
+.seg button{border:0;background:none;padding:9px 16px;font-size:16px;white-space:nowrap}
+.btn{padding:9px 16px}
+.btn.big{font-size:19px;padding:12px 22px}
+.card{padding:14px 16px}
+.mapcard{overflow:hidden;position:relative}
+.mapcard svg{display:block;width:100%;height:auto}
+.ask{display:flex;flex-direction:column;gap:8px}
+.kind{align-self:flex-start;border:2px solid currentColor;display:inline-flex}
+.kind.ex{color:var(--accent)} .kind.im{color:var(--accent2)}
+.ask h2{line-height:1.25}
+.ask h2 b.ex{color:var(--accent)} .ask h2 b.im{color:var(--accent2)}
+.small{font-size:14px;color:var(--muted)}
+.hidden{display:none!important}
+/* 1. 왜 주고받을까 */
+.lands{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch}
+.landbox{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.landbox h3{font-size:22px}
+.face{font-size:64px;line-height:1}
+.goods{display:flex;flex-direction:column;gap:6px;width:100%}
+.goods div{display:flex;align-items:center;gap:8px;justify-content:center;min-height:44px;background:var(--surface2);border-radius:8px;padding:4px 8px;font-size:15px;font-weight:600}
+.goods span{font-size:28px;letter-spacing:2px;line-height:1.1}
+.goods .need{outline:2.5px dashed var(--no);outline-offset:-2px}
+.swap{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;font-size:34px}
+@media (max-width:640px){.lands{grid-template-columns:1fr}.swap{flex-direction:row}.goods span{font-size:24px}}
+/* 3. 막대 */
+.bars{display:flex;flex-direction:column;gap:8px}
+.barrow{display:grid;grid-template-columns:minmax(86px,auto) 1fr auto;gap:10px;align-items:center;font-weight:600}
+.barrow i{display:block;height:26px;border-radius:4px;background:var(--accent);min-width:4px;transition:width .5s}
+.bars.im .barrow i{background:var(--accent2)}
+.barrow b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+/* 4. 재료 */
+.parts{display:flex;flex-wrap:wrap;gap:8px}
+.part{display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-weight:600;font-size:16px}
+.part span{font-size:26px}
+.part.off{opacity:.55;border-color:var(--no);text-decoration:line-through}
+.prod{font-size:70px;line-height:1;text-align:center}
+.prod.off{filter:grayscale(1);opacity:.35}
+/* 5. 문제 */
+.opts{display:flex;flex-wrap:wrap;gap:10px}
+.opts .btn{font-size:20px;padding:13px 24px;min-width:120px}
+.opts .btn.right{background:var(--ok);border-color:var(--ok);color:#fff}
+.opts .btn.wrong{border-color:var(--no);color:var(--no);opacity:.6}
+.qtext{font-size:clamp(22px,3.4vw,30px);font-weight:700;line-height:1.35}
+/* 지도 글자 */
+text.lbl{font-family:"Gowun Batang",serif;font-weight:700;paint-order:stroke;stroke:var(--surface);stroke-width:7px;stroke-linejoin:round;fill:var(--ink)}
+text.amt{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;paint-order:stroke;stroke:var(--surface);stroke-width:6px;stroke-linejoin:round}
+</style>
+<link rel="stylesheet" href="theme-soc.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><h1>나라와 나라가 주고받아요</h1><p id="tagline">무역</p></div>
+    <div class="tabs" id="tabs" role="tablist">
+      <button data-t="why" role="tab" aria-selected="true">왜 주고받을까</button>
+      <button data-t="exim" role="tab" aria-selected="false">수출과 수입</button>
+      <button data-t="korea" role="tab" aria-selected="false">우리나라의 무역</button>
+      <button data-t="stop" role="tab" aria-selected="false">무역이 멈추면</button>
+      <button data-t="quiz" role="tab" aria-selected="false">문제 풀기</button>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section id="p-why">
+    <div class="lands">
+      <div class="card landbox"><h3>가 나라</h3><div class="face" id="faceA"></div><div class="goods" id="goodsA"></div></div>
+      <div class="swap"><button class="btn primary big" id="swapBtn">⇄ 바꾸기</button><button class="btn" id="swapReset">처음으로</button></div>
+      <div class="card landbox"><h3>나 나라</h3><div class="face" id="faceB"></div><div class="goods" id="goodsB"></div></div>
+    </div>
+    <div class="card ask" style="margin-top:14px"><h2 id="whySay"></h2><p class="small">두 나라 모두 쌀 3, 기름 3이 필요해요.</p></div>
+  </section>
+
+  <!-- 2~4: 지도 -->
+  <section id="p-map" class="hidden">
+    <div class="bar" id="mapBar"></div>
+    <div class="mapcard" style="margin-top:12px">
+      <svg id="map" viewBox="0 84 1600 650" role="img" aria-label="세계 지도">
+        <defs>
+          <marker id="ahEx" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker>
+          <marker id="ahIm" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent2)"/></marker>
+        </defs>
+        <rect x="0" y="0" width="1600" height="800" fill="var(--ocean)"/>
+        <path id="land" d="" fill="var(--land)" stroke="var(--coast)" stroke-width="0.8"/>
+        <g id="routes"></g><g id="places"></g><g id="ship"></g>
+      </svg>
+    </div>
+    <div class="card ask" style="margin-top:12px"><span class="kind ex hidden" id="mKind"></span><h2 id="mSay"></h2><p class="small" id="mSmall"></p></div>
+    <div id="koreaBox" class="two hidden" style="margin-top:12px">
+      <div class="card"><h3 id="barTitle" style="margin-bottom:10px"></h3><div class="bars" id="itemBars"></div></div>
+      <div class="card"><h3 style="margin-bottom:10px">모두 더하면</h3><div class="bars" id="totalBars"></div><p class="small" style="margin-top:10px">2025년 · 산업통상부, 관세청 발표</p></div>
+    </div>
+    <div id="stopBox" class="card hidden" style="margin-top:12px"><div class="prod" id="prod"></div><p class="small" style="text-align:center;margin:6px 0 10px">재료를 눌러 길을 막아 보세요.</p><div class="parts" id="parts" style="justify-content:center"></div></div>
+  </section>
+
+  <!-- 5 -->
+  <section id="p-quiz" class="hidden">
+    <div class="card ask">
+      <span class="kind ex" id="qNo">문제 1</span>
+      <p class="qtext" id="qText"></p>
+      <div class="opts" id="qOpts"></div>
+      <h2 id="qMsg" style="min-height:1.3em"></h2>
+      <div class="bar"><button class="btn primary big hidden" id="qNext">다음 ▶</button><span class="small" id="qScore" style="margin-left:auto;font-size:16px;font-weight:700"></span></div>
+    </div>
+  </section>
+</div>
+<script src="worldmap-data.js"></script>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", $=function(id){ return document.getElementById(id); };
+  function mk(tag,a,txt){ var e=document.createElementNS(NS,tag); for(var k in a) e.setAttribute(k,a[k]); if(txt!=null) e.textContent=txt; return e; }
+  var px=WORLDMAP.px; $("land").setAttribute("d",WORLDMAP.land);
+  /* 곳 [경도, 위도] */
+  var P={kr:[127.8,36.5,"우리나라"],cn:[98,36,"중국"],us:[-98,39,"미국"],sea:[108,8,"동남아시아"],eu:[10,50,"유럽 연합"],sa:[45,24,"사우디아라비아"],au:[134,-25,"오스트레일리아"],tw:[121,23.7,"대만"],my:[102,4,"말레이시아"],gh:[-1.2,7.9,"가나"],th:[101,15.5,"타이"]};
+  function pt(k){ return px(P[k][0],P[k][1]); }
+  /* 두 곳을 잇는 굽은 길. 태평양을 건널 때는 지도 오른쪽 끝에서 나가 왼쪽 끝으로 들어온다 */
+  function curve(a,b,bend){ var mx=(a[0]+b[0])/2, my=(a[1]+b[1])/2, dx=b[0]-a[0], dy=b[1]-a[1], L=Math.hypot(dx,dy)||1, k=(bend==null?0.18:bend)*L, s=dx>=0?1:-1;
+    return "M"+a[0].toFixed(1)+","+a[1].toFixed(1)+"Q"+(mx+dy/L*k*s).toFixed(1)+","+(my-dx/L*k*s).toFixed(1)+" "+b[0].toFixed(1)+","+b[1].toFixed(1); }
+  function route(from,to){ var a=pt(from), b=pt(to);
+    if(Math.abs(a[0]-b[0])<=800) return [curve(a,b)];
+    var right=a[0]>b[0]?a:b, left=a[0]>b[0]?b:a, t=(1600-right[0])/((1600-right[0])+left[0]), y=right[1]+(left[1]-right[1])*t, e1=[1600,y], e2=[0,y];
+    return a===right?[curve(a,e1,0.1),curve(e2,b,0.1)]:[curve(a,e2,0.1),curve(e1,b,0.1)]; }
+  function drawRoute(from,to,kind,w){ var g=$("routes"), segs=route(from,to), els=[];
+    segs.forEach(function(d,i){ var p=mk("path",{d:d,fill:"none",stroke:kind==="ex"?"var(--accent)":"var(--accent2)","stroke-width":w||7,"stroke-linecap":"round",opacity:.9}); if(i===segs.length-1) p.setAttribute("marker-end","url(#"+(kind==="ex"?"ahEx":"ahIm")+")"); g.appendChild(p); els.push(p); });
+    return els; }
+  function place(k,dy,extra){ var p=pt(k), g=$("places"), me=k==="kr";
+    g.appendChild(mk("circle",{cx:p[0],cy:p[1],r:me?13:9,fill:me?"var(--no)":"var(--ink)",stroke:"var(--surface)","stroke-width":3}));
+    g.appendChild(mk("text",{x:p[0],y:p[1]+(dy==null?-20:dy),"text-anchor":"middle",class:"lbl","font-size":me?34:30},P[k][2]));
+    if(extra) g.appendChild(mk("text",{x:p[0],y:p[1]+(dy==null?-20:dy)+(dy>0?34:-36),"text-anchor":"middle",class:"amt","font-size":27,fill:extra[1]},extra[0])); }
+  function clearMap(){ $("routes").innerHTML=""; $("places").innerHTML=""; $("ship").innerHTML=""; cancelAnimationFrame(raf); }
+  var raf=0;
+  function sail(els,emoji,done){ var g=$("ship"); g.innerHTML=""; var t=mk("text",{"font-size":54,"text-anchor":"middle","dominant-baseline":"central"},emoji); g.appendChild(t);
+    var lens=els.map(function(e){ return e.getTotalLength(); }), tot=lens.reduce(function(a,b){ return a+b; },0), t0=performance.now(), dur=Math.max(1400,tot*2.4);
+    els.forEach(function(e,i){ e.style.strokeDasharray=lens[i]; e.style.strokeDashoffset=lens[i]; });
+    cancelAnimationFrame(raf);
+    (function step(now){ var k=Math.min(1,(now-t0)/dur), d=k*tot, acc=0;
+      for(var i=0;i<els.length;i++){ var seg=Math.max(0,Math.min(lens[i],d-acc)); els[i].style.strokeDashoffset=lens[i]-seg; if(d>=acc&&(d<=acc+lens[i]||i===els.length-1)){ var q=els[i].getPointAtLength(seg); t.setAttribute("x",q.x); t.setAttribute("y",q.y-26); } acc+=lens[i]; }
+      if(k<1) raf=requestAnimationFrame(step); else if(done) done(); })(t0); }
+  function chips(arr,cur,fn){ var bar=$("mapBar"); bar.innerHTML=""; var seg=document.createElement("div"); seg.className="seg"; seg.setAttribute("role","group");
+    arr.forEach(function(a){ var b=document.createElement("button"); b.textContent=a[1]; b.setAttribute("aria-pressed",a[0]===cur?"true":"false"); b.onclick=function(){ fn(a[0]); }; seg.appendChild(b); }); bar.appendChild(seg); return bar; }
+  function say(kind,html,small){ var k=$("mKind"); k.classList.toggle("hidden",!kind); if(kind){ k.className="kind "+kind; k.textContent=kind==="ex"?"수출":"수입"; } $("mSay").innerHTML=html; $("mSmall").textContent=small||""; }
+
+  /* ───── 1. 왜 주고받을까 ───── */
+  var W={n:0};
+  function rep(e,n){ var s=""; for(var i=0;i<n;i++) s+=e; return s||"없음"; }
+  function whyRender(){ var n=W.n, a=[6-n,n], b=[n,6-n];
+    function box(el,v){ el.innerHTML='<div class="'+(v[0]<3?"need":"")+'"><span>'+rep("🌾",v[0])+'</span>쌀 '+v[0]+'</div><div class="'+(v[1]<3?"need":"")+'"><span>'+rep("🛢️",v[1])+'</span>기름 '+v[1]+'</div>'; }
+    box($("goodsA"),a); box($("goodsB"),b);
+    var f=n>=3?"😄":(n>0?"🙂":"😟"); $("faceA").textContent=f; $("faceB").textContent=f;
+    $("swapBtn").disabled=n>=3;
+    $("whySay").innerHTML=n===0?"가 나라는 기름이 없고, 나 나라는 쌀이 없어요.":(n<3?"조금 나아졌어요. 더 바꿔 볼까요?":"서로 바꾸니 둘 다 좋아졌어요. 이것이 <b class=\"ex\">무역</b>이에요."); }
+  $("swapBtn").onclick=function(){ if(W.n<3){ W.n++; whyRender(); } };
+  $("swapReset").onclick=function(){ W.n=0; whyRender(); };
+
+  /* ───── 2. 수출과 수입 ───── */
+  var G=[["semi","💾 반도체","ex","cn","반도체","💾"],["car","🚗 자동차","ex","us","자동차","🚗"],["oil","🛢️ 원유","im","sa","원유","🛢️"],["gas","🔥 천연가스","im","au","천연가스","🔥"],["wheat","🌾 밀","im","us","밀","🌾"]], gSel="semi";
+  function eximRender(){ clearMap(); var g=G.filter(function(x){ return x[0]===gSel; })[0], ex=g[2]==="ex";
+    chips(G.map(function(x){ return [x[0],x[1]]; }),gSel,function(k){ gSel=k; eximRender(); });
+    var again=document.createElement("button"); again.className="btn primary"; again.textContent="🚢 배 띄우기"; again.onclick=eximRender; $("mapBar").appendChild(again);
+    place("kr",-22); place(g[3],g[3]==="au"?40:-20);
+    var els=ex?drawRoute("kr",g[3],"ex"):drawRoute(g[3],"kr","im");
+    say(g[2],ex?('우리나라가 '+P[g[3]][2]+'에 '+g[4]+eul(g[4])+' <b class="ex">팔아요</b>.'):('우리나라가 '+P[g[3]][2]+'에서 '+g[4]+eul(g[4])+' <b class="im">사 와요</b>.'),ex?"수출 = 다른 나라에 파는 것":"수입 = 다른 나라에서 사 오는 것");
+    sail(els,g[5]); }
+  function eul(w){ var c=w.charCodeAt(w.length-1); return (c>=0xAC00&&(c-0xAC00)%28)?"을":"를"; }
+
+  /* ───── 3. 우리나라의 무역 (2025년) ───── */
+  var K={dir:"ex"};
+  var EX={items:[["💾 반도체",1734],["🚗 자동차",720],["⚙️ 기계",469],["⛽ 석유 제품",455],["🧪 석유 화학",425]],to:[["cn",1308,-22],["us",1229,-22],["sea",1225,44],["eu",701,-22]]};
+  var IM={items:[["💾 반도체",775],["🛢️ 원유",752]],more:"그 밖에 천연가스, 석탄, 철광석도 많이 사 와요.",from:[["sa","원유",-22],["au","천연가스 · 석탄",44],["tw","반도체",44]]};
+  function num(n){ return String(n).replace(/\B(?=(\d{3})+$)/g,","); }
+  function bars(el,rows,max,cls){ el.className="bars "+(cls||""); el.innerHTML=rows.map(function(r){ return '<div class="barrow"><span>'+r[0]+'</span><i style="width:'+Math.max(2,r[1]/max*100)+'%'+(r[2]?";background:"+r[2]:"")+'"></i><b>'+(r[3]||"")+num(r[1])+'억 달러</b></div>'; }).join(""); }
+  function koreaRender(){ clearMap(); var ex=K.dir==="ex";
+    chips([["ex","수출 (파는 것)"],["im","수입 (사 오는 것)"]],K.dir,function(k){ K.dir=k; koreaRender(); });
+    place("kr",ex?-22:-22);
+    if(ex){ EX.to.forEach(function(t){ drawRoute("kr",t[0],"ex",3+t[1]/1308*9); place(t[0],t[2],[num(t[1])+"억 달러","var(--accent)"]); });
+      say("ex",'가장 많이 판 것은 <b class="ex">반도체</b>예요.',"화살표가 굵을수록 많이 팔았어요."); $("barTitle").textContent="많이 판 것";
+      bars($("itemBars"),EX.items,1734,"ex"); }
+    else { IM.from.forEach(function(t){ drawRoute(t[0],"kr","im",7); place(t[0],t[2],[t[1],"var(--accent2)"]); });
+      say("im",'<b class="im">반도체</b>와 <b class="im">원유</b>를 가장 많이 사 왔어요.',IM.more); $("barTitle").textContent="많이 사 온 것";
+      bars($("itemBars"),[[IM.items[0][0],775],[IM.items[1][0],752,null,"약 "]],1734,"im"); }
+    bars($("totalBars"),[["수출",7097,"var(--accent)"],["수입",6317,"var(--accent2)"]],7097,""); }
+
+  /* ───── 4. 무역이 멈추면 ───── */
+  var PR=[["ramen","🍜 라면","🍜",[["🌾","밀","us"],["🌴","팜유","my"]]],["car","🚗 자동차","🚗",[["🛢️","원유","sa"],["⛏️","철광석","au"],["🌳","고무","th"]]],["choco","🍫 초콜릿","🍫",[["🫘","카카오","gh"],["🍬","설탕","au"]]]], pSel="ramen", off={};
+  function stopRender(){ clearMap(); var p=PR.filter(function(x){ return x[0]===pSel; })[0];
+    chips(PR.map(function(x){ return [x[0],x[1]]; }),pSel,function(k){ pSel=k; off={}; stopRender(); });
+    place("kr",-22); var blocked=0;
+    p[3].forEach(function(it){ var o=!!off[it[2]+it[1]]; if(o) blocked++; var els=drawRoute(it[2],"kr","im",7); if(o) els.forEach(function(e){ e.setAttribute("stroke","var(--muted)"); e.setAttribute("stroke-dasharray","6 12"); e.setAttribute("opacity",.5); e.removeAttribute("marker-end"); });
+      place(it[2],it[2]==="au"||it[2]==="my"?44:-22,[it[0]+" "+it[1],o?"var(--no)":"var(--accent2)"]); });
+    $("prod").textContent=p[2]; $("prod").className="prod"+(blocked?" off":"");
+    $("parts").innerHTML=""; p[3].forEach(function(it){ var b=document.createElement("button"), key=it[2]+it[1]; b.className="part"+(off[key]?" off":""); b.innerHTML="<span>"+it[0]+"</span>"+it[1]+" · "+P[it[2]][2]; b.onclick=function(){ off[key]=!off[key]; stopRender(); }; $("parts").appendChild(b); });
+    var nm=p[1].replace(/^\S+\s/,"");
+    say(null,blocked?(nm+eul(nm)+' 만들 수 없어요!'):(nm+' 재료는 여러 나라에서 와요.'),blocked?"나라들은 서로 기대어 살아요.":""); }
+
+  /* ───── 5. 문제 풀기 ───── */
+  var QS=[["우리나라 자동차를 미국에 팔아요.","수출",["수출","수입"]],["사우디아라비아에서 원유를 사 와요.","수입",["수출","수입"]],["우리나라 반도체를 중국에 팔아요.","수출",["수출","수입"]],["오스트레일리아에서 천연가스를 사 와요.","수입",["수출","수입"]],["미국에서 밀을 사 와요.","수입",["수출","수입"]],["우리나라 배(선박)를 다른 나라에 팔아요.","수출",["수출","수입"]],
+    ["나라와 나라가 물건을 사고파는 것은?","무역",["무역","여행","저축"]],["2025년 우리나라가 가장 많이 판 것은?","반도체",["반도체","쌀","원유"]],["우리나라에서 거의 나지 않아 사 와야 하는 것은?","원유",["원유","반도체","자동차"]],["다른 나라에 물건을 파는 것은?","수출",["수출","수입"]],["다른 나라에서 물건을 사 오는 것은?","수입",["수출","수입"]],["나라마다 많이 나는 것이 달라서 하는 것은?","무역",["무역","방학","운동"]]];
+  var Q={order:[],i:0,score:0,done:false};
+  function shuf(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)),t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function quizStart(){ Q.order=shuf(QS).slice(0,8); Q.i=0; Q.score=0; quizRender(); }
+  function quizRender(){ var end=Q.i>=Q.order.length; Q.done=false;
+    $("qScore").textContent="맞힌 문제 "+Q.score+" / "+Q.order.length; $("qMsg").textContent=""; $("qNext").classList.add("hidden");
+    if(end){ $("qNo").textContent="끝"; $("qText").textContent=Q.score+"문제 맞혔어요!"; $("qOpts").innerHTML=""; var b=document.createElement("button"); b.className="btn primary big"; b.textContent="다시 하기"; b.onclick=quizStart; $("qOpts").appendChild(b); return; }
+    var q=Q.order[Q.i]; $("qNo").textContent="문제 "+(Q.i+1); $("qText").textContent=q[0]; $("qOpts").innerHTML="";
+    shuf(q[2]).forEach(function(o){ var b=document.createElement("button"); b.className="btn"; b.textContent=o; b.onclick=function(){ if(Q.done) return; Q.done=true; var ok=o===q[1]; if(ok) Q.score++;
+        Array.prototype.forEach.call($("qOpts").children,function(c){ if(c.textContent===q[1]) c.classList.add("right"); else if(c===b) c.classList.add("wrong"); c.disabled=true; });
+        $("qMsg").textContent=ok?"정답이에요!":"답은 "+q[1]+"!"; $("qScore").textContent="맞힌 문제 "+Q.score+" / "+Q.order.length; $("qNext").classList.remove("hidden"); };
+      $("qOpts").appendChild(b); }); }
+  $("qNext").onclick=function(){ Q.i++; quizRender(); };
+
+  /* ───── 탭 ───── */
+  var TAG={why:"왜 무역을 할까요?",exim:"파는 것과 사 오는 것",korea:"2025년 우리나라",stop:"길이 막히면 어떻게 될까요?",quiz:"확인해 봐요"};
+  function setTab(t){ Array.prototype.forEach.call($("tabs").children,function(b){ b.setAttribute("aria-selected",b.dataset.t===t?"true":"false"); });
+    var map=(t==="exim"||t==="korea"||t==="stop");
+    $("p-why").classList.toggle("hidden",t!=="why"); $("p-map").classList.toggle("hidden",!map); $("p-quiz").classList.toggle("hidden",t!=="quiz");
+    $("koreaBox").classList.toggle("hidden",t!=="korea"); $("stopBox").classList.toggle("hidden",t!=="stop");
+    $("tagline").textContent=TAG[t]; cancelAnimationFrame(raf);
+    if(t==="why") whyRender(); else if(t==="exim") eximRender(); else if(t==="korea") koreaRender(); else if(t==="stop"){ off={}; stopRender(); } else quizStart(); }
+  Array.prototype.forEach.call($("tabs").children,function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+  setTab("why");
+})();
+</script>
+<script src="zoom.js"></script>
+</body>
+</html>
