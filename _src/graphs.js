@@ -121,4 +121,4 @@ function myUI(){ $('top').innerHTML=chipsH([['band','띠그래프'],['pie','원�
 var UIS={xy:xyUI,pic:pgUI,band:bdUI,pie:piUI,read:function(){ $('top').innerHTML=''; quiz.ui(); },pick:function(){ $('top').innerHTML=''; pkq.ui(); },mine:myUI}, DRS={xy:xyDraw,pic:pgDraw,band:bdDraw,pie:piDraw,read:rdDraw,pick:pkq.draw,mine:myDraw};
 function ui(){ UIS[tab](); }
 function draw(){ tone(); g.clearRect(0,0,W,H); DRS[tab](); }
-function setTab(t){ anStop(); tab=t; $('hint').textContent=t==='pie'?'직접 그리기에서는 원 둘레의 눈금 근처를 눌러요.':''; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+function setTab(t){ anStop(); tab=t; $('hint').textContent=t==='pie'?'👆 원 둘레의 눈금을 눌러요':''; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }

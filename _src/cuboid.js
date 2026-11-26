@@ -100,5 +100,5 @@ function qzUI(){ if(!qz) qzNew(); $('top').innerHTML='';
 var HINT0='';
 function ui(){ if(tab==='shape') shUI(); else if(tab==='rel') rlUI(); else if(tab==='sketch') skUI(); else if(tab==='net') ntUI(); else qzUI(); }
 function draw(){ tone(); if(tab==='shape') shDraw(); else if(tab==='rel') rlDraw(); else if(tab==='sketch') skDraw(); else if(tab==='net') ntDraw(); else qzDraw(); }
-function setTab(t){ ntStop(); qzStop(); if(!HINT0) HINT0=$('hint').textContent; if(tab==='sketch'&&t!=='sketch'){ yaw=-0.5; pit=0.36; } tab=t; $('hint').textContent=t==='sketch'?'모서리를 누를 때마다 실선과 점선이 바뀌어요.':HINT0;
+function setTab(t){ ntStop(); qzStop(); if(!HINT0) HINT0=$('hint').textContent; if(tab==='sketch'&&t!=='sketch'){ yaw=-0.5; pit=0.36; } tab=t; $('hint').textContent=t==='sketch'?'👆 모서리를 누르면 실선 ↔ 점선':HINT0;
   document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }

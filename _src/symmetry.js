@@ -99,4 +99,4 @@ function ptUI(){ var s=PS[ptI]; $('top').innerHTML=chips(PS.map(function(x,i){ r
 var UIS={cong:cgUI,line:lnUI,ldraw:drUI,point:ptUI,pdraw:drUI}, DRS={cong:cgDraw,line:lnDraw,ldraw:drDraw,point:ptDraw,pdraw:drDraw};
 function ui(){ UIS[tab](); }
 function draw(){ tone(); lay(); g.clearRect(0,0,W,H); DRS[tab](); }
-function setTab(t){ anStop(); tab=t; $('hint').textContent=(t==='ldraw'||t==='pdraw')?'모눈의 점(선이 만나는 곳)을 누르면 점이 찍혀요.':''; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
+function setTab(t){ anStop(); tab=t; $('hint').textContent=(t==='ldraw'||t==='pdraw')?'👆 모눈의 점을 눌러요':''; document.querySelectorAll('#tabs button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.t===t); }); ui(); draw(); }
