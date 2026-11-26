@@ -228,7 +228,7 @@ function ptDraw(){ if(zm==='mix'){ var sz=Math.min(40,W/14), y=H*0.26; txt(zA+' 
   var mul=up?['1','10','100','1000'][zk]:['1','0.1','0.01','0.001'][zk]; txt('× '+mul,W/2,y0+24+rh+17,ACC,18);
   var res=(zN/Math.pow(10,zP)*(up?Math.pow(10,zk):Math.pow(10,-zk))).toFixed(Math.max(0,rp)).replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,'');
   $('say').innerHTML=zk===0?(D(zN,zP)+'에 '+(up?'10, 100, 1000':'0.1, 0.01, 0.001')+'을 곱하면 숫자들의 자리가 어떻게 바뀔까요?<small>아래에서 곱하는 수를 골라 보세요.</small>'):
-    ('<b class="r">'+D(zN,zP)+' × '+mul+' = '+res+'</b> 숫자는 그대로이고 자리만 '+(up?'왼쪽':'오른쪽')+'으로 '+zk+'칸씩 옮겨졌어요.<small style="font-size:15.5px;color:var(--ink)">'+(up?'곱하는 수의 0이 하나씩 늘어날 때마다 곱의 소수점이 오른쪽으로 한 자리씩 옮겨져요. 옮길 자리가 없으면 0을 채워요.':'곱하는 소수의 소수점 아래 자리 수가 하나씩 늘어날 때마다 곱의 소수점이 왼쪽으로 한 자리씩 옮겨져요. 자리가 모자라면 0을 채워요.')+'</small>'); }
+    ('<b class="r">'+D(zN,zP)+' × '+mul+' = '+res+'</b> 자리만 '+(up?'왼쪽':'오른쪽')+'으로 '+zk+'칸!<small style="font-size:15.5px;color:var(--ink)">'+(up?'곱하는 수의 0이 하나씩 늘어날 때마다 곱의 소수점이 오른쪽으로 한 자리씩 옮겨져요. 옮길 자리가 없으면 0을 채워요.':'곱하는 소수의 소수점 아래 자리 수가 하나씩 늘어날 때마다 곱의 소수점이 왼쪽으로 한 자리씩 옮겨져요. 자리가 모자라면 0을 채워요.')+'</small>'); }
 function ptUI(){ $('top').innerHTML='<div class="chips">'+[['up','10, 100, 1000 곱하기'],['down','0.1, 0.01, 0.001 곱하기'],['mix','소수끼리 곱하기']].map(function(k){ return '<button class="chip" aria-pressed="'+(k[0]===zm)+'" data-k="'+k[0]+'">'+k[1]+'</button>'; }).join('')+'</div>';
   if(zm==='mix'){ $('ctl').innerHTML='<div class="dims">'+sld('z1','앞 수의 소수 자리',0,2,z1)+sld('z2','뒤 수의 소수 자리',0,2,z2)+'</div><div class="row"><button class="btn" id="zNew">다른 수</button></div>';
     $('z1').oninput=function(){ z1=+this.value; this.nextElementSibling.textContent=z1; draw(); }; $('z2').oninput=function(){ z2=+this.value; this.nextElementSibling.textContent=z2; draw(); };

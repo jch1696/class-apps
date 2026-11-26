@@ -43,7 +43,7 @@ function exDraw(){ var o=SC[sc], xs=scXs(o), ys=xs.map(function(x){ return calc(
   ctable([[o.a+' (□)'].concat(xs),[o.b+' (△)'].concat(ys),['내 식의 값'].concat(my)],62,[null,null,my.map(function(v,i){ return v===''+ys[i]?'rgba(30,142,90,.25)':'rgba(217,72,43,.22)'; })]);
   txt('△ = □ '+eo+' '+ek,W/2,62+120+44,ok?'#1E8E5A':INK,Math.min(40,W/12));
   $('say').innerHTML=ok?('<b class="r">맞았어요!</b> '+o.a+'를 □, '+o.b+'를 △라고 하면 <b>△ = □ '+o.op+' '+o.k+'</b>예요.<small style="font-size:15.5px;color:var(--ink)">거꾸로 □ = △ '+inv(o.op)+' '+o.k+Pr(o.k)+' 나타낼 수도 있어요. 기호는 □, △ 대신 ○, ☆ 같은 다른 모양을 써도 돼요.</small>'):
-    (o.a+'를 □, '+o.b+'를 △라고 할 때 두 양 사이의 대응 관계를 식으로 만들어 보세요.<small>아래에서 기호와 수를 골라요. 「내 식의 값」이 모두 초록색이 되면 맞는 식이에요.</small>'); }
+    (o.a+' □, '+o.b+' △ → 식을 만들어 보세요.<small>아래에서 기호와 수를 골라요. 「내 식의 값」이 모두 초록색이 되면 맞는 식이에요.</small>'); }
 function exUI(){ $('top').innerHTML='';
   $('ctl').innerHTML='<div class="row" style="margin-top:6px"><span style="font-family:var(--display);font-size:18px">△ = □</span>'+OPS.map(function(p){ return '<button class="chip ck" aria-pressed="'+(p===eo)+'" data-p="'+p+'">'+p+'</button>'; }).join('')+'<input type="range" id="eK" min="1" max="12" value="'+ek+'" style="max-width:220px"><output>'+ek+'</output></div><div class="row"><button class="btn" id="eNew">다른 상황 ▶</button></div>';
   $('ctl').querySelectorAll('[data-p]').forEach(function(b){ b.onclick=function(){ eo=b.dataset.p; exUI(); draw(); }; });

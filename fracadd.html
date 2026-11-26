@@ -285,7 +285,7 @@ var qz=null, qzScore=[0,0];
 function prop(dmax){ var d, n; do{ d=2+rnd(dmax-1); n=1+rnd(d-1); }while(gcd(n,d)>1); return {n:n,d:d}; }
 function qzNew(){ var t=rnd(8), q={done:false,tries:0,exact:false,kind:'fr'}, a, b, w1, w2, k, L;
   if(t===0){ a=prop(7); k=pick([2,3,4,5,6]); q.tk=[{n:a.n*k,d:a.d*k}]; q.n=a.n; q.d=a.d; q.exact=true; q.ask='기약분수로 나타내 보세요.'; q.why='분모와 분자를 최대공약수 '+k+Pr(k)+' 나누면 '+F(a.n,a.d); }
-  else if(t===5){ do{ a=prop(9); b=prop(9); }while(a.d===b.d); L=lcm(a.d,b.d); var A5=a.n*L/a.d, C5=b.n*L/b.d; q.kind='cmp'; q.tk=[{n:a.n,d:a.d},'○',{n:b.n,d:b.d}]; q.ans=A5>C5?'>':'<'; q.ask='두 분수의 크기를 비교하여 ○ 안에 알맞은 기호를 골라 보세요.'; q.hint='두 분모의 최소공배수로 통분한 다음 분자를 비교해요.';
+  else if(t===5){ do{ a=prop(9); b=prop(9); }while(a.d===b.d); L=lcm(a.d,b.d); var A5=a.n*L/a.d, C5=b.n*L/b.d; q.kind='cmp'; q.tk=[{n:a.n,d:a.d},'○',{n:b.n,d:b.d}]; q.ans=A5>C5?'>':'<'; q.ask='○ 안에 알맞은 기호는?'; q.hint='두 분모의 최소공배수로 통분한 다음 분자를 비교해요.';
     q.show=F(a.n,a.d)+' '+q.ans+' '+F(b.n,b.d); q.why='통분하면 '+F(a.n,a.d)+' = '+F(A5,L)+', '+F(b.n,b.d)+' = '+F(C5,L)+'이에요. 분자를 비교하면 '+A5+' '+q.ans+' '+C5+'.'; }
   else if(t===6){ var d6=pick([2,4,5,8,20,25,50]), n6; do{ n6=ri(1,d6-1); }while(gcd(n6,d6)>1); var T6=T10(d6), k6=T6/d6; q.kind='dec'; q.tk=[{n:n6,d:d6}]; q.ans=n6/d6; q.show=dcs(n6,d6); q.ask='분수를 소수로 나타내 보세요.'; q.hint='분모를 '+T6+Pr(T6)+' 만들어요. 분모와 분자에 '+J(k6,'을','를')+' 곱해요.';
     q.why='분모와 분자에 '+J(k6,'을','를')+' 곱하면 '+F(n6*k6,T6)+' = '+q.show; }
@@ -298,7 +298,7 @@ function qzDraw(){ if(!qz) qzNew(); var q=qz, SM='<small style="font-size:15.5px
   cexpr(q.kind==='cmp'?(q.done?[q.tk[0],q.ans,q.tk[2]]:q.tk):q.tk.concat(['=',q.done&&q.kind==='dec'?q.show:'?']),W/2,H/2,Math.min(50,W/12));
   if(q.kind==='fr'){ $('say').innerHTML=q.done?('<b class="r">정답이에요!</b> 답: '+MX(q.n,q.d)+SM+q.why+'</small>'):
     (q.ask+(q.tries>=2?SM+'도움말: '+(q.exact?'분모와 분자의 공약수로 나누어요.':'먼저 두 분모의 최소공배수로 통분해요.')+'</small>':'<small>자연수 칸은 대분수일 때만 써요. 답이 자연수이면 자연수 칸에만 쓰면 돼요.</small>')); return; }
-  $('say').innerHTML=q.done?((q.right?'<b class="r">정답이에요!</b> ':'아쉬워요. ')+'답: '+q.show+SM+q.why+'</small>'):(q.ask+(q.tries>=2||q.kind==='cmp'?SM+'도움말: '+q.hint+'</small>':'')); }
+  $('say').innerHTML=q.done?((q.right?'<b class="r">정답이에요!</b> ':'아쉬워요. ')+'답: '+q.show+SM+q.why+'</small>'):(q.ask+(q.tries>=2?SM+'도움말: '+q.hint+'</small>':'')); }
 function qzUI(msg,cls){ if(!qz) qzNew(); var q=qz, h; $('top').innerHTML='';
   if(q.kind==='cmp') h=['>','<'].map(function(o){ return '<button class="btn'+(q.done?(o===q.ans?' primary':''):' primary')+'" data-o="'+o+'"'+(q.done?' disabled':'')+' style="min-width:64px;font-size:22px">'+o.replace('<','&lt;').replace('>','&gt;')+'</button>'; }).join('');
   else h='<span>답 = '+(q.kind==='dec'?'<input type="number" class="wide" id="qD" inputmode="decimal" step="any">':frIn('q',true))+'</span>'+(q.done?'':'<button class="btn primary" id="qGo">확인하기</button>');

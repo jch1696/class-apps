@@ -68,7 +68,7 @@ function xpDraw(){ var p=xp/4, cx=W*0.27, cy=H*0.46, r=Math.min(H*0.34,W*0.2), b
   rect(bx,y,bw,hh,rgba(BLUE,0.9)); if(xn) rect(bx,y,bw*xr/xn,hh,rgba(RED,0.95)); rect(bx,y,bw,hh,null,INK,2.2); line(bx+bw*p,y-12,bx+bw*p,y+hh+12,INK,2.4,[6,4]); txt('예상',bx+bw*p,y-22,INK,13);
   txt('빨강 '+xr+'번',bx,y+hh+34,HOT,17,'left'); txt('파랑 '+(xn-xr)+'번',bx+bw,y+hh+34,ACC,17,'right'); if(xn) txt('빨강의 비율 '+(xr/xn*100).toFixed(1)+'%',bx,y+hh+66,INK,17,'left');
   var ex=['0','1/4','1/2','3/4','1'][xp];
-  $('say').innerHTML=xn===0?('회전판을 돌리면 화살이 빨간색에 멈출 가능성은 '+(xp===0?'0 (불가능하다)':(xp===4?'1 (확실하다)':(xp===2?F(1,2)+' (반반이다)':(xp===1?'「~아닐 것 같다」':'「~일 것 같다」'))))+'예요. 정말 그럴까요?<small>아래 버튼으로 여러 번 돌려 보세요.</small>'):
+  $('say').innerHTML=xn===0?('빨간색에 멈출 가능성: <b class="r">'+(xp===0?'0 (불가능하다)':(xp===4?'1 (확실하다)':(xp===2?F(1,2)+' (반반이다)':(xp===1?'「~아닐 것 같다」':'「~일 것 같다」'))))+'</b> 정말 그럴까요?<small>아래 버튼으로 여러 번 돌려 보세요.</small>'):
     (xn+'번 돌려서 빨간색이 '+xr+'번 나왔어요. 빨간색의 비율은 <b class="r">'+(xr/xn*100).toFixed(1)+'%</b>이고, 예상한 비율은 '+(p*100)+'%예요.<small style="font-size:15.5px;color:var(--ink)">'+(xn<50?'돌린 횟수가 적으면 예상과 많이 다를 수 있어요. 더 많이 돌려 보세요.':'돌린 횟수가 많아질수록 결과가 예상한 비율에 가까워져요.')+'</small>'); }
 function xpSpin(k){ var p=xp/4, last=0; for(var i=0;i<k;i++){ last=Math.random(); if(last<p) xr++; xn++; } xa=-Math.PI/2+Math.PI*2*last; draw(); }
 function xpUI(){ $('top').innerHTML=chipsH([[0,'빨강 없음'],[1,'빨강 1/4'],[2,'빨강 절반'],[3,'빨강 3/4'],[4,'모두 빨강']],xp,'p');
