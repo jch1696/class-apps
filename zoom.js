@@ -23,3 +23,17 @@
   function start(){ document.body.appendChild(box); set(z); }
   if(document.body) start(); else document.addEventListener('DOMContentLoaded',start);
 })();
+
+/* 글 줄이기(sayFold): 설명 상자(#say)의 긴 풀이는 접어 두고, 단추를 눌러야 펼친다. 도움말과 짧은 안내는 그대로 보인다. */
+(function(){
+  var say=document.getElementById('say'); if(!say||!window.MutationObserver) return;
+  var open=false, ob=new MutationObserver(fix);
+  function fix(){ ob.disconnect();
+    var ss=say.querySelectorAll('small'), n=0, i, old=say.querySelector('.say-more'); if(old) old.remove();
+    for(i=0;i<ss.length;i++){ var t=(ss[i].textContent||'').trim(); if(t.length>40&&t.indexOf('도움말')!==0){ ss[i].style.display=open?'block':'none'; n++; } }
+    if(n){ var b=document.createElement('button'); b.type='button'; b.className='say-more'; b.textContent=open?'설명 접기 ▲':'설명 보기 ▼';
+      b.style.cssText='display:block;margin:6px 0 0;font:inherit;font-size:14px;font-weight:700;cursor:pointer;color:inherit;background:transparent;border:1.5px solid currentColor;border-radius:999px;padding:4px 14px;opacity:.75';
+      b.onclick=function(){ open=!open; fix(); }; say.appendChild(b); }
+    ob.observe(say,{childList:true,subtree:true}); }
+  fix();
+})();
