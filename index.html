@@ -40,7 +40,13 @@ section>.grid:first-of-type{margin-top:12px}
 .jump button{font:inherit;font-weight:700;font-size:15px;cursor:pointer;color:var(--c);background:var(--surface);border:2px solid var(--c);border-radius:10px;padding:7px 15px;min-height:40px}
 .jump button[aria-pressed="true"]{color:#fff;background:var(--c)}.jump button:focus-visible{outline:3px solid var(--c);outline-offset:2px}
 footer{margin-top:26px;color:var(--muted);font-size:13px}
-</style></head><body><main>
+/* 사회: 지도책 느낌 (theme-soc.css 와 같은 색) */
+section[data-s="soc"] h2.sec{font-family:"Gowun Batang","Nanum Myeongjo",serif;letter-spacing:-.01em}
+section[data-s="soc"] .card{background:color-mix(in srgb,#E9D9AE 26%,var(--surface));border-color:color-mix(in srgb,#B5822A 38%,var(--line));border-radius:8px;box-shadow:3px 4px 0 rgba(70,55,25,.16)}
+section[data-s="soc"] .card h2{font-family:"Gowun Batang","Nanum Myeongjo",serif}
+section[data-s="soc"] .pic{background:color-mix(in srgb,#B5822A 14%,var(--surface))}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&display=swap"></head><body><main>
 <h1>우리 반 수업 앱</h1><p class="sub">월항초등학교 6학년 1반 · 수업에서 쓰는 앱을 모아 둔 곳이에요.</p>
 <nav class="filter" id="filter" aria-label="과목 고르기"><button data-f="all" aria-pressed="true">전체</button><button data-f="math" aria-pressed="false" style="--c:#C08A2B">수학 28</button><button data-f="soc" aria-pressed="false" style="--c:#2A5E63">사회 1</button><button data-f="mus" aria-pressed="false" style="--c:#3d5a98">음악 4</button></nav>
 <section data-s="math" style="--c:#C08A2B"><h2 class="sec">수학</h2>

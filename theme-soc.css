@@ -1,0 +1,104 @@
+/* 사회 과목 공통 옷 — 「탐험가의 지도책」
+   쓰는 법: <html data-subject="soc"> + 글꼴(Gowun Batang, IBM Plex Sans KR) 링크 + <link rel="stylesheet" href="theme-soc.css">
+   제목은 명조(고운바탕), 읽는 글·단추는 고딕(IBM Plex Sans KR). 종이색 바탕, 청록 + 황토.
+   공통 파일 zoom.js 가 수학용 색·글꼴을 덮어쓰므로, 여기 규칙은 모두 html[data-subject="soc"] 로 시작해 그보다 우선한다. */
+html:root[data-subject="soc"]{
+  --display:"Gowun Batang","Nanum Myeongjo",serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --paper:#EDE3CC; --bg:#EDE3CC; --surface:#FBF6E9; --surface2:#F2E8D2;
+  --ink:#2A2318; --muted:#6A5C45; --line:#C9BA98;
+  --accent:#1E6E69; --accent-ink:#FFFBEF; --accent2:#B5822A; --accent2-ink:#FFFBEF;
+  --sel:#1E6E69; --sel-ink:#FFFBEF;
+  --ocean:#BCD6DA; --land:#EFE4C6; --coast:#9A8D6C; --grat:rgba(60,50,30,.13);
+  --mt:#8A5A2B; --wa:#12708F; --pl:#5C7A2E; --co:#7A3E8E;
+  --tex:rgba(90,70,30,.07); --tex2:rgba(90,70,30,.05);
+  --shadow:3px 4px 0 rgba(70,55,25,.16);
+}
+@media (prefers-color-scheme:dark){
+  html:root[data-subject="soc"]:not([data-theme="light"]){
+    --paper:#191713; --bg:#191713; --surface:#23201A; --surface2:#2C2820;
+    --ink:#EFE6D0; --muted:#B3A78C; --line:#4D4534;
+    --accent:#63BDB3; --accent-ink:#0F201E; --accent2:#D9A94E; --accent2-ink:#241A06;
+    --sel:#63BDB3; --sel-ink:#0F201E;
+    --ocean:#13262B; --land:#3B3526; --coast:#5C5440; --grat:rgba(230,215,170,.10);
+    --mt:#D2A06A; --wa:#57C1DE; --pl:#9FC46F; --co:#D3A6E6;
+    --tex:rgba(255,240,200,.045); --tex2:rgba(255,240,200,.03);
+    --shadow:3px 4px 0 rgba(0,0,0,.45);
+  }
+}
+html:root[data-subject="soc"][data-theme="dark"]{
+  --paper:#191713; --bg:#191713; --surface:#23201A; --surface2:#2C2820;
+  --ink:#EFE6D0; --muted:#B3A78C; --line:#4D4534;
+  --accent:#63BDB3; --accent-ink:#0F201E; --accent2:#D9A94E; --accent2-ink:#241A06;
+  --sel:#63BDB3; --sel-ink:#0F201E;
+  --ocean:#13262B; --land:#3B3526; --coast:#5C5440; --grat:rgba(230,215,170,.10);
+  --mt:#D2A06A; --wa:#57C1DE; --pl:#9FC46F; --co:#D3A6E6;
+  --tex:rgba(255,240,200,.045); --tex2:rgba(255,240,200,.03);
+  --shadow:3px 4px 0 rgba(0,0,0,.45);
+}
+
+/* 종이 바탕: 잔 점 + 지도 눈금 */
+html[data-subject="soc"] body{
+  background-color:var(--paper);
+  background-image:radial-gradient(var(--tex) 1px,transparent 1.3px),linear-gradient(var(--tex2) 1px,transparent 1px),linear-gradient(90deg,var(--tex2) 1px,transparent 1px);
+  background-size:7px 7px,96px 96px,96px 96px;
+  font-family:var(--body); font-weight:500; color:var(--ink);
+}
+html[data-subject="soc"] h1,html[data-subject="soc"] h2,html[data-subject="soc"] h3{font-family:var(--display); font-weight:700}
+html[data-subject="soc"] button,html[data-subject="soc"] label,html[data-subject="soc"] input,html[data-subject="soc"] textarea,html[data-subject="soc"] output,html[data-subject="soc"] select{font-family:var(--body)}
+
+/* 머리: 나침반 + 점선 길 */
+html[data-subject="soc"] .topbar{border-bottom:0; padding-bottom:16px;
+  background:linear-gradient(90deg,var(--muted) 0 12px,transparent 12px 20px) left bottom/20px 2px repeat-x}
+html[data-subject="soc"] .brand h1{font-size:clamp(24px,3vw,33px); letter-spacing:-.01em; padding-left:48px; min-height:38px; display:flex; align-items:center;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='17' fill='none' stroke='%23B5822A' stroke-width='2'/%3E%3Ccircle cx='20' cy='20' r='12.5' fill='none' stroke='%23B5822A' stroke-width='.8' stroke-dasharray='2 2.6'/%3E%3Cpath d='M20 2 L24.5 20 L20 38 L15.5 20Z' fill='%231E6E69'/%3E%3Cpath d='M2 20 L20 15.5 L38 20 L20 24.5Z' fill='%23B5822A'/%3E%3Ccircle cx='20' cy='20' r='2.6' fill='%23FBF6E9'/%3E%3C/svg%3E") left center/38px 38px no-repeat}
+html[data-subject="soc"] .brand p{font-size:14.5px; font-weight:500; color:var(--muted)}
+
+/* 탭: 지도책 색인표 */
+html[data-subject="soc"] .tabs{background:transparent; border:0; padding:0; gap:6px}
+html[data-subject="soc"] .tabs button{font-family:var(--body); font-size:16px; font-weight:700; padding:10px 17px; color:var(--ink);
+  background:var(--surface); border:1.5px solid var(--line); border-radius:10px 10px 3px 3px; box-shadow:none}
+html[data-subject="soc"] .tabs button[aria-selected="true"]{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);
+  outline:1.5px dashed color-mix(in srgb,var(--accent-ink) 62%,transparent); outline-offset:-5px; box-shadow:var(--shadow)}
+
+/* 고르기 단추 묶음 */
+html[data-subject="soc"] .seg{background:var(--surface2); border:1.5px solid var(--line); border-radius:8px}
+html[data-subject="soc"] .seg button{font-weight:600; color:var(--muted); border-radius:5px}
+html[data-subject="soc"] .seg button[aria-pressed="true"]{background:var(--accent2); color:var(--accent2-ink)}
+
+/* 단추: 도장처럼 납작하게 */
+html[data-subject="soc"] .btn{font-size:15px; font-weight:600; border:1.5px solid var(--line); border-radius:7px; background:var(--surface); color:var(--ink);
+  box-shadow:2px 2px 0 rgba(70,55,25,.13)}
+html[data-subject="soc"] .btn:hover{border-color:var(--accent)}
+html[data-subject="soc"] .btn:active{transform:translate(1px,1px); box-shadow:none}
+html[data-subject="soc"] .btn.primary,html[data-subject="soc"] .btn[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
+
+/* 카드: 종이 쪽지 */
+html[data-subject="soc"] .card{background:var(--surface); border:1.5px solid var(--line); border-radius:8px; box-shadow:var(--shadow)}
+/* 지도: 액자 테두리 */
+html[data-subject="soc"] .mapcard{background:var(--surface); border:2px solid var(--ink); border-radius:5px; margin:7px 9px 9px 7px;
+  box-shadow:0 0 0 5px var(--surface),0 0 0 6.5px var(--line),6px 9px 0 6px rgba(70,55,25,.13)}
+html[data-subject="soc"] .maplegend{background:var(--surface2); border-top:1.5px solid var(--ink); font-size:13.5px; font-weight:600; color:var(--ink)}
+html[data-subject="soc"] .maplegend .proj{color:var(--muted); font-weight:500}
+html[data-subject="soc"] .zoomctl button{border:1.5px solid var(--ink); border-radius:6px; box-shadow:2px 2px 0 rgba(70,55,25,.18)}
+html[data-subject="soc"] .zoomlvl{border:1.5px solid var(--line); border-radius:6px}
+
+/* 이름표: 살짝 기운 도장 */
+html[data-subject="soc"] .kind{font-family:var(--display); font-size:13.5px; font-weight:700; letter-spacing:.06em; border-width:2px; border-radius:4px;
+  padding:3px 11px; transform:rotate(-2deg); background:color-mix(in srgb,currentColor 7%,transparent)}
+html[data-subject="soc"] .ask h2{font-size:31px}
+html[data-subject="soc"] .ask .desc{font-size:15px}
+html[data-subject="soc"] .listwrap h3{font-family:var(--body); font-size:13px; font-weight:700; letter-spacing:.04em; color:var(--muted)}
+html[data-subject="soc"] ul.chips li{font-size:14.5px; font-weight:600; color:var(--ink); background:var(--surface); border:1.5px solid var(--line); border-radius:6px}
+html[data-subject="soc"] ul.chips li em{font-weight:500}
+html[data-subject="soc"] ul.chips.look li.sel,html[data-subject="soc"] ul.chips.pick li.armed,html[data-subject="soc"] ul.chips.courses li.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+html[data-subject="soc"] .hintbox{font-size:14.5px}
+html[data-subject="soc"] .track{border-radius:2px} html[data-subject="soc"] .track span{background:var(--accent2)}
+html[data-subject="soc"] .meter .row b{font-family:var(--display); font-size:18px; font-weight:700}
+html[data-subject="soc"] .result .big{font-family:var(--display); font-weight:700; color:var(--accent)}
+html[data-subject="soc"] input[type=text],html[data-subject="soc"] textarea{border:1.5px solid var(--line); border-radius:6px; background:var(--surface)}
+html[data-subject="soc"] .zchips button{font-weight:600; border-width:1.5px; border-radius:6px}
+@media (max-width:600px){
+  html[data-subject="soc"] .tabs button{font-size:14px; padding:8px 10px}
+  html[data-subject="soc"] .brand h1{padding-left:40px; background-size:32px 32px}
+}
