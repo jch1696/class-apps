@@ -154,12 +154,12 @@ text.amt{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;paint-order:s
     if(extra) g.appendChild(mk("text",{x:p[0],y:p[1]+(dy==null?-20:dy)+(dy>0?34:-36),"text-anchor":"middle",class:"amt","font-size":27,fill:extra[1]},extra[0])); }
   function clearMap(){ $("routes").innerHTML=""; $("places").innerHTML=""; $("ship").innerHTML=""; cancelAnimationFrame(raf); }
   var raf=0;
-  function sail(els,emoji,done){ var g=$("ship"); g.innerHTML=""; var t=mk("text",{"font-size":54,"text-anchor":"middle","dominant-baseline":"central"},emoji); g.appendChild(t);
+  function sail(els,emoji,done){ var g=$("ship"); g.innerHTML=""; var t=mk("g",{}); t.appendChild(mk("text",{"font-size":64,"text-anchor":"middle","dominant-baseline":"central"},"🚢")); t.appendChild(mk("text",{y:-46,"font-size":34,"text-anchor":"middle","dominant-baseline":"central"},emoji)); g.appendChild(t);
     var lens=els.map(function(e){ return e.getTotalLength(); }), tot=lens.reduce(function(a,b){ return a+b; },0), t0=performance.now(), dur=Math.max(1400,tot*2.4);
     els.forEach(function(e,i){ e.style.strokeDasharray=lens[i]; e.style.strokeDashoffset=lens[i]; });
     cancelAnimationFrame(raf);
     (function step(now){ var k=Math.min(1,(now-t0)/dur), d=k*tot, acc=0;
-      for(var i=0;i<els.length;i++){ var seg=Math.max(0,Math.min(lens[i],d-acc)); els[i].style.strokeDashoffset=lens[i]-seg; if(d>=acc&&(d<=acc+lens[i]||i===els.length-1)){ var q=els[i].getPointAtLength(seg); t.setAttribute("x",q.x); t.setAttribute("y",q.y-26); } acc+=lens[i]; }
+      for(var i=0;i<els.length;i++){ var seg=Math.max(0,Math.min(lens[i],d-acc)); els[i].style.strokeDashoffset=lens[i]-seg; if(d>=acc&&(d<=acc+lens[i]||i===els.length-1)){ var q=els[i].getPointAtLength(seg); t.setAttribute("transform","translate("+q.x+","+(q.y-24)+")"); } acc+=lens[i]; }
       if(k<1) raf=requestAnimationFrame(step); else if(done) done(); })(t0); }
   function chips(arr,cur,fn){ var bar=$("mapBar"); bar.innerHTML=""; var seg=document.createElement("div"); seg.className="seg"; seg.setAttribute("role","group");
     arr.forEach(function(a){ var b=document.createElement("button"); b.textContent=a[1]; b.setAttribute("aria-pressed",a[0]===cur?"true":"false"); b.onclick=function(){ fn(a[0]); }; seg.appendChild(b); }); bar.appendChild(seg); return bar; }
@@ -179,13 +179,15 @@ text.amt{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;paint-order:s
 
   /* ───── 2. 수출과 수입 ───── */
   var G=[["semi","💾 반도체","ex","cn","반도체","💾"],["car","🚗 자동차","ex","us","자동차","🚗"],["oil","🛢️ 원유","im","sa","원유","🛢️"],["gas","🔥 천연가스","im","au","천연가스","🔥"],["wheat","🌾 밀","im","us","밀","🌾"]], gSel="semi";
-  function eximRender(){ clearMap(); var g=G.filter(function(x){ return x[0]===gSel; })[0], ex=g[2]==="ex";
+  function eximRender(go){ go=go===true; clearMap(); var g=G.filter(function(x){ return x[0]===gSel; })[0], ex=g[2]==="ex";
     chips(G.map(function(x){ return [x[0],x[1]]; }),gSel,function(k){ gSel=k; eximRender(); });
-    var again=document.createElement("button"); again.className="btn primary"; again.textContent="🚢 배 띄우기"; again.onclick=eximRender; $("mapBar").appendChild(again);
+    var again=document.createElement("button"); again.className="btn primary"; again.textContent="🚢 배 띄우기"; again.onclick=function(){ eximRender(true); }; $("mapBar").appendChild(again);
     place("kr",-22); place(g[3],g[3]==="au"?40:-20);
     var els=ex?drawRoute("kr",g[3],"ex"):drawRoute(g[3],"kr","im");
     say(g[2],ex?('우리나라가 '+P[g[3]][2]+'에 '+g[4]+eul(g[4])+' <b class="ex">팔아요</b>.'):('우리나라가 '+P[g[3]][2]+'에서 '+g[4]+eul(g[4])+' <b class="im">사 와요</b>.'),ex?"수출 = 다른 나라에 파는 것":"수입 = 다른 나라에서 사 오는 것");
-    sail(els,g[5]); }
+    if(!go){ els.forEach(function(e){ e.setAttribute("opacity",.3); e.setAttribute("stroke-dasharray","4 16"); e.removeAttribute("marker-end"); }); return; }
+    var end=pt(ex?g[3]:"kr");
+    sail(els,g[5],function(){ var sh=$("ship"); sh.innerHTML=""; sh.appendChild(mk("text",{x:end[0]+46,y:end[1]+8,"font-size":44,"text-anchor":"middle","dominant-baseline":"central"},g[5])); }); }
   function eul(w){ var c=w.charCodeAt(w.length-1); return (c>=0xAC00&&(c-0xAC00)%28)?"을":"를"; }
 
   /* ───── 3. 우리나라의 무역 (2025년) ───── */
