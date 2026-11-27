@@ -66,6 +66,7 @@ button{font:inherit;cursor:pointer}
 .opts .btn.right{background:var(--ok);border-color:var(--ok);color:#fff}
 .opts .btn.wrong{border-color:var(--no);color:var(--no);opacity:.6}
 .qtext{font-size:clamp(22px,3.4vw,30px);font-weight:700;line-height:1.35}
+.ask h2 b.vs{color:var(--no)} .kind.vs{color:var(--no)} .kind.both{color:var(--ink)}
 /* 지도 글자 */
 text.lbl{font-family:"Gowun Batang",serif;font-weight:700;paint-order:stroke;stroke:var(--surface);stroke-width:7px;stroke-linejoin:round;fill:var(--ink)}
 text.amt{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;paint-order:stroke;stroke:var(--surface);stroke-width:6px;stroke-linejoin:round}
@@ -81,6 +82,7 @@ text.amt{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;paint-order:s
       <button data-t="exim" role="tab" aria-selected="false">수출과 수입</button>
       <button data-t="korea" role="tab" aria-selected="false">우리나라의 무역</button>
       <button data-t="stop" role="tab" aria-selected="false">무역이 멈추면</button>
+      <button data-t="rel" role="tab" aria-selected="false">돕고 겨루고</button>
       <button data-t="quiz" role="tab" aria-selected="false">문제 풀기</button>
     </div>
   </header>
@@ -103,6 +105,7 @@ text.amt{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;paint-order:s
         <defs>
           <marker id="ahEx" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker>
           <marker id="ahIm" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent2)"/></marker>
+          <marker id="ahVs" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--no)"/></marker>
         </defs>
         <rect x="0" y="0" width="1600" height="800" fill="var(--ocean)"/>
         <path id="land" d="" fill="var(--land)" stroke="var(--coast)" stroke-width="0.8"/>
@@ -136,17 +139,18 @@ text.amt{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;paint-order:s
   function mk(tag,a,txt){ var e=document.createElementNS(NS,tag); for(var k in a) e.setAttribute(k,a[k]); if(txt!=null) e.textContent=txt; return e; }
   var px=WORLDMAP.px; $("land").setAttribute("d",WORLDMAP.land);
   /* 곳 [경도, 위도] */
-  var P={kr:[127.8,36.5,"우리나라"],cn:[98,36,"중국"],us:[-98,39,"미국"],sea:[108,8,"동남아시아"],eu:[10,50,"유럽 연합"],sa:[45,24,"사우디아라비아"],au:[134,-25,"오스트레일리아"],tw:[121,23.7,"대만"],my:[102,4,"말레이시아"],gh:[-1.2,7.9,"가나"],th:[101,15.5,"타이"]};
+  var P={kr:[127.8,36.5,"우리나라"],cn:[98,36,"중국"],us:[-98,39,"미국"],sea:[108,8,"동남아시아"],eu:[10,50,"유럽 연합"],sa:[45,24,"사우디아라비아"],au:[134,-25,"오스트레일리아"],tw:[121,23.7,"대만"],my:[102,4,"말레이시아"],gh:[-1.2,7.9,"가나"],th:[101,15.5,"타이"],de:[10,51,"독일"]};
   function pt(k){ return px(P[k][0],P[k][1]); }
   /* 두 곳을 잇는 굽은 길. 태평양을 건널 때는 지도 오른쪽 끝에서 나가 왼쪽 끝으로 들어온다 */
   function curve(a,b,bend){ var mx=(a[0]+b[0])/2, my=(a[1]+b[1])/2, dx=b[0]-a[0], dy=b[1]-a[1], L=Math.hypot(dx,dy)||1, k=(bend==null?0.18:bend)*L, s=dx>=0?1:-1;
     return "M"+a[0].toFixed(1)+","+a[1].toFixed(1)+"Q"+(mx+dy/L*k*s).toFixed(1)+","+(my-dx/L*k*s).toFixed(1)+" "+b[0].toFixed(1)+","+b[1].toFixed(1); }
-  function route(from,to){ var a=pt(from), b=pt(to);
-    if(Math.abs(a[0]-b[0])<=800) return [curve(a,b)];
+  function route(from,to,bend){ var a=pt(from), b=pt(to);
+    if(Math.abs(a[0]-b[0])<=800) return [curve(a,b,bend)];
     var right=a[0]>b[0]?a:b, left=a[0]>b[0]?b:a, t=(1600-right[0])/((1600-right[0])+left[0]), y=right[1]+(left[1]-right[1])*t, e1=[1600,y], e2=[0,y];
     return a===right?[curve(a,e1,0.1),curve(e2,b,0.1)]:[curve(a,e2,0.1),curve(e1,b,0.1)]; }
-  function drawRoute(from,to,kind,w){ var g=$("routes"), segs=route(from,to), els=[];
-    segs.forEach(function(d,i){ var p=mk("path",{d:d,fill:"none",stroke:kind==="ex"?"var(--accent)":"var(--accent2)","stroke-width":w||7,"stroke-linecap":"round",opacity:.9}); if(i===segs.length-1) p.setAttribute("marker-end","url(#"+(kind==="ex"?"ahEx":"ahIm")+")"); g.appendChild(p); els.push(p); });
+  var KC={ex:["var(--accent)","ahEx"],im:["var(--accent2)","ahIm"],vs:["var(--no)","ahVs"]};
+  function drawRoute(from,to,kind,w,bend){ var g=$("routes"), segs=route(from,to,bend), els=[];
+    segs.forEach(function(d,i){ var p=mk("path",{d:d,fill:"none",stroke:KC[kind][0],"stroke-width":w||7,"stroke-linecap":"round",opacity:.9}); if(i===segs.length-1) p.setAttribute("marker-end","url(#"+KC[kind][1]+")"); g.appendChild(p); els.push(p); });
     return els; }
   function place(k,dy,extra){ var p=pt(k), g=$("places"), me=k==="kr";
     g.appendChild(mk("circle",{cx:p[0],cy:p[1],r:me?13:9,fill:me?"var(--no)":"var(--ink)",stroke:"var(--surface)","stroke-width":3}));
@@ -154,13 +158,17 @@ text.amt{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;paint-order:s
     if(extra) g.appendChild(mk("text",{x:p[0],y:p[1]+(dy==null?-20:dy)+(dy>0?34:-36),"text-anchor":"middle",class:"amt","font-size":27,fill:extra[1]},extra[0])); }
   function clearMap(){ $("routes").innerHTML=""; $("places").innerHTML=""; $("ship").innerHTML=""; cancelAnimationFrame(raf); }
   var raf=0;
-  function sail(els,emoji,done){ var g=$("ship"); g.innerHTML=""; var t=mk("g",{}); t.appendChild(mk("text",{"font-size":64,"text-anchor":"middle","dominant-baseline":"central"},"🚢")); t.appendChild(mk("text",{y:-46,"font-size":34,"text-anchor":"middle","dominant-baseline":"central"},emoji)); g.appendChild(t);
-    var lens=els.map(function(e){ return e.getTotalLength(); }), tot=lens.reduce(function(a,b){ return a+b; },0), t0=performance.now(), dur=Math.max(1400,tot*2.4);
-    els.forEach(function(e,i){ e.style.strokeDasharray=lens[i]; e.style.strokeDashoffset=lens[i]; });
-    cancelAnimationFrame(raf);
-    (function step(now){ var k=Math.min(1,(now-t0)/dur), d=k*tot, acc=0;
-      for(var i=0;i<els.length;i++){ var seg=Math.max(0,Math.min(lens[i],d-acc)); els[i].style.strokeDashoffset=lens[i]-seg; if(d>=acc&&(d<=acc+lens[i]||i===els.length-1)){ var q=els[i].getPointAtLength(seg); t.setAttribute("transform","translate("+q.x+","+(q.y-24)+")"); } acc+=lens[i]; }
+  function sails(list,done){ var g=$("ship"); g.innerHTML=""; var mx=0;
+    list.forEach(function(f){ f.t=mk("g",{}); f.t.appendChild(mk("text",{"font-size":64,"text-anchor":"middle","dominant-baseline":"central"},"🚢")); if(f.emoji) f.t.appendChild(mk("text",{y:-46,"font-size":34,"text-anchor":"middle","dominant-baseline":"central"},f.emoji)); g.appendChild(f.t);
+      f.lens=f.els.map(function(e){ return e.getTotalLength(); }); f.tot=f.lens.reduce(function(a,b){ return a+b; },0); mx=Math.max(mx,f.tot);
+      f.els.forEach(function(e,i){ e.style.strokeDasharray=f.lens[i]; e.style.strokeDashoffset=f.lens[i]; }); });
+    var t0=performance.now(), dur=Math.max(1400,mx*2.4); cancelAnimationFrame(raf);
+    (function step(now){ var k=Math.min(1,(now-t0)/dur);
+      list.forEach(function(f){ var d=k*f.tot, acc=0, els=f.els, lens=f.lens;
+        for(var i=0;i<els.length;i++){ var seg=Math.max(0,Math.min(lens[i],d-acc)); els[i].style.strokeDashoffset=lens[i]-seg; if(d>=acc&&(d<=acc+lens[i]||i===els.length-1)){ var q=els[i].getPointAtLength(seg); f.t.setAttribute("transform","translate("+q.x+","+(q.y-24)+")"); } acc+=lens[i]; } });
       if(k<1) raf=requestAnimationFrame(step); else if(done) done(); })(t0); }
+  function sail(els,emoji,done){ sails([{els:els,emoji:emoji}],done); }
+  function dim(els){ els.forEach(function(e){ e.setAttribute("opacity",.3); e.setAttribute("stroke-dasharray","4 16"); e.removeAttribute("marker-end"); }); }
   function chips(arr,cur,fn){ var bar=$("mapBar"); bar.innerHTML=""; var seg=document.createElement("div"); seg.className="seg"; seg.setAttribute("role","group");
     arr.forEach(function(a){ var b=document.createElement("button"); b.textContent=a[1]; b.setAttribute("aria-pressed",a[0]===cur?"true":"false"); b.onclick=function(){ fn(a[0]); }; seg.appendChild(b); }); bar.appendChild(seg); return bar; }
   function say(kind,html,small){ var k=$("mKind"); k.classList.toggle("hidden",!kind); if(kind){ k.className="kind "+kind; k.textContent=kind==="ex"?"수출":"수입"; } $("mSay").innerHTML=html; $("mSmall").textContent=small||""; }
@@ -217,11 +225,32 @@ text.amt{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;paint-order:s
     $("prod").textContent=p[2]; $("prod").className="prod"+(blocked?" off":"");
     $("parts").innerHTML=""; p[3].forEach(function(it){ var b=document.createElement("button"), key=it[2]+it[1]; b.className="part"+(off[key]?" off":""); b.innerHTML="<span>"+it[0]+"</span>"+it[1]+" · "+P[it[2]][2]; b.onclick=function(){ off[key]=!off[key]; stopRender(); }; $("parts").appendChild(b); });
     var nm=p[1].replace(/^\S+\s/,"");
-    say(null,blocked?(nm+eul(nm)+' 만들 수 없어요!'):(nm+' 재료는 여러 나라에서 와요.'),blocked?"나라들은 서로 기대어 살아요.":""); }
+    say(null,blocked?(nm+eul(nm)+' 만들 수 없어요!'):(nm+' 재료는 여러 나라에서 와요.'),blocked?"나라들은 서로 기대어 살아요. = 상호 의존":""); }
 
-  /* ───── 5. 문제 풀기 ───── */
+  /* ───── 5. 돕고 겨루고 (상호 의존과 경쟁) ───── */
+  var R={m:"help"};
+  function relSay(cls,label,html,small){ var k=$("mKind"); k.className="kind "+cls; k.textContent=label; $("mSay").innerHTML=html; $("mSmall").textContent=small; }
+  function relRender(go){ go=go===true; clearMap(); var m=R.m, fl=[];
+    chips([["help","🤝 서로 도와요"],["race","🏁 서로 겨뤄요"],["both","🤝🏁 둘 다예요"]],m,function(k){ R.m=k; relRender(); });
+    var b=document.createElement("button"); b.className="btn primary"; b.textContent=m==="race"?"🏁 출발":"🚢 배 띄우기"; b.onclick=function(){ relRender(true); }; $("mapBar").appendChild(b);
+    function add(from,to,kind,emoji,bend){ fl.push({els:drawRoute(from,to,kind,7,bend),emoji:emoji}); }
+    place("kr",-22);
+    if(m==="help"){ place("sa",-22); add("kr","sa","ex","🚗",.22); add("sa","kr","im","🛢️",-.22);
+      relSay("ex","상호 의존",'사우디아라비아는 <b class="im">원유</b>를, 우리나라는 <b class="ex">자동차</b>를 보내요.',"서로 없으면 안 돼요."); }
+    else if(m==="race"){ place("us",-22); place("de",-22); add("kr","us","vs","🚗"); add("de","us","vs","🚗");
+      relSay("vs","경쟁",'우리나라와 독일이 미국에 <b class="vs">자동차</b>를 팔아요.',"더 좋게, 더 싸게 만들려고 겨뤄요."); }
+    else { place("cn",44); place("eu",-22); add("kr","cn","ex","💾",.3); add("cn","kr","im","🔋",-.3); add("kr","eu","vs","",.2); add("cn","eu","vs","",-.12);
+      relSay("both","상호 의존 + 경쟁",'중국은 <b class="ex">돕는</b> 나라이면서 <b class="vs">겨루는</b> 나라예요.',"반도체와 배터리 재료는 주고받아요. 배는 유럽에 서로 팔려고 겨뤄요."); }
+    if(!go){ fl.forEach(function(f){ dim(f.els); }); return; }
+    function end(){ $("ship").innerHTML=""; }
+    if(m!=="both"){ sails(fl,end); return; }
+    var vs=fl.slice(2); vs.forEach(function(f){ dim(f.els); });
+    sails(fl.slice(0,2),function(){ vs.forEach(function(f){ f.els.forEach(function(e){ e.setAttribute("opacity",.9); e.removeAttribute("stroke-dasharray"); e.setAttribute("marker-end","url(#ahVs)"); }); }); sails(vs,end); }); }
+
+  /* ───── 6. 문제 풀기 ───── */
   var QS=[["우리나라 자동차를 미국에 팔아요.","수출",["수출","수입"]],["사우디아라비아에서 원유를 사 와요.","수입",["수출","수입"]],["우리나라 반도체를 중국에 팔아요.","수출",["수출","수입"]],["오스트레일리아에서 천연가스를 사 와요.","수입",["수출","수입"]],["미국에서 밀을 사 와요.","수입",["수출","수입"]],["우리나라 배(선박)를 다른 나라에 팔아요.","수출",["수출","수입"]],
-    ["나라와 나라가 물건을 사고파는 것은?","무역",["무역","여행","저축"]],["2025년 우리나라가 가장 많이 판 것은?","반도체",["반도체","쌀","원유"]],["우리나라에서 거의 나지 않아 사 와야 하는 것은?","원유",["원유","반도체","자동차"]],["다른 나라에 물건을 파는 것은?","수출",["수출","수입"]],["다른 나라에서 물건을 사 오는 것은?","수입",["수출","수입"]],["나라마다 많이 나는 것이 달라서 하는 것은?","무역",["무역","방학","운동"]]];
+    ["나라와 나라가 물건을 사고파는 것은?","무역",["무역","여행","저축"]],["2025년 우리나라가 가장 많이 판 것은?","반도체",["반도체","쌀","원유"]],["우리나라에서 거의 나지 않아 사 와야 하는 것은?","원유",["원유","반도체","자동차"]],["다른 나라에 물건을 파는 것은?","수출",["수출","수입"]],["다른 나라에서 물건을 사 오는 것은?","수입",["수출","수입"]],["나라마다 많이 나는 것이 달라서 하는 것은?","무역",["무역","방학","운동"]],
+    ["우리나라와 독일이 미국에 자동차를 팔려고 해요.","경쟁",["상호 의존","경쟁"]],["우리는 원유를 사 오고, 그 나라는 우리 자동차를 사 가요.","상호 의존",["상호 의존","경쟁"]],["두 나라가 더 좋은 휴대 전화를 만들어 팔려고 해요.","경쟁",["상호 의존","경쟁"]],["밀이 오지 않으면 라면을 만들 수 없어요.","상호 의존",["상호 의존","경쟁"]]];
   var Q={order:[],i:0,score:0,done:false};
   function shuf(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)),t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
   function quizStart(){ Q.order=shuf(QS).slice(0,8); Q.i=0; Q.score=0; quizRender(); }
@@ -236,13 +265,13 @@ text.amt{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;paint-order:s
   $("qNext").onclick=function(){ Q.i++; quizRender(); };
 
   /* ───── 탭 ───── */
-  var TAG={why:"왜 무역을 할까요?",exim:"파는 것과 사 오는 것",korea:"2025년 우리나라",stop:"길이 막히면 어떻게 될까요?",quiz:"확인해 봐요"};
+  var TAG={why:"왜 무역을 할까요?",exim:"파는 것과 사 오는 것",korea:"2025년 우리나라",stop:"길이 막히면 어떻게 될까요?",rel:"상호 의존과 경쟁",quiz:"확인해 봐요"};
   function setTab(t){ Array.prototype.forEach.call($("tabs").children,function(b){ b.setAttribute("aria-selected",b.dataset.t===t?"true":"false"); });
-    var map=(t==="exim"||t==="korea"||t==="stop");
+    var map=(t==="exim"||t==="korea"||t==="stop"||t==="rel");
     $("p-why").classList.toggle("hidden",t!=="why"); $("p-map").classList.toggle("hidden",!map); $("p-quiz").classList.toggle("hidden",t!=="quiz");
     $("koreaBox").classList.toggle("hidden",t!=="korea"); $("stopBox").classList.toggle("hidden",t!=="stop");
     $("tagline").textContent=TAG[t]; cancelAnimationFrame(raf);
-    if(t==="why") whyRender(); else if(t==="exim") eximRender(); else if(t==="korea") koreaRender(); else if(t==="stop"){ off={}; stopRender(); } else quizStart(); }
+    if(t==="why") whyRender(); else if(t==="exim") eximRender(); else if(t==="korea") koreaRender(); else if(t==="stop"){ off={}; stopRender(); } else if(t==="rel") relRender(); else quizStart(); }
   Array.prototype.forEach.call($("tabs").children,function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
   setTab("why");
 })();
