@@ -115,3 +115,25 @@
 
 /* 📌 약속: 약속 카드 파일을 불러온다(카드가 있는 앱에만 단추가 생김) */
 (function(){ try{ if(/yaksok/.test(location.pathname)) return; var s=document.createElement('script'); s.src='yaksok.js'; document.head.appendChild(s); }catch(e){} })();
+
+/* 🔖 파비콘: 앱마다 같은 아이콘을 붙인다(목록·약속 모음은 html에 직접 들어 있음) */
+(function(){ try{ if(document.querySelector('link[rel~="icon"]')) return; var h=document.head;
+  [['icon','favicon.svg','image/svg+xml'],['icon','favicon-32.png','image/png'],['apple-touch-icon','apple-touch-icon.png','']].forEach(function(a){ var l=document.createElement('link'); l.rel=a[0]; l.href=a[1]; if(a[2]) l.type=a[2]; h.appendChild(l); }); }catch(e){} })();
+
+/* 📱 폰에서 위아래로 밀기: 그림판(canvas)은 손가락 끌기를 통째로 가져가게(touch-action:none) 되어 있어서, 그림 위에서 밀면 화면이 안 내려갔다.
+   그림을 끌어서 쓰는 화면(입체 돌리기, 사각형 만들기, 각 재기)이 아닐 때는 위아래 밀기를 화면 넘기기로 돌려준다. 누르기(탭)는 그대로 된다.
+   앱이 window.needDrag()를 두면 그 값을 따른다. */
+(function(){
+  var cv=document.querySelector('canvas'); if(!cv||typeof window.D3==='undefined') return;
+  var page=(location.pathname.split('/').pop()||'').replace(/\.html$/,'');
+  function need(){ try{
+    if(typeof window.needDrag==='function') return !!window.needDrag();
+    if(window.D3&&!(typeof window.noDrag==='function'&&window.noDrag())) return true;
+    if(page==='quad4'&&window.tab==='make') return true;
+    if(page==='angle4'&&window.tab==='meas') return true;
+  }catch(e){ return true; } return false; }
+  function upd(){ var n=need(); cv.style.touchAction=n?'none':'pan-y'; cv.style.cursor=n?'':'default'; }
+  function later(){ setTimeout(upd,0); }
+  ['click','input','change','pointerup','keyup'].forEach(function(t){ document.addEventListener(t,later,true); });
+  upd();
+})();
